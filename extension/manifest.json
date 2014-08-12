@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+
+  "name": "Chrome Experience Sampling",
+  "description": "This extension shows periodic surveys to participating Chrome users about features we're studying.",
+  "version": "1.0",
+
+  "browser_action": {
+    "default_icon": "icon.png"
+  },
+
+  "background": {
+    "scripts": ["eventPage.js"],
+    "persistent": false
+  },
+
+  "permissions": [
+    "experienceSamplingPrivate",
+    "notifications",
+    "storage",
+    "alarms"
+  ]
+}
