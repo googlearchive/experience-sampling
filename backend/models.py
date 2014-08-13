@@ -1,16 +1,9 @@
-"""TODO(cthomp): DO NOT SUBMIT without one-line documentation for models.
+"""AppEngine Datastore models for the Chrome Experience Sampling backend.
 
-TODO(cthomp): DO NOT SUBMIT without a detailed description of models.
+These classes define the data models for form and survey responses.
 """
 
 from google.appengine.ext import ndb
-
-
-class ConsentForm(ndb.Model):
-  """Models a response to the consent form"""
-  legal_name = ndb.StringProperty()
-  date_signed = ndb.StringProperty()
-  date_received = ndb.DateTimeProperty(auto_now_add=True)
 
 
 class Response(ndb.Model):

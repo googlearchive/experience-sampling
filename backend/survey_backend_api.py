@@ -1,20 +1,16 @@
-"""Chrome Experience Sampling backend API
+"""Chrome Experience Sampling backend API.
 
-Implemented using Google Cloud Endpoints.
+Implemented using Google Cloud Endpoints for App Engine.
 """
 
 import endpoints
-import webapp2
-from protorpc import messages
 from protorpc import message_types
+from protorpc import messages
 from protorpc import remote
-from google.appengine.ext import ndb
-from google.appengine.api import users
-
-import json
-import logging
 
 import models
+
+from google.appengine.api import users
 
 package = 'ChromeExperienceSampling'
 
@@ -23,9 +19,11 @@ class Response(messages.Message):
   question = messages.StringField(1, required=True)
   answer = messages.StringField(2, required=True)
 
+
 def response_model_to_msg(model):
   return Response(question=model.question,
                   answer=model.answer)
+
 
 def response_msg_to_model(msg):
   return models.Response(question=msg.question,
@@ -37,10 +35,12 @@ class Survey(messages.Message):
   date = message_types.DateTimeField(2, required=True)
   responses = messages.MessageField(Response, 3, repeated=True)
 
+
 def survey_model_to_msg(model):
   return Survey(participant_id=model.participant_id,
                 date=model.date_taken,
                 responses=map(response_model_to_msg, model.responses))
+
 
 def survey_msg_to_model(msg):
   return models.Survey(participant_id=msg.participant_id,
@@ -69,9 +69,9 @@ class ExperienceSamplingApi(remote.Service):
                     path='getsurveys', http_method='GET',
                     name='cesp.getSurveys')
   def surveys_list(self, unused_request):
-    # AUTHORIZATION: Must be admin user to access this endpoint. 
-    #if not users.is_current_user_admin():
-    #  raise endpoints.UnauthorizedException('Administrative access required.')
+    # AUTHORIZATION: Must be admin user to access this endpoint.
+    if not users.is_current_user_admin():
+      raise endpoints.UnauthorizedException('Administrative access required.')
 
     # Get all surveys from the datastore.
     surveys = models.Survey.query().fetch()

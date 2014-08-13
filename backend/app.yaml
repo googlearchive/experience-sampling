@@ -5,9 +5,6 @@ threadsafe: true
 api_version: 1
 
 handlers:
-# webapp2 handler for homepage
-#- url: /
-  #script: home.APPLICATION
 # Endpoints handler
 - url: /_ah/spi/.*
   script: survey_backend_api.APPLICATION
