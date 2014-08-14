@@ -59,7 +59,7 @@ class ExperienceSamplingApi(remote.Service):
 
   @endpoints.method(Survey, message_types.VoidMessage,
                     path='submitsurvey', http_method='POST',
-                    name='cesp.submitSurvey')
+                    name='submitSurvey')
   def survey_submit(self, request):
     survey = survey_msg_to_model(request)
     survey.put()
@@ -67,7 +67,7 @@ class ExperienceSamplingApi(remote.Service):
 
   @endpoints.method(message_types.VoidMessage, SurveyCollection,
                     path='getsurveys', http_method='GET',
-                    name='cesp.getSurveys')
+                    name='getSurveys')
   def surveys_list(self, unused_request):
     # AUTHORIZATION: Must be admin user to access this endpoint.
     if not users.is_current_user_admin():
