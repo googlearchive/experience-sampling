@@ -3,10 +3,7 @@
 These classes define the data models for form and survey responses.
 """
 
-from messages import SurveyType
-
 from google.appengine.ext import ndb
-from google.appengine.ext.ndb import msgprop
 
 package = 'ChromeExperienceSampling'
 
@@ -22,8 +19,7 @@ class ResponseModel(ndb.Model):
 
 
 class SurveyModel(ndb.Model):
-  survey_type = msgprop.EnumProperty(SurveyType,
-                                     indexed=True)
+  survey_type = ndb.StringProperty(indexed=True)
   participant_id = ndb.IntegerProperty(indexed=True)
   date_taken = ndb.DateTimeProperty()
   date_received = ndb.DateTimeProperty(auto_now_add=True)

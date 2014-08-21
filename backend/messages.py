@@ -14,13 +14,8 @@ class ResponseMessage(messages.Message):
   answer = messages.StringField(2, required=True)
 
 
-class SurveyType(messages.Enum):
-  DEMOGRAPHICS = 1
-  SURVEY = 2
-
-
 class SurveyMessage(messages.Message):
-  survey_type = messages.EnumField(SurveyType, 1, default='SURVEY')
+  survey_type = messages.StringField(1, required=True)
   participant_id = messages.IntegerField(2, required=True)
   date_taken = message_types.DateTimeField(3, required=True)
   responses = messages.MessageField(ResponseMessage, 4, repeated=True)

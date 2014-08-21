@@ -7,20 +7,22 @@ Alternately, this can export the data from Datastore into a Spreadsheet in the
 admin's Google Drive.
 """
 
-import site
-site.addsitedir("lib")
-
-import cloudstorage as gcs
+import datetime
 import gc
 import json
+import site
 import time
+
+site.addsitedir('lib')
+
+import cloudstorage as gcs
 import webapp2
 
 from models import SurveyModel
 
 from google.appengine.api import taskqueue
-from google.appengine.ext import ndb
 
+package = 'ChromeExperienceSampling'
 
 EXPORT_PAGE_HTML = """\
 <html>
@@ -33,7 +35,17 @@ EXPORT_PAGE_HTML = """\
 """
 
 
+class ModelEncoder(json.JSONEncoder):
+  """Some property types don't encode to JSON, so we explicitly handle them."""
+
+  def default(self, obj):
+    if isinstance(obj, datetime.datetime):
+      return obj.isoformat()
+    return json.JSONEncoder.default(self, obj)
+
+
 class ExportPage(webapp2.RequestHandler):
+
   def get(self):
     self.response.write(EXPORT_PAGE_HTML)
 
@@ -43,25 +55,30 @@ class ExportPage(webapp2.RequestHandler):
                   params={'filename': self.request.get('filename')})
     self.redirect('/export')
 
+
 class ExportWorker(webapp2.RequestHandler):
+
   def post(self):
-    bucket_name = "default"
+    bucket_name = 'survey_responses'
     filename = self.request.get('filename')
     if not filename:
       time_string = time.strftime('%Y_%m_%d_%H%M%S_%Z')
-      filename = '.'.join(['chrome-experience-sampling', time_string, 'csv'])
+      filename = '.'.join(['surveys', time_string, 'json'])
 
     def export_data(filename):
-      with gcs.open("/" + bucket_name + "/" + filename, 'w') as f:
+      with gcs.open('/' + bucket_name + '/' + filename, 'w') as f:
         query = SurveyModel.query()
         cursor = None
         more = True
+        delim = ''
         while more:
           records, cursor, more = query.fetch_page(50, start_cursor=cursor)
           gc.collect()
           for record in records:
-            f.write(json.dumps(record.to_dict()))
-    
+            f.write(delim)
+            f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+          delim = ',\n'
+
     export_data(filename)
 
 APPLICATION = webapp2.WSGIApplication([
