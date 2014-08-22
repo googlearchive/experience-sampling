@@ -14,11 +14,10 @@ import site
 import time
 
 site.addsitedir('lib')
-
 import cloudstorage as gcs
-import webapp2
 
 from models import SurveyModel
+import webapp2
 
 from google.appengine.api import taskqueue
 
@@ -45,10 +44,9 @@ class ModelEncoder(json.JSONEncoder):
 
 
 class ExportPage(webapp2.RequestHandler):
-  """Serves a form for administrators to add a taskqueue job to export data
-  from the Datastore to Cloud Storage."""
+  """Serves a form to add a taskqueue job to export data."""
 
-def get(self):
+  def get(self):
     self.response.write(EXPORT_PAGE_HTML)
 
   def post(self):
@@ -66,7 +64,7 @@ class ExportWorker(webapp2.RequestHandler):
   them one at a time to the export file in order to minimize memory usage.
   """
 
-def post(self):
+  def post(self):
     bucket_name = 'survey_responses'
     filename = self.request.get('filename')
     if not filename:
