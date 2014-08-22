@@ -45,20 +45,28 @@ class ModelEncoder(json.JSONEncoder):
 
 
 class ExportPage(webapp2.RequestHandler):
+  """Serves a form for administrators to add a taskqueue job to export data
+  from the Datastore to Cloud Storage."""
 
-  def get(self):
+def get(self):
     self.response.write(EXPORT_PAGE_HTML)
 
   def post(self):
-    # Add a task to export the data to Cloud Storage.
     taskqueue.add(url='/export/worker',
                   params={'filename': self.request.get('filename')})
     self.redirect('/export')
 
 
 class ExportWorker(webapp2.RequestHandler):
+  """Taskqueue worker to do the Datastore to Cloud Storage export.
 
-  def post(self):
+  Can optionally take in a filename to use for the file in Cloud Storage.
+  If not specified, it will use a default name plus the date and time.
+  Repeatedly queries for more SurveyModel items from the Datastore, appending
+  them one at a time to the export file in order to minimize memory usage.
+  """
+
+def post(self):
     bucket_name = 'survey_responses'
     filename = self.request.get('filename')
     if not filename:
@@ -85,5 +93,5 @@ APPLICATION = webapp2.WSGIApplication([
     ('/export/', ExportPage),
     ('/export', ExportPage),
     ('/export/worker', ExportWorker)
-], debug=True)
+])
 
