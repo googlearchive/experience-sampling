@@ -9,6 +9,20 @@ handlers:
 - url: /_ah/spi/.*
   script: survey_backend_api.APPLICATION
 
+# Data export
+- url: /export($|/.*$)
+  script: export.APPLICATION
+  secure: always
+  login: admin
+
 libraries:
 - name: endpoints
   version: latest
+- name: webapp2
+  version: latest
+
+admin_console:
+  pages:
+  - name: Data Export
+    url: /export
+
