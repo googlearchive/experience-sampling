@@ -2,67 +2,96 @@
 <head>
 <title>Consent to Participate</title>
 <link rel="stylesheet" type="text/css" href="consent.css">
+<script src="constants.js"></script>
+<script src="consent.js"></script>
 </head>
 
 <body>
-<div id="study-title">
-<h1>
-User study - Chrome Experience Sampling Study informed consent [DRAFT]
-</h1>
-</div>
+  <div id="consent-text">
+    <div id="study-title" class="centered">
+      <h1>Informed consent for Safe Browsing Study</h1>
+      <p id="thank-you" class="hidden alert">
+        <b>Thank you for agreeing to participate in this study!</b>
+      </p>
+    </div>
 
-<div id="study-information">
-<h3>Purpose of this research project:</h3>
-<p>The goal of the current study is to &lt;goals of study&gt;.</p>
+    <div id="study-information" class="hidden centered">
+      <p>Thank you for your participation in our research study. It is being
+      conducted by members of the Chrome team at Google Inc ("Google").</p>
 
-<h3>What you will do during the study</h3>
-If you agree to take part in this study you will be asked to &lt;insert summary of study activities&gt;.
-The study will last approximately 30 days.
+      <h3>Purpose of the study</h3>
+      <p>We are looking to better understand how people interpret and interact
+      with security warnings in Chrome.</p>
 
-<h3>What are the risks associated with this study?</h3>
-There are no known risks involved in this study beyond what users normally face when using a computer.
-Some additional information about your browsing and interactions with Chrome will be sent to Google,
-solely for the purposes of this study.
+      <h3>Procedure</h3>
+      <p>You will be required to install a Chrome browser extension (small
+      piece of software) in the Chrome browser on your home computer. The
+      browser extension will detect when you've been shown a security warning
+      while browsing so that we can ask you to answer some simple questions
+      about your response to the warning. We would like to run the study over a
+      period of four months. During this time, we do not expect you to change
+      your normal web browsing behavior. The number of surveys that you are
+      shown will depend on how often you encounter security warnings during
+      your normal browsing. Google may update the extension from time to time
+      to change the available survey questions. We expect that each survey will
+      take 2-3 minutes to complete. Upon conclusion of the study, we will
+      remove the extension from your computer.</p>
 
-<h3>What are the benefits associated with this study?</h3>
-You may not benefit directly from participating in this study.
-However, we hope that what we learn from this study can be used to improve the Chrome browser.
+      <h3>Potential Risks</h3>
+      <p>Each browser extension will contain an anonymous identifier to enable
+      us to group survey responses from a single participant. If you provide
+      identifying information in response to any of the survey questions, then
+      Google may know personal information about you and will be able to
+      associate it with your other responses in the study. You should only
+      provide information that you are comfortable sharing with Google.
+      Otherwise, there are no special risks associated with the study beyond
+      the risks posed by normal internet usage.</p>
 
-<h3>Incentive</h3>
-As per our recruitment materials, this is a non-compensated volunteer study.
+      <h3>Privacy and Confidentiality</h3>
+      <p>All information provided during the study will remain confidential
+      within Google. All logged data will be stored on a secure Google server
+      accessible only to the researchers involved in this study. Any
+      information that is obtained in connection with this study and could
+      identify you will remain confidential within Google. Google may, however,
+      publish the results of this study along with data collected from the
+      study in an aggregated, anonymized form.</p>
 
-<h3>Voluntary Participation</h3>
-Participation in this study is voluntary.
-You may withdraw from this study at any time, and for any reason, without penalty.
-The researchers also have the right to end the study at any time.
+      <h3>Data Use</h3>
+      <p>The survey responses that you provide to Google will be used to
+      improve Google's products and services.</p>
 
-<h3>Confidentiality</h3>
-The researchers will attempt to keep your participation in this study confidential.
-We will try to hide your identity by using a participant number instead of your name on the data we collect and in our reports, but your identity may become known from the aggregated data or if required by law. 
-The data collected will be used by internal Google teams for the purposes of product improvement and research.
+      <h3>Participation and Withdrawal</h3>
+      <p>Your participation in this research study is voluntary and you may
+      withdraw at any time. You may remove the study extension at any time by
+      following these instructions. Any survey responses that you have already
+      submitted will continue to be part of the study data.</p>
 
-<h3>Questions about this study</h3>
-If you have questions, contact Rob Reeder, Research Scientist at rreeder@google.com.  
+      <h3>Identification of Investigators</h3>
+      <p>If you have any questions or concerns about the research, please feel
+      free to contact:<br>Rob Reeder, chrome-experience-sampling@google.com.</p>
+    </div>
+  </div>
 
-<h3>Consent</h3>
-Marking your consent means that you understand the information in this form and that you agree to participate in the research described above.
+  <div id="consent-form-holder" class="hidden">
+    <form name="consent-form">
+      <fieldset id="terms">
+        <input type="radio" name="consent" value="yes" required /> I acknowledge that I have read this informed consent and agree to the terms
+        <br>
+        <input type="radio" name="consent" value="no" /> I acknowledge that I have read this informed consent and do NOT agree to the terms
+      </fieldset>
 
-If you do not agree to participate, you may close this page and the extension will be uninstalled.
-</div>
+      <fieldset id="submit">
+        <input type="submit" value="Sign form and submit" id="submit-button" />
+      </fieldset>
+    </form>
+    <div id="set-value" class="hidden alert">Please select a form response</div>
+  </div>
 
-<div id="consent-form">
-<form>
-<fieldset>
-  <legend>I agree to have details of my interactions with Chrome and my survey responses recorded.</legend>
-  <input type="radio" name="consent" value="yes" required />Yes<br />
-  <input type="radio" name="consent" value="no" />No
-</fieldset>
-
-<fieldset class="submit">
-  <input type="submit" value="Sign form and submit" />
-</fieldset>
-</form>
-</div>
+  <div id="retract-consent" class="hidden alert centered">
+    <p>You previously signed this consent form. If you no longer want to
+    participate, you should <a href="chrome://extensions">uninstall this
+    extension</a>.</p>
+  </div>
 
 </body>
 </html>
