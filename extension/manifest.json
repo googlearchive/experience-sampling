@@ -20,5 +20,7 @@
     "storage",
     "alarms",
     "https://chrome-experience-sampling.appspot.com/_ah/api/*"
-  ]
+  ],
+
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAm59Ynx+zRFTGluBKpTEDEIbF3BAYIlEjvA1+6G817fjYGtTZKCLROOXTF8Yp8iEzdp2pvUcR5nAReB4zysBNlSDYbjqgikCvnBLh5j8KJi116LfNymOJ2NrG8NoM0W+k83+OFj1qlVCcHvQo6GUqGQOCcFGLLu+WhAC1XG9Daai/x663F4a9pozMGWeAuHs0owU9SrNKIbxDD8VYFcCQAwUzSeuFLtCocDmVtIj1LCCpNMFmaIa7AuFJzVvEZdAInAeB8OvHJfeUB7woQoOuIllOdeAKPJZ1GC7hA1EvE+fzPBsxyHk0ZPVY52OREz8z70NBOYIJ9cYsqBCjGgNBNwIDAQAB"
 }
