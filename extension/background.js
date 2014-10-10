@@ -79,7 +79,7 @@ chrome.runtime.onStartup.addListener(getConsentStatus);
  * Creates a new HTML5 notification to prompt the participant to take an
  * experience sampling survey.
  * @param {object} element The browser element of interest.
- * @param {object{ decision The decision the participant made.
+ * @param {object} decision The decision the participant made.
  */
 function showSurveyPrompt(element, decision) {
   if (!cesp.readyForSurveys) return;
