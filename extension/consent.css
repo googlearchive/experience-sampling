@@ -1,14 +1,34 @@
-body {
-  padding: 2em;
-}
-  
-#study-information {
-  -webkit-column-count: 2; 
-  -webkit-column-rule: 1px solid #bbb;
-  -webkit-column-gap: 2em;
+@font-face {
+  font-family: 'OpenSans';
+  font-weight: normal;
+  src: url(
+    'chrome-extension://__MSG_@@extension_id__/open-sans/OpenSans-Regular.ttf');
 }
 
-#consent-form {
+@font-face {
+  font-family: 'OpenSans';
+  font-weight: bold;
+  src: url(
+    'chrome-extension://__MSG_@@extension_id__/open-sans/OpenSans-Bold.ttf');
+}
+
+.alert {
+  color: red;
+  font-weight: bold;
+}
+
+body {
+  padding: 2em;
+  font-family: 'OpenSans';
+  font-size: .9em;
+}
+  
+.centered {
+  margin: 0 auto;
+  width: 800px;
+}
+
+#consent-form-holder {
   margin-left: auto;
   margin-right: auto;
   width: 60%;
@@ -25,3 +45,14 @@ fieldset.submit {
   text-align: center;
 }
 
+.hidden {
+  display: none;
+}
+
+#set-value {
+  text-align: center;
+}
+
+#study-title {
+  text-align: center;
+}
