@@ -49,6 +49,10 @@ fieldset.submit {
   text-align: center;
 }
 
+label {
+  padding-left: 5px;
+}
+
 legend {
   font-weight: bold;
   padding-bottom: .3em;
