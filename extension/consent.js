@@ -4,7 +4,6 @@
 
 var consentForm = {};  // Namespace variable
 
-consentForm.CLOSE_TIME =      3600;  // Milliseconds
 consentForm.UNINSTALL_TIME =  200;   // Milliseconds
 
 consentForm.status = constants.CONSENT_PENDING;
@@ -58,14 +57,8 @@ function consentFormSubmitted(event) {
   console.log('Consent form submitted: ' + consentRadio.value);
   if (consentRadio.value == 'yes') {
     setConsentStorageValue(constants.CONSENT_GRANTED);
-    $('thank-you').classList.remove('hidden');
     $('consent-form-holder').classList.add('hidden');
-    setTimeout(window.close, consentForm.CLOSE_TIME);
-    // TODO(felt): Remove the SETUP stuff. Just here because the setup survey
-    // isn't implemented yet.
-    var items = {};
-    items[constants.SETUP_KEY] = constants.SETUP_COMPLETED;
-    chrome.storage.local.set(items);
+    window.location.href = 'surveys/setup.html';
   } else if (consentRadio.value == 'no') {
     setConsentStorageValue(constants.CONSENT_REJECTED);
     $('consent-form-holder').classList.add('hidden');
