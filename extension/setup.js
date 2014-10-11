@@ -3,7 +3,7 @@
  */
 
 var setupSurvey = {};  // Namespace variable
-setupSurvey.CLOSE_TIME = 3600;  // One minute.
+setupSurvey.CLOSE_TIME = 3000;  // Half a minute, in milliseconds
 setupSurvey.status = constants.SETUP_PENDING;
 
 /**
