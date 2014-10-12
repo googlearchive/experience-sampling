@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'OpenSans';
+  font-weight: normal;
+  src: url(
+    'chrome-extension://__MSG_@@extension_id__/open-sans/OpenSans-Regular.ttf');
+}
+
+@font-face {
+  font-family: 'OpenSans';
+  font-weight: bold;
+  src: url(
+    'chrome-extension://__MSG_@@extension_id__/open-sans/OpenSans-Bold.ttf');
+}
+
+.alert {
+  color: #DB4437;
+}
+
+body {
+  color: #656565;
+  padding: 2em;
+  font-family: 'OpenSans';
+  font-size: .9em;
+}
+
+.centered {
+  margin: 0 auto;
+  width: 800px;
+}
+
+.fieldset {
+  background-color: #ECF3FE;
+  border: none;
+  margin-bottom: 1em;
+  padding: 8px;
+}
+
+fieldset.submit {
+  background-color: none;
+  border: none;
+  text-align: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.inner-centering {
+  text-align: center;
+}
+
+label {
+  padding-left: 5px;
+}
+
+legend {
+  font-weight: bold;
+  padding-bottom: .3em;
+}
+
+#survey-container {
+  padding-top: 30px;
+}

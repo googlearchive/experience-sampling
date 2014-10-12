@@ -51,11 +51,15 @@ function maybeShowConsentForm(consentLookup) {
  * Checks whether the setup survey has been completed yet. If it has been, we
  * are now ready to start showing surveys. If not, we need to listen for
  * when it's completed.
- * @param {object} surveyLookup Object containing survey status (or empty).
+ * @param {object} setupLookup Object containing setup survey status (or empty).
  */
-function maybeShowSetupSurvey(surveyLookup) {
-  // TODO(felt): Do this check for real.
-  cesp.readyForSurveys = true;
+function maybeShowSetupSurvey(setupLookup) {
+  if (!setupLookup || setupLookup[constants.SETUP_KEY] == null ||
+      setupLookup[constants.SETUP_KEY] == constants.SETUP_PENDING) {
+    chrome.tabs.create({'url': chrome.extension.getURL('surveys/setup.html')});
+  } else if (setupLookup[constants.SETUP_KEY] == constants.SETUP_COMPLETED) {
+    cesp.readyForSurveys = true;
+  }
 }
 
 /**
