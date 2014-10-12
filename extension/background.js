@@ -13,6 +13,7 @@ var cesp = {};  // namespace variable
 cesp.readyForSurveys = false;
 
 // Settings.
+cesp.serverURL = "https://chrome-experience-sampling.appspot.com/";
 cesp.notificationTitle = "New survey available";
 cesp.notificationBody = "Click here to take a survey about the screen you just"
                         + "saw";
@@ -116,3 +117,60 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 // Trigger the new survey prompt when the participant makes a decision about an
 // experience sampling element.
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
+
+var Response = function(question, answer) {
+  /**
+   * A survey response (question and answer).
+   * @constructor
+   * @param {string} question The question being answered.
+   * @param {string} answer The answer to that question.
+   */
+  this.question = question;
+  this.answer = answer;
+}
+
+var Survey = function(type, participantId, dateTaken, responses) {
+  /**
+   * A completed survey.
+   * @constructor
+   * @param {string} type The type of survey.
+   * @param {int} participantId The participant ID.
+   * @param {Date} dateTaken The date and time when the survey was taken.
+   * @param {Array.Response} responses An array of Response objects.
+  */
+  this.type = type;
+  this.participantId = participantId;
+  this.dateTaken = dateTaken;
+  this.responses = responses;
+};
+
+function sendSurvey(survey) {
+  /**
+   * Sends a survey to the CESP backend via XHR.
+   * @param {Survey} survey The completed survey to send to the backend.
+   */
+  var url = cesp.serverURL + "/_ah/api/cesp/v1/submitsurvey";
+  var method = "POST";
+  var dateTaken = survey.dateTaken.toISOString();
+  // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
+  if (dateTaken.slice(-1) == "Z") {
+    dateTaken = dateTaken.slice(0, -1);
+  }
+  var data = {
+    "date_taken": dateTaken,
+    "participant_id": survey.participantId,
+    "responses": [],
+    "survey_type": survey.type
+  };
+  console.log(survey.responses);
+  for (i in survey.responses) {
+    console.log(survey.responses[i]);
+    data.responses.push(survey.responses[i]);
+  };
+  var xhr = new XMLHttpRequest();
+  function responseListener() { console.log(this.responseText); /* handle response */ }
+  xhr.onload = responseListener;
+  xhr.open(method, url, true);
+  xhr.setRequestHeader('Content-Type', 'application/JSON');
+  xhr.send(JSON.stringify(data));
+}
