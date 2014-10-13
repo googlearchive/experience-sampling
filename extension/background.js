@@ -172,7 +172,8 @@ function sendSurvey(survey, successCallback, errorCallback) {
     "responses": [],
     "survey_type": survey.type
   };
-  for (i in survey.responses) {
+  var l = survey.responses.length;
+  for (var i = 0; i < l; i++) {
     data.responses.push(survey.responses[i]);
   };
   var xhr = new XMLHttpRequest();
