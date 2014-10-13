@@ -165,7 +165,7 @@ function sendSurvey(survey, successCallback, errorCallback) {
   // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
   if (dateTaken.slice(-1) === "Z") {
     dateTaken = dateTaken.slice(0, -1);
-  };
+  }
   var data = {
     "date_taken": dateTaken,
     "participant_id": survey.participantId,
@@ -174,7 +174,7 @@ function sendSurvey(survey, successCallback, errorCallback) {
   };
   for (var i = 0; i < survey.responses.length; i++) {
     data.responses.push(survey.responses[i]);
-  };
+  }
   var xhr = new XMLHttpRequest();
   function onLoadHandler(event) {
     if (xhr.readyState === 4) {
