@@ -127,7 +127,7 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
 var Response = function(question, answer) {
   this.question = question;
   this.answer = answer;
-}
+};
 
 /**
  * A completed survey.
@@ -147,13 +147,21 @@ var Survey = function(type, participantId, dateTaken, responses) {
 /**
  * Sends a survey to the CESP backend via XHR.
  * @param {Survey} survey The completed survey to send to the backend.
+ * @param {function} successCallback A function to call on receiving a
+ *     successful response (HTTP 204). It should look like
+ *     "function(response) {...};" where "response" is the text of the response
+ *     (if there is any).
+ * @param {function} errorCallback A function to call on receiving an error
+ *     from the server, or on timing out. It should look like
+ *     "function(status) {...};" where "status" is an HTTP status code integer,
+ *     if there is one. For a timeout, there is no status.
  */
-function sendSurvey(survey) {
+function sendSurvey(survey, successCallback, errorCallback) {
   var url = cesp.serverURL + "/_ah/api/cesp/v1/submitsurvey";
   var method = "POST";
   var dateTaken = survey.dateTaken.toISOString();
   // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
-  if (dateTaken.slice(-1) == "Z") {
+  if (dateTaken.slice(-1) === "Z") {
     dateTaken = dateTaken.slice(0, -1);
   }
   var data = {
@@ -162,15 +170,30 @@ function sendSurvey(survey) {
     "responses": [],
     "survey_type": survey.type
   };
-  console.log(survey.responses);
   for (i in survey.responses) {
-    console.log(survey.responses[i]);
     data.responses.push(survey.responses[i]);
   };
   var xhr = new XMLHttpRequest();
-  function responseListener() { console.log(this.responseText); /* handle response */ }
-  xhr.onload = responseListener;
+  var onLoadHandler = function(event) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 204) {
+        successCallback(xhr.response);
+      } else {
+        errorCallback(xhr.status);
+      }
+    }
+  }
+  var onErrorHandler = function(event) {
+    errorCallback(xhr.status);
+  }
+  var onTimeoutHandler = function(event) {
+    errorCallback();
+  }
   xhr.open(method, url, true);
   xhr.setRequestHeader('Content-Type', 'application/JSON');
+  xhr.timeout = 4000;
+  xhr.onload = onLoadHandler;
+  xhr.onerror = onErrorHandler;
+  xhr.ontimeout = onTimeoutHandler;
   xhr.send(JSON.stringify(data));
 }
