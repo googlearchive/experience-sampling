@@ -159,7 +159,7 @@ function Survey(type, participantId, dateTaken, responses) {
  *     if there is one. For a timeout, there is no status.
  */
 function sendSurvey(survey, successCallback, errorCallback) {
-  var url = cesp.serverURL + cesp.SUBMIT_SURVEY_ACTION;
+  var url = cesp.SERVER_URL + cesp.SUBMIT_SURVEY_ACTION;
   var method = "POST";
   var dateTaken = survey.dateTaken.toISOString();
   // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
