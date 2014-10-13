@@ -13,7 +13,9 @@ var cesp = {};  // namespace variable
 cesp.readyForSurveys = false;
 
 // Settings.
-cesp.serverURL = "https://chrome-experience-sampling.appspot.com/";
+cesp.SERVER_URL = "https://chrome-experience-sampling.appspot.com";
+cesp.SUBMIT_SURVEY_ACTION = "/_ah/api/cesp/v1/submitsurvey";
+cesp.XHR_TIMEOUT = 4000;
 cesp.notificationTitle = "New survey available";
 cesp.notificationBody = "Click here to take a survey about the screen you just"
                         + "saw";
@@ -124,7 +126,7 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
  * @param {string} question The question being answered.
  * @param {string} answer The answer to that question.
  */
-var Response = function(question, answer) {
+function Response(question, answer) {
   this.question = question;
   this.answer = answer;
 };
@@ -137,7 +139,7 @@ var Response = function(question, answer) {
  * @param {Date} dateTaken The date and time when the survey was taken.
  * @param {Array.Response} responses An array of Response objects.
 */
-var Survey = function(type, participantId, dateTaken, responses) {
+function Survey(type, participantId, dateTaken, responses) {
   this.type = type;
   this.participantId = participantId;
   this.dateTaken = dateTaken;
@@ -147,23 +149,23 @@ var Survey = function(type, participantId, dateTaken, responses) {
 /**
  * Sends a survey to the CESP backend via XHR.
  * @param {Survey} survey The completed survey to send to the backend.
- * @param {function} successCallback A function to call on receiving a
+ * @param {function(string)} successCallback A function to call on receiving a
  *     successful response (HTTP 204). It should look like
  *     "function(response) {...};" where "response" is the text of the response
  *     (if there is any).
- * @param {function} errorCallback A function to call on receiving an error
- *     from the server, or on timing out. It should look like
+ * @param {function(!number=)} errorCallback A function to call on receiving an
+ *     error from the server, or on timing out. It should look like
  *     "function(status) {...};" where "status" is an HTTP status code integer,
  *     if there is one. For a timeout, there is no status.
  */
 function sendSurvey(survey, successCallback, errorCallback) {
-  var url = cesp.serverURL + "/_ah/api/cesp/v1/submitsurvey";
+  var url = cesp.serverURL + cesp.SUBMIT_SURVEY_ACTION;
   var method = "POST";
   var dateTaken = survey.dateTaken.toISOString();
   // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
   if (dateTaken.slice(-1) === "Z") {
     dateTaken = dateTaken.slice(0, -1);
-  }
+  };
   var data = {
     "date_taken": dateTaken,
     "participant_id": survey.participantId,
@@ -174,7 +176,7 @@ function sendSurvey(survey, successCallback, errorCallback) {
     data.responses.push(survey.responses[i]);
   };
   var xhr = new XMLHttpRequest();
-  var onLoadHandler = function(event) {
+  function onLoadHandler(event) {
     if (xhr.readyState === 4) {
       if (xhr.status === 204) {
         successCallback(xhr.response);
@@ -183,15 +185,15 @@ function sendSurvey(survey, successCallback, errorCallback) {
       }
     }
   }
-  var onErrorHandler = function(event) {
+  function onErrorHandler(event) {
     errorCallback(xhr.status);
   }
-  var onTimeoutHandler = function(event) {
+  function onTimeoutHandler(event) {
     errorCallback();
   }
   xhr.open(method, url, true);
   xhr.setRequestHeader('Content-Type', 'application/JSON');
-  xhr.timeout = 4000;
+  xhr.timeout = cesp.XHR_TIMEOUT;
   xhr.onload = onLoadHandler;
   xhr.onerror = onErrorHandler;
   xhr.ontimeout = onTimeoutHandler;
