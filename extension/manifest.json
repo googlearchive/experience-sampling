@@ -5,10 +5,6 @@
   "description": "This extension shows periodic surveys to participating Chrome users about features we're studying.",
   "version": "1.0",
 
-  "browser_action": {
-    "default_icon": "icon.png"
-  },
-
   "background": {
     "scripts": ["constants.js", "background.js"],
     "persistent": false
