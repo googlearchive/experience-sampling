@@ -118,37 +118,37 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 // experience sampling element.
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
 
+/**
+ * A survey response (question and answer).
+ * @constructor
+ * @param {string} question The question being answered.
+ * @param {string} answer The answer to that question.
+ */
 var Response = function(question, answer) {
-  /**
-   * A survey response (question and answer).
-   * @constructor
-   * @param {string} question The question being answered.
-   * @param {string} answer The answer to that question.
-   */
   this.question = question;
   this.answer = answer;
 }
 
+/**
+ * A completed survey.
+ * @constructor
+ * @param {string} type The type of survey.
+ * @param {int} participantId The participant ID.
+ * @param {Date} dateTaken The date and time when the survey was taken.
+ * @param {Array.Response} responses An array of Response objects.
+*/
 var Survey = function(type, participantId, dateTaken, responses) {
-  /**
-   * A completed survey.
-   * @constructor
-   * @param {string} type The type of survey.
-   * @param {int} participantId The participant ID.
-   * @param {Date} dateTaken The date and time when the survey was taken.
-   * @param {Array.Response} responses An array of Response objects.
-  */
   this.type = type;
   this.participantId = participantId;
   this.dateTaken = dateTaken;
   this.responses = responses;
 };
 
+/**
+ * Sends a survey to the CESP backend via XHR.
+ * @param {Survey} survey The completed survey to send to the backend.
+ */
 function sendSurvey(survey) {
-  /**
-   * Sends a survey to the CESP backend via XHR.
-   * @param {Survey} survey The completed survey to send to the backend.
-   */
   var url = cesp.serverURL + "/_ah/api/cesp/v1/submitsurvey";
   var method = "POST";
   var dateTaken = survey.dateTaken.toISOString();
