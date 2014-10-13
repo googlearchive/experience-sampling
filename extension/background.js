@@ -129,7 +129,7 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
 function Response(question, answer) {
   this.question = question;
   this.answer = answer;
-};
+}
 
 /**
  * A completed survey.
@@ -144,7 +144,7 @@ function Survey(type, participantId, dateTaken, responses) {
   this.participantId = participantId;
   this.dateTaken = dateTaken;
   this.responses = responses;
-};
+}
 
 /**
  * Sends a survey to the CESP backend via XHR.
