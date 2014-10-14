@@ -17,6 +17,106 @@ function setSetupStorageValue(newState) {
 }
 
 /**
+ * Adds the questions for the setup survey.
+ * @param {Object} parentNode The DOM node to attach the surveys to.
+ */
+function addQuestions(parentNode) {
+  var age = new Fixed(
+      constants.QuestionType.RADIO,
+      'What is your age?',
+      true,
+      ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
+      false);
+  parentNode.appendChild(age.makeDOMTree());
+
+  var gender = new Fixed(
+      constants.QuestionType.CHECKBOX,
+      'What is your gender?',
+      true,
+      ['Female', 'Male', constants.OTHER],
+      false);
+  parentNode.appendChild(gender.makeDOMTree());
+
+  var source = new Fixed(
+      constants.QuestionType.RADIO,
+      'How did you learn about this study?',
+      true,
+      [
+        'Web advertisement',
+        'Chrome blog',
+        'Social media (Twitter, Facebook, Google+, etc.)',
+        'Word of mouth'
+      ],
+      false);
+  parentNode.appendChild(source.makeDOMTree());
+
+  var source = new Fixed(
+      constants.QuestionType.DROPDOWN,
+      'What state do you live in?',
+      true,
+      [
+        'Alabama',
+        'Alaska',
+        'Arizona',
+        'Arkansas',
+        'California',
+        'Colorado',
+        'Connecticut',
+        'Delaware',
+        'Florida',
+        'Georgia',
+        'Hawaii',
+        'Idaho',
+        'Illinois',
+        'Indiana',
+        'Iowa',
+        'Kansas',
+        'Kentucky',
+        'Louisiana',
+        'Maine',
+        'Maryland',
+        'Massachusetts',
+        'Michigan',
+        'Minnesota',
+        'Mississippi',
+        'Missouri',
+        'Montana',
+        'Nebraska',
+        'Nevada',
+        'New Hampshire',
+        'New Jersey',
+        'New Mexico',
+        'New York',
+        'North Carolina',
+        'North Dakota',
+        'Ohio',
+        'Oklahoma',
+        'Oregon',
+        'Pennsylvania',
+        'Rhode Island',
+        'South Carolina',
+        'South Dakota',
+        'Tennessee',
+        'Texas',
+        'Utah',
+        'Vermont',
+        'Virginia',
+        'Washington',
+        'West Virginia',
+        'Wisconsin',
+        'Wyoming',
+        'District of Columbia',
+        'Puerto Rico',
+        'Guam',
+        'American Samoa',
+        'U.S. Virgin Islands',
+        'Northern Mariana Islands'
+      ],
+      false);
+  parentNode.appendChild(source.makeDOMTree());
+}
+
+/**
  * Sets up the survey form based on the saved survey value.
  * @param {object} savedState Object possibly containing the setup status.
  */
@@ -33,6 +133,8 @@ function setupSurveyForm(savedState) {
     // Show the survey.
     $('explanation').classList.remove('hidden');
     $('survey-container').classList.remove('hidden');
+    addQuestions($('survey-form'));
+    $('survey-form').appendChild(makeSubmitButtonDOM());
     document.forms['survey-form'].addEventListener(
         'submit', setupFormSubmitted);
   } else if (setupSurvey.status == constants.SETUP_COMPLETED) {
