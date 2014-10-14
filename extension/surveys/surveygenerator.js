@@ -129,13 +129,59 @@ ScaleQuestion.prototype.constructor = ScaleQuestion;
 
 // ESSAY
 
-// TODO(felt): Implement and document this.
+/**
+ * Represents free response questions. Currently supports SHORT_STRING,
+ * SHORT_ESSAY and LONG_ESSAY question types.
+ * @param {string} questionType Question presentation (constants.QuestionType).
+ * @param {string} question The question to be asked.
+ * @param {boolean} required Whether the question needs to be answered.
+ */
 function EssayQuestion(questionType, question, required) {
   Question.call(this, questionType, question, required);
 }
 
 EssayQuestion.prototype = Object.create(Question.prototype);
 EssayQuestion.prototype.constructor = EssayQuestion;
+
+/**
+ * Creates the DOM representation of an EssayQuestion.
+ * @return {Object} The DOM node that contains the question.
+ */
+EssayQuestion.prototype.makeDOMTree = function() {
+  var container = document.createElement('div');
+  container.classList.add('fieldset');
+
+  var legend = document.createElement('legend');
+  legend.textContent = this.question;
+  container.appendChild(legend);
+
+  switch (this.questionType) {
+    case constants.QuestionType.SHORT_STRING:
+      var input = document.createElement('input');
+      input.setAttribute('type', 'text');
+      input.setAttribute('name', shrink(this.question));
+      if (this.required)
+        input.setAttribute('required', this.required);
+      container.appendChild(input);
+      break;
+    case constants.QuestionType.SHORT_ESSAY:
+    case constants.QuestionType.LONG_ESSAY:
+      var textarea = document.createElement('textarea');
+      textarea.setAttribute('name', shrink(this.question));
+      textarea.setAttribute('cols', 60);
+      textarea.setAttribute(
+          'rows',
+          this.questionType == constants.QuestionType.SHORT_ESSAY ? 5 : 10);
+      if (this.required)
+        textarea.setAttribute('required', this.required);
+      container.appendChild(textarea);
+      break;
+    default:
+      throw new Error('Question "' + this.question + '" has an unexpected ' +
+        'question type: ' + this.questionType);
+  }
+  return container;
+}
 
 // HELPER METHODS
 

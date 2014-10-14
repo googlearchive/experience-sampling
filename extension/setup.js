@@ -114,6 +114,24 @@ function addQuestions(parentNode) {
       ],
       false);
   parentNode.appendChild(source.makeDOMTree());
+
+  var pinaColadas = new EssayQuestion(
+      constants.QuestionType.SHORT_STRING,
+      'How much do you like pina coladas?',
+      true);
+  parentNode.appendChild(pinaColadas.makeDOMTree());
+
+  var pinaColadasDetails = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'What is your favorite thing about pina coladas?',
+      true);
+  parentNode.appendChild(pinaColadasDetails.makeDOMTree());
+
+  var pinaColadasEssay = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'Please compare and contrast pina coladas and mimosas.',
+      false);
+  parentNode.appendChild(pinaColadasEssay.makeDOMTree());
 }
 
 /**
