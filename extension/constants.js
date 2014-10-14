@@ -38,8 +38,7 @@ constants.Randomize = {
   ANCHOR_LAST: 'anchorLast'  // Last element will stay in its place.
 };
 
-// Handle "other" specially. Remember to do ANCHOR_LAST if you use the
-// OTHER field as your last answer choice!
+// Handle "other" specially.
 constants.OTHER = 'Other: ';
 
 // An element lookup shortcut, per convention.
