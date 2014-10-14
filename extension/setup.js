@@ -21,7 +21,7 @@ function setSetupStorageValue(newState) {
  * @param {Object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  var age = new Fixed(
+  var age = new FixedQuestion(
       constants.QuestionType.RADIO,
       'What is your age?',
       true,
@@ -29,7 +29,7 @@ function addQuestions(parentNode) {
       false);
   parentNode.appendChild(age.makeDOMTree());
 
-  var gender = new Fixed(
+  var gender = new FixedQuestion(
       constants.QuestionType.CHECKBOX,
       'What is your gender?',
       true,
@@ -37,7 +37,7 @@ function addQuestions(parentNode) {
       false);
   parentNode.appendChild(gender.makeDOMTree());
 
-  var source = new Fixed(
+  var source = new FixedQuestion(
       constants.QuestionType.RADIO,
       'How did you learn about this study?',
       true,
@@ -50,7 +50,7 @@ function addQuestions(parentNode) {
       false);
   parentNode.appendChild(source.makeDOMTree());
 
-  var source = new Fixed(
+  var source = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
       'What state do you live in?',
       true,

@@ -21,7 +21,7 @@ function Question(questionType, question, required) {
  * has submitted the survey form.
  * @param {string} The text of the user's answer.
  */
-Question.prototype.setUserResponse = function (response) {
+Question.prototype.setUserResponse = function(response) {
   this.userResponse = response;
 };
 
@@ -47,68 +47,71 @@ Question.prototype.makeDOMTree = function() {
  * @param {Array.string} answers The list of answers to be shown.
  * @param {boolean} randomize Whether to randomize the question order.
  */
-function Fixed(questionType, question, required, answers, randomize) {
+function FixedQuestion(questionType, question, required, answers, randomize) {
   Question.call(this, questionType, question, required);
   this.answers = answers;
   this.randomize = randomize;
 }
 
-Fixed.prototype = Object.create(Question.prototype);
-Fixed.prototype.constructor = Fixed;
+FixedQuestion.prototype = Object.create(Question.prototype);
+FixedQuestion.prototype.constructor = FixedQuestion;
 
 /**
- * Creates the DOM representation of a Fixed question.
+ * Creates the DOM representation of a FixedQuestion question.
  * @return {Object} The DOM node that contains the question.
  */
 // TODO(felt): Implement answer randomization.
-Fixed.prototype.makeDOMTree = function() {
+FixedQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
   container.classList.add('fieldset');
 
   var legend = document.createElement('legend');
-  legend.innerText = this.question;
+  legend.textContent = this.question;
   container.appendChild(legend);
 
   var shrunkenQuestion = shrink(this.question);
-  if (this.questionType == constants.QuestionType.CHECKBOX ||
-      this.questionType == constants.QuestionType.RADIO) {
-    for (var i = 0; i < this.answers.length; i++) {
-      var shrunkenAnswer = i + '-' + shrink(this.answers[i]);
-      var input = document.createElement('input');
-      input.setAttribute('id', shrunkenAnswer);
-      input.setAttribute('name', shrunkenQuestion);
-      input.setAttribute('type', this.questionType);
-      input.setAttribute('value', shrunkenAnswer);
-      input.setAttribute('required', this.required);
-      container.appendChild(input);
+  switch(this.questionType) {
+    case constants.QuestionType.CHECKBOX:
+    case constants.QuestionType.RADIO:
+      for (var i = 0; i < this.answers.length; i++) {
+        var shrunkenAnswer = i + '-' + shrink(this.answers[i]);
+        var input = document.createElement('input');
+        input.setAttribute('id', shrunkenAnswer);
+        input.setAttribute('name', shrunkenQuestion);
+        input.setAttribute('type', this.questionType);
+        input.setAttribute('value', shrunkenAnswer);
+        input.setAttribute('required', this.required);
+        container.appendChild(input);
 
-      var label = document.createElement('label');
-      label.setAttribute('for', shrunkenAnswer);
-      label.innerText = this.answers[i];
-      container.appendChild(label);
+        var label = document.createElement('label');
+        label.setAttribute('for', shrunkenAnswer);
+        label.textContent = this.answers[i];
+        container.appendChild(label);
 
-      if (this.answers[i] == constants.OTHER) {
-        var textInput = document.createElement('input');
-        textInput.setAttribute('type', 'text');
-        textInput.setAttribute('name', shrunkenAnswer);
-        container.appendChild(textInput);
+        if (this.answers[i] == constants.OTHER) {
+          var textInput = document.createElement('input');
+          textInput.setAttribute('type', 'text');
+          textInput.setAttribute('name', shrunkenAnswer);
+          container.appendChild(textInput);
+        }
+
+        if (i < this.answers.length - 1)
+          container.appendChild(document.createElement('br'));
       }
-
-      if (i < this.answers.length - 1)
-        container.appendChild(document.createElement('br'));
-    }
-  } else if (this.questionType == constants.QuestionType.DROPDOWN) {
-    var select = document.createElement('select');
-    for (var i = 0; i < this.answers.length; i++) {
-      var option = document.createElement('option');
-      option.value = i + '-' + shrink(this.answers[i]);
-      option.innerText = this.answers[i];
-      select.appendChild(option);
-    }
-    container.appendChild(select);
-  } else {
-    throw new Error('Question "' + this.question + '" has an unexpected ' +
-      'question type: ' + this.questionType);
+      break;
+    case constants.QuestionType.DROPDOWN:
+      var select = document.createElement('select');
+      for (var i = 0; i < this.answers.length; i++) {
+        var option = document.createElement('option');
+        option.value = i + '-' + shrink(this.answers[i]);
+        option.textContent = this.answers[i];
+        select.appendChild(option);
+      }
+      container.appendChild(select);
+      break;
+    default:
+      throw new Error('Question "' + this.question + '" has an unexpected ' +
+        'question type: ' + this.questionType);
   }
   return container;
 }
@@ -116,22 +119,23 @@ Fixed.prototype.makeDOMTree = function() {
 // SCALE
 
 // TODO(felt): Implement and document this.
-function Scale(questionType, question, required, direction, labels, randomize) {
+function ScaleQuestion(
+    questionType, question, required, direction, labels, randomize) {
   Question.call(this, questionType, question, required);
 }
 
-Scale.prototype = Object.create(Question.prototype);
-Scale.prototype.constructor = Scale;
+ScaleQuestion.prototype = Object.create(Question.prototype);
+ScaleQuestion.prototype.constructor = ScaleQuestion;
 
 // ESSAY
 
 // TODO(felt): Implement and document this.
-function Essay(questionType, question, required) {
+function EssayQuestion(questionType, question, required) {
   Question.call(this, questionType, question, required);
 }
 
-Essay.prototype = Object.create(Question.prototype);
-Essay.prototype.constructor = Essay;
+EssayQuestion.prototype = Object.create(Question.prototype);
+EssayQuestion.prototype.constructor = EssayQuestion;
 
 // HELPER METHODS
 
