@@ -115,6 +115,25 @@ function addQuestions(parentNode) {
       false);
   parentNode.appendChild(source.makeDOMTree());
 
+  var source = new FixedQuestion(
+      constants.QuestionType.DROPDOWN,
+      'Are these states randomized?',
+      true,
+      [
+        'Alabama',
+        'Alaska',
+        'Arizona',
+        'Arkansas',
+        'California',
+        'Colorado',
+        'Connecticut',
+        'Delaware',
+        'Florida',
+        'Georgia',
+      ],
+      true);
+  parentNode.appendChild(source.makeDOMTree());
+
   var pinaColadas = new EssayQuestion(
       constants.QuestionType.SHORT_STRING,
       'How much do you like pina coladas?',

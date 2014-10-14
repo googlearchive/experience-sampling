@@ -60,7 +60,6 @@ FixedQuestion.prototype.constructor = FixedQuestion;
  * Creates the DOM representation of a FixedQuestion question.
  * @return {Object} The DOM node that contains the question.
  */
-// TODO(felt): Implement answer randomization.
 FixedQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
   container.classList.add('fieldset');
@@ -73,6 +72,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
   switch (this.questionType) {
     case constants.QuestionType.CHECKBOX:
     case constants.QuestionType.RADIO:
+      var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
         var shrunkenAnswer = i + '-' + shrink(this.answers[i]);
         var input = document.createElement('input');
@@ -101,11 +101,20 @@ FixedQuestion.prototype.makeDOMTree = function() {
       break;
     case constants.QuestionType.DROPDOWN:
       var select = document.createElement('select');
+      var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
         var option = document.createElement('option');
         option.value = i + '-' + shrink(this.answers[i]);
         option.textContent = this.answers[i];
-        select.appendChild(option);
+        if (this.randomize)
+          answerChoices.push(option);
+        else
+          select.appendChild(option);
+      }
+      if (this.randomize) {
+        answerChoices = knuthShuffle(answerChoices);
+        for (var i = 0; i < answerChoices.length; i++)
+          select.appendChild(option);
       }
       container.appendChild(select);
       break;
@@ -193,6 +202,25 @@ EssayQuestion.prototype.makeDOMTree = function() {
  */
 function shrink(answer) {
   return answer.replace(/[\W\s]+/g, '').substring(0, 40);
+}
+
+/**
+ * Use the knuth (aka Fisher-Yates) shuffle to randomize an array.
+ * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
+ * @param {Array.Object} The array to randomize.
+ * @returns {Array.Object} The randomized array.
+ */
+function knuthShuffle(arr) {
+  for (var i = 0; i < arr.length; i++) {
+    // Random int: i <= randomIndex < arr.length
+    var randomIndex = Math.floor(Math.random() * (arr.length - i)) + i;
+
+    // Swap with current element.
+    var swapTemp = arr[i];
+    arr[i] = arr[randomIndex];
+    arr[randomIndex] = swapTemp;
+  }
+  return arr;
 }
 
 /**
