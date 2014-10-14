@@ -26,6 +26,7 @@ constants.QuestionType = {
   SCALE: 'scale',
 
   // Handled by the Essay class.
+  SHORT_STRING: 'shortString',
   SHORT_ESSAY: 'shortEssay',
   LONG_ESSAY: 'longEssay'
 };
