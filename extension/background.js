@@ -13,6 +13,9 @@ var cesp = {};  // namespace variable
 cesp.readyForSurveys = false;
 
 // Settings.
+cesp.SERVER_URL = "https://chrome-experience-sampling.appspot.com";
+cesp.SUBMIT_SURVEY_ACTION = "/_ah/api/cesp/v1/submitsurvey";
+cesp.XHR_TIMEOUT = 4000;
 cesp.notificationTitle = "New survey available";
 cesp.notificationBody = "Click here to take a survey about the screen you just"
                         + "saw";
@@ -120,3 +123,83 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 // Trigger the new survey prompt when the participant makes a decision about an
 // experience sampling element.
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
+
+/**
+ * A survey response (question and answer).
+ * @constructor
+ * @param {string} question The question being answered.
+ * @param {string} answer The answer to that question.
+ */
+function Response(question, answer) {
+  this.question = question;
+  this.answer = answer;
+}
+
+/**
+ * A completed survey.
+ * @constructor
+ * @param {string} type The type of survey.
+ * @param {int} participantId The participant ID.
+ * @param {Date} dateTaken The date and time when the survey was taken.
+ * @param {Array.Response} responses An array of Response objects.
+*/
+function Survey(type, participantId, dateTaken, responses) {
+  this.type = type;
+  this.participantId = participantId;
+  this.dateTaken = dateTaken;
+  this.responses = responses;
+}
+
+/**
+ * Sends a survey to the CESP backend via XHR.
+ * @param {Survey} survey The completed survey to send to the backend.
+ * @param {function(string)} successCallback A function to call on receiving a
+ *     successful response (HTTP 204). It should look like
+ *     "function(response) {...};" where "response" is the text of the response
+ *     (if there is any).
+ * @param {function(!number=)} errorCallback A function to call on receiving an
+ *     error from the server, or on timing out. It should look like
+ *     "function(status) {...};" where "status" is an HTTP status code integer,
+ *     if there is one. For a timeout, there is no status.
+ */
+function sendSurvey(survey, successCallback, errorCallback) {
+  var url = cesp.SERVER_URL + cesp.SUBMIT_SURVEY_ACTION;
+  var method = "POST";
+  var dateTaken = survey.dateTaken.toISOString();
+  // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
+  if (dateTaken.slice(-1) === "Z") {
+    dateTaken = dateTaken.slice(0, -1);
+  }
+  var data = {
+    "date_taken": dateTaken,
+    "participant_id": survey.participantId,
+    "responses": [],
+    "survey_type": survey.type
+  };
+  for (var i = 0; i < survey.responses.length; i++) {
+    data.responses.push(survey.responses[i]);
+  }
+  var xhr = new XMLHttpRequest();
+  function onLoadHandler(event) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 204) {
+        successCallback(xhr.response);
+      } else {
+        errorCallback(xhr.status);
+      }
+    }
+  }
+  function onErrorHandler(event) {
+    errorCallback(xhr.status);
+  }
+  function onTimeoutHandler(event) {
+    errorCallback();
+  }
+  xhr.open(method, url, true);
+  xhr.setRequestHeader('Content-Type', 'application/JSON');
+  xhr.timeout = cesp.XHR_TIMEOUT;
+  xhr.onload = onLoadHandler;
+  xhr.onerror = onErrorHandler;
+  xhr.ontimeout = onTimeoutHandler;
+  xhr.send(JSON.stringify(data));
+}
