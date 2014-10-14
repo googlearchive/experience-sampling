@@ -69,12 +69,12 @@ FixedQuestion.prototype.makeDOMTree = function() {
   legend.textContent = this.question;
   container.appendChild(legend);
 
-  var shrunkenQuestion = shrink(this.question);
+  var shrunkenQuestion = getDomNameFromValue(this.question);
   switch (this.questionType) {
     case constants.QuestionType.CHECKBOX:
     case constants.QuestionType.RADIO:
       for (var i = 0; i < this.answers.length; i++) {
-        var shrunkenAnswer = i + '-' + shrink(this.answers[i]);
+        var shrunkenAnswer = i + '-' + getDomNameFromValue(this.answers[i]);
         var input = document.createElement('input');
         input.setAttribute('id', shrunkenAnswer);
         input.setAttribute('name', shrunkenQuestion);
@@ -103,7 +103,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
       var select = document.createElement('select');
       for (var i = 0; i < this.answers.length; i++) {
         var option = document.createElement('option');
-        option.value = i + '-' + shrink(this.answers[i]);
+        option.value = i + '-' + getDomNameFromValue(this.answers[i]);
         option.textContent = this.answers[i];
         select.appendChild(option);
       }
@@ -159,7 +159,8 @@ EssayQuestion.prototype.makeDOMTree = function() {
     case constants.QuestionType.SHORT_STRING:
       var input = document.createElement('input');
       input.setAttribute('type', 'text');
-      input.setAttribute('name', shrink(this.question));
+      input.setAttribute('name', getDomNameFromValue(this.question));
+      input.setAttribute('size', 60);
       if (this.required)
         input.setAttribute('required', this.required);
       container.appendChild(input);
@@ -167,7 +168,7 @@ EssayQuestion.prototype.makeDOMTree = function() {
     case constants.QuestionType.SHORT_ESSAY:
     case constants.QuestionType.LONG_ESSAY:
       var textarea = document.createElement('textarea');
-      textarea.setAttribute('name', shrink(this.question));
+      textarea.setAttribute('name', getDomNameFromValue(this.question));
       textarea.setAttribute('cols', 60);
       textarea.setAttribute(
           'rows',
@@ -191,7 +192,7 @@ EssayQuestion.prototype.makeDOMTree = function() {
  * @param {string} The original input answer.
  * @returns {string} The shrunken version of the answer.
  */
-function shrink(answer) {
+function getDomNameFromValue(answer) {
   return answer.replace(/[\W\s]+/g, '').substring(0, 40);
 }
 
