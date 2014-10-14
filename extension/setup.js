@@ -137,7 +137,7 @@ function addQuestions(parentNode) {
         'Connecticut',
         'Delaware',
         'Florida',
-        'Georgia',
+        'Georgia'
       ],
       constants.Randomize.ALL);
   parentNode.appendChild(source.makeDOMTree());

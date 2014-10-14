@@ -111,16 +111,12 @@ FixedQuestion.prototype.makeDOMTree = function() {
         var option = document.createElement('option');
         option.value = i + '-' + shrink(this.answers[i]);
         option.textContent = this.answers[i];
-        if (this.randomize == constants.Randomize.NONE)
-          select.appendChild(option);
-        else
-          answerChoices.push(option);
+        answerChoices.push(option);
       }
-      if (this.randomize != constants.Randomize.NONE) {
+      if (this.randomize != constants.Randomize.NONE)
         answerChoices = knuthShuffle(answerChoices, this.randomize);
-        for (var i = 0; i < answerChoices.length; i++)
-          select.appendChild(answerChoices[i]);
-      }
+      for (var i = 0; i < answerChoices.length; i++)
+        select.appendChild(answerChoices[i]);
       container.appendChild(select);
       break;
     default:
