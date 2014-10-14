@@ -16,11 +16,11 @@ cesp.readyForSurveys = false;
 cesp.SERVER_URL = "https://chrome-experience-sampling.appspot.com";
 cesp.SUBMIT_SURVEY_ACTION = "/_ah/api/cesp/v1/submitsurvey";
 cesp.XHR_TIMEOUT = 4000;
-cesp.notificationTitle = "New survey available";
-cesp.notificationBody = "Click here to take a survey about the screen you just"
-                        + "saw";
-cesp.iconFile = "icon.png";
-cesp.notificationDefaultTimeout = 15000;  // milliseconds
+cesp.NOTIFICATION_TITLE = "New survey available";
+cesp.NOTIFICATION_BODY =
+    "Click here to take a survey about the screen you just saw";
+cesp.ICON_FILE = "icon.png";
+cesp.NOTIFICATION_DEFAULT_TIMEOUT = 15000;  // milliseconds
 
 /**
  * Retrieves the registration status from Local Storage.
@@ -91,12 +91,12 @@ chrome.runtime.onStartup.addListener(getConsentStatus);
 function showSurveyPrompt(element, decision) {
   if (!cesp.readyForSurveys) return;
   var timePromptShown = new Date();
-  var opt = {body: cesp.notificationTitle,
-             icon: cesp.iconFile,
+  var opt = {body: cesp.NOTIFICATION_TITLE,
+             icon: cesp.ICON_FILE,
              tag: cesp.notificationTag};
-  var notification = new window.Notification(cesp.notificationTitle, opt);
+  var notification = new window.Notification(cesp.NOTIFICATION_TITLE, opt);
   notification.onshow = function() {
-    setTimeout(notification.close, cesp.notificationDefaultTimeout);
+    setTimeout(notification.close, cesp.NOTIFICATION_DEFAULT_TIMEOUT);
   };
   notification.onclick = function() {
     var timePromptClicked = new Date();

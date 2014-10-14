@@ -70,7 +70,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
   container.appendChild(legend);
 
   var shrunkenQuestion = shrink(this.question);
-  switch(this.questionType) {
+  switch (this.questionType) {
     case constants.QuestionType.CHECKBOX:
     case constants.QuestionType.RADIO:
       for (var i = 0; i < this.answers.length; i++) {
