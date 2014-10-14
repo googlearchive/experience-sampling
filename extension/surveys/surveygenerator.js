@@ -45,9 +45,10 @@ Question.prototype.makeDOMTree = function() {
  * @param {string} question The question to be asked.
  * @param {boolean} required Whether the question needs to be answered.
  * @param {Array.string} answers The list of answers to be shown.
- * @param {boolean} randomize Whether to randomize the question order.
+ * @param {String} randomize Type of randomization (constants.Randomize).
  */
-function FixedQuestion(questionType, question, required, answers, randomize) {
+function FixedQuestion(
+    questionType, question, required, answers, randomize) {
   Question.call(this, questionType, question, required);
   this.answers = answers;
   this.randomize = randomize;
@@ -74,6 +75,8 @@ FixedQuestion.prototype.makeDOMTree = function() {
     case constants.QuestionType.RADIO:
       var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
+        var answer = document.createElement('div');
+
         var shrunkenAnswer = i + '-' + shrink(this.answers[i]);
         var input = document.createElement('input');
         input.setAttribute('id', shrunkenAnswer);
@@ -81,23 +84,25 @@ FixedQuestion.prototype.makeDOMTree = function() {
         input.setAttribute('type', this.questionType);
         input.setAttribute('value', shrunkenAnswer);
         input.setAttribute('required', this.required);
-        container.appendChild(input);
+        answer.appendChild(input);
 
         var label = document.createElement('label');
         label.setAttribute('for', shrunkenAnswer);
         label.textContent = this.answers[i];
-        container.appendChild(label);
+        answer.appendChild(label);
 
         if (this.answers[i] == constants.OTHER) {
           var textInput = document.createElement('input');
           textInput.setAttribute('type', 'text');
           textInput.setAttribute('name', shrunkenAnswer);
-          container.appendChild(textInput);
+          answer.appendChild(textInput);
         }
-
-        if (i < this.answers.length - 1)
-          container.appendChild(document.createElement('br'));
+        answerChoices.push(answer);
       }
+      if (this.randomize != constants.Randomize.NONE)
+        answerChoices = knuthShuffle(answerChoices, this.randomize);
+      for (var i = 0; i < answerChoices.length; i++)
+        container.appendChild(answerChoices[i])
       break;
     case constants.QuestionType.DROPDOWN:
       var select = document.createElement('select');
@@ -106,15 +111,15 @@ FixedQuestion.prototype.makeDOMTree = function() {
         var option = document.createElement('option');
         option.value = i + '-' + shrink(this.answers[i]);
         option.textContent = this.answers[i];
-        if (this.randomize)
-          answerChoices.push(option);
+        if (this.randomize == constants.Randomize.NONE)
+          select.appendChild(option);
         else
-          select.appendChild(option);
+          answerChoices.push(option);
       }
-      if (this.randomize) {
-        answerChoices = knuthShuffle(answerChoices);
+      if (this.randomize != constants.Randomize.NONE) {
+        answerChoices = knuthShuffle(answerChoices, this.randomize);
         for (var i = 0; i < answerChoices.length; i++)
-          select.appendChild(option);
+          select.appendChild(answerChoices[i]);
       }
       container.appendChild(select);
       break;
@@ -207,13 +212,16 @@ function shrink(answer) {
 /**
  * Use the knuth (aka Fisher-Yates) shuffle to randomize an array.
  * http://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
- * @param {Array.Object} The array to randomize.
+ * @param {Array.Object} arr The array to randomize.
+ * @param {string} randomType The type of randomization (constants.Randomize)
  * @returns {Array.Object} The randomized array.
  */
-function knuthShuffle(arr) {
-  for (var i = 0; i < arr.length; i++) {
+function knuthShuffle(arr, randomType) {
+  var end = randomType == constants.Randomize.ANCHOR_LAST ?
+            arr.length - 1 : arr.length;
+  for (var i = 0; i < end; i++) {
     // Random int: i <= randomIndex < arr.length
-    var randomIndex = Math.floor(Math.random() * (arr.length - i)) + i;
+    var randomIndex = Math.floor(Math.random() * (end - i)) + i;
 
     // Swap with current element.
     var swapTemp = arr[i];
