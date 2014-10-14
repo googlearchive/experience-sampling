@@ -4,6 +4,7 @@
 <title>Survey Example</title>
 <link rel="stylesheet" type="text/css" href="survey-style.css">
 <script src="../constants.js"></script>
+<script src="surveygenerator.js"></script>
 <script src="../setup.js"></script>
 </head>
 
@@ -32,60 +33,7 @@
   </div>
 
   <div class="centered hidden" id="survey-container">
-    <form name="survey-form">
-
-      <div class="fieldset">
-        <legend>What is your age?</legend>
-        <input name="age" type="radio" value="18" required /><label for="age">18-24</label><br>
-        <input name="age" type="radio" value="25" required /><label for="age">25-34</label><br>
-        <input name="age" type="radio" value="35" required /><label for="age">35-44</label><br>
-        <input name="age" type="radio" value="45" required /><label for="age">45-54</label><br>
-        <input name="age" type="radio" value="55" required /><label for="age">55-64</label><br>
-        <input name="age" type="radio" value="65" required /><label for="age">65 or older</label><br>
-        <input name="age" type="radio" value="none" required /><label for="age">I prefer not to answer</label>
-      </div>
-
-      <div class="fieldset">
-        <legend>What is your gender?</legend>
-        <input type="radio" name="gender" value="female" required /><label for="gender">Female</label><br>
-        <input type="radio" name="gender" value="male" required /><label for="gender">Male</label><br>
-        <input type="radio" name="gender" value="other" required /><label for="gender">Other: </label><input type="text" name="other" /><br>
-        <input type="radio" name="gender" value="none" required /><label for "gender">I prefer not to answer</label>
-      </div>
-
-      <div class="fieldset">
-        <legend>How did you learn about this study?</legend>
-        <input name="source" type="radio" value="ad" required /><label for="source">Web advertisement</label><br>
-        <input name="source" type="radio" value="blog" required /><label for="source">Chrome blog</label><br>
-        <input name="source" type="radio" value="social-media" required /><label for="source">Social media (Twitter, Facebook, Google+, etc.)</label><br>
-        <input name="source" type="radio" value="word-of-mouth" required /><label for="source">Word of mouth</label><br>
-        <input name="source" type="radio" value="none" required /><label for "source">I prefer not to answer</label>
-      </div>
-
-      <div class="fieldset">
-        <legend>What kind of computer are you using?</legend>
-        <input name="computer" type="radio" value="ad" required /><label for="computer">Mac</label><br>
-        <input name="computer" type="radio" value="blog" required /><label for="computer">Windows</label><br>
-        <input name="computer" type="radio" value="social-media" required /><label for="computer">Linux</label><br>
-        <input name="computer" type="radio" value="word-of-mouth" required /><label for="computer">I don't know</label><br>
-        <input name="computer" type="radio" value="none" required /><label for "computer">I prefer not to answer</label>
-      </div>
-
-      <div class="fieldset">
-        <legend>Whose computer is it?</legend>
-        <input name="owner" type="radio" value="ad" required /><label for="owner">Mine</label><br>
-        <input name="owner" type="radio" value="blog" required /><label for="owner">A friend or family member's</label><br>
-        <input name="owner" type="radio" value="social-media" required /><label for="owner">My employer's</label><br>
-        <input name="owner" type="radio" value="word-of-mouth" required /><label for="owner">My school's</label><br>
-        <input name="owner" type="radio" value="word-of-mouth" required /><label for="owner">A library's</label><br>
-        <input type="radio" name="owner" value="other" required /><label for="owner">Other: </label><input type="text" name="other" /><br>
-        <input type="radio" name="owner" value="none" required /><label for="owner">I prefer not to answer</label><br>
-      </div>
-
-      <fieldset class="submit">
-        <input id="submit-button" type="submit" value="Submit" />
-      </fieldset>
-    </form>
+    <form name="survey-form" id="survey-form"></form>
   </div>
   
 </body>
