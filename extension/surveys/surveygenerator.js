@@ -107,17 +107,16 @@ FixedQuestion.prototype.makeDOMTree = function() {
       var select = document.createElement('select');
       var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
-        var elementNum = this.required ? i : i + 1;
         var option = document.createElement('option');
-        option.value = elementNum + '-' + getDomNameFromValue(this.answers[i]);
+        option.value = i + '-' + getDomNameFromValue(this.answers[i]);
         option.textContent = this.answers[i];
         answerChoices.push(option);
       }
       if (this.randomize != constants.Randomize.NONE)
         answerChoices = knuthShuffle(answerChoices, this.randomize);
-      if (this.required == false) {
+      if (!this.required) {
         var blankOption = document.createElement('option');
-        blankOption.value = '0-NONE';
+        blankOption.value = this.answers.length + '-NONE';
         blankOption.textContent = ' ';
         select.appendChild(blankOption);
       }
