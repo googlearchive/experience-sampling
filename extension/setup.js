@@ -126,7 +126,7 @@ function addQuestions(parentNode) {
   var source = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
       'Are these states randomized?',
-      true,
+      false,
       [
         'Alabama',
         'Alaska',
