@@ -31,6 +31,13 @@ constants.QuestionType = {
   LONG_ESSAY: 'longEssay'
 };
 
+// The type of randomization desired for answer choices.
+constants.Randomize = {
+  NONE: 'none',
+  ALL: 'all',
+  ANCHOR_LAST: 'anchorLast'  // Last element will stay in its place.
+};
+
 // Handle "other" specially.
 constants.OTHER = 'Other: ';
 
