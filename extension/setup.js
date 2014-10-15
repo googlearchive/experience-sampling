@@ -26,15 +26,23 @@ function addQuestions(parentNode) {
       'What is your age?',
       true,
       ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
-      false);
+      constants.Randomize.NONE);
   parentNode.appendChild(age.makeDOMTree());
+
+  var realAge = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'What is your REAL age?',
+      true,
+      ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
+      constants.Randomize.ALL);
+  parentNode.appendChild(realAge.makeDOMTree());
 
   var gender = new FixedQuestion(
       constants.QuestionType.CHECKBOX,
       'What is your gender?',
       true,
       ['Female', 'Male', constants.OTHER],
-      false);
+      constants.Randomize.ANCHOR_LAST);
   parentNode.appendChild(gender.makeDOMTree());
 
   var source = new FixedQuestion(
@@ -47,7 +55,7 @@ function addQuestions(parentNode) {
         'Social media (Twitter, Facebook, Google+, etc.)',
         'Word of mouth'
       ],
-      false);
+      constants.Randomize.ALL);
   parentNode.appendChild(source.makeDOMTree());
 
   var source = new FixedQuestion(
@@ -112,7 +120,26 @@ function addQuestions(parentNode) {
         'U.S. Virgin Islands',
         'Northern Mariana Islands'
       ],
-      false);
+      constants.Randomize.NONE);
+  parentNode.appendChild(source.makeDOMTree());
+
+  var source = new FixedQuestion(
+      constants.QuestionType.DROPDOWN,
+      'Are these states randomized?',
+      true,
+      [
+        'Alabama',
+        'Alaska',
+        'Arizona',
+        'Arkansas',
+        'California',
+        'Colorado',
+        'Connecticut',
+        'Delaware',
+        'Florida',
+        'Georgia'
+      ],
+      constants.Randomize.ALL);
   parentNode.appendChild(source.makeDOMTree());
 
   var pinaColadas = new EssayQuestion(
