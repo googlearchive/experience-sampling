@@ -114,6 +114,12 @@ FixedQuestion.prototype.makeDOMTree = function() {
       }
       if (this.randomize != constants.Randomize.NONE)
         answerChoices = knuthShuffle(answerChoices, this.randomize);
+      if (!this.required) {
+        var blankOption = document.createElement('option');
+        blankOption.value = this.answers.length + '-NONE';
+        blankOption.textContent = ' ';
+        select.appendChild(blankOption);
+      }
       for (var i = 0; i < answerChoices.length; i++)
         select.appendChild(answerChoices[i]);
       container.appendChild(select);
