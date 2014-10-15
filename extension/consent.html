@@ -1,21 +1,24 @@
 <html>
 <head>
 <title>Consent to Participate</title>
-<link rel="stylesheet" type="text/css" href="consent.css">
+<link rel="stylesheet" type="text/css" href="surveys/survey-style.css">
 <script src="constants.js"></script>
+<script src="surveys/surveygenerator.js"></script>
 <script src="consent.js"></script>
 </head>
 
 <body>
   <div id="consent-text">
-    <div id="study-title" class="centered">
+    <div class="centered inner-centering">
       <h1>Informed consent for Safe Browsing Study</h1>
     </div>
 
-    <div id="study-information" class="hidden centered">
-      <p>Thank you for your participation in our research study. It is being
-      conducted by members of the Chrome team at Google Inc ("Google").</p>
+    <div class="centered inner-centering alert-gentle hidden" id="top-blurb">
+      Thank you for your participation in our research study.<br> It is being
+      conducted by members of the Chrome team at Google Inc ("Google").
+    </div>
 
+    <div id="study-information" class="hidden centered">
       <h3>Purpose of the study</h3>
       <p>We are looking to better understand how people interpret and interact
       with security warnings in Chrome.</p>
@@ -65,23 +68,12 @@
 
       <h3>Identification of Investigators</h3>
       <p>If you have any questions or concerns about the research, please feel
-      free to contact:<br>Rob Reeder, chrome-experience-sampling@google.com.</p>
+      free to contact: Rob Reeder, chrome-experience-sampling@google.com.</p>
     </div>
   </div>
 
-  <div id="consent-form-holder" class="hidden">
-    <form name="consent-form">
-      <fieldset id="terms">
-        <input type="radio" name="consent" value="yes" required /> I acknowledge that I have read this informed consent and agree to the terms
-        <br>
-        <input type="radio" name="consent" value="no" /> I acknowledge that I have read this informed consent and do NOT agree to the terms
-      </fieldset>
-
-      <fieldset id="submit">
-        <input type="submit" value="Sign form and submit" id="submit-button" />
-      </fieldset>
-    </form>
-    <div id="set-value" class="hidden alert">Please select a form response</div>
+  <div id="consent-form-holder" class="hidden centered">
+    <form name="consent-form" id="consent-form"></form>
   </div>
 
   <div id="retract-consent" class="hidden alert centered">

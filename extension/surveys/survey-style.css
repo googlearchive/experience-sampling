@@ -16,6 +16,10 @@
   color: #DB4437;
 }
 
+.alert-gentle {
+  color: #4285F4;
+}
+
 body {
   color: #656565;
   padding: 2em;
