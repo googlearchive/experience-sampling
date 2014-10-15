@@ -225,7 +225,9 @@ ScaleQuestion.prototype.makeDOMTree = function() {
   var horizontal =
       this.questionType == constants.QuestionType.HORIZ_SCALE ||
       this.questionType == constants.QuestionType.MULT_HORIZ_SCALE;
-  var multi = this.questionType == constants.QuestionType.MULT_HORIZ_SCALE;
+  var multi =
+      (this.questionType == constants.QuestionType.MULT_HORIZ_SCALE) &&
+      this.attributes.length > 0;
   var container = document.createElement('div');
   container.classList.add('fieldset');
 
@@ -236,15 +238,17 @@ ScaleQuestion.prototype.makeDOMTree = function() {
   var reverse = this.randomize == constants.Randomize.NONE ? false : coinToss();
   var shrunkenQuestion = getDomNameFromValue(this.question);
   if (multi) {
-    for (var i = 0; i < this.attributes.length; i++) {
+    var shuffledAttributes =
+        knuthShuffle(this.attributes, constants.Randomize.ALL);
+    for (var i = 0; i < shuffledAttributes.length; i++) {
       var floatScale = document.createElement('div');
       floatScale.classList.add('horizontal-rowlabel');
       if (i == 0)
         floatScale.classList.add('first-rowlabel');
-      floatScale.innerText = this.attributes[i] + ':';
+      floatScale.innerText = shuffledAttributes[i] + ':';
       container.appendChild(floatScale);
       var questionName =
-          getDomNameFromValue(this.attributes[i]) + shrunkenQuestion;
+          getDomNameFromValue(shuffledAttributes[i]) + shrunkenQuestion;
       container.appendChild(
           this.makeSingleRow(horizontal, questionName, reverse, (i == 0)));
     }
