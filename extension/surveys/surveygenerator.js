@@ -257,7 +257,7 @@ ScaleQuestion.prototype.makeDOMTree = function() {
         this.makeSingleRow(horizontal, shrunkenQuestion, reverse, true));
   }
   return container;
-}
+};
 
 // ESSAY
 
