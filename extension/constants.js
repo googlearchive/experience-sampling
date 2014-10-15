@@ -23,7 +23,9 @@ constants.QuestionType = {
   DROPDOWN: 'dropdown',
 
   // Handled by the Scale class.
-  SCALE: 'scale',
+  HORIZ_SCALE: 'horizontalScale',
+  MULT_HORIZ_SCALE: 'multipleHorizontalScale',
+  VERTICAL_SCALE: 'verticalScale',
 
   // Handled by the Essay class.
   SHORT_STRING: 'shortString',

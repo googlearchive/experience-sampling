@@ -159,6 +159,39 @@ function addQuestions(parentNode) {
       'Please compare and contrast pina coladas and mimosas.',
       false);
   parentNode.appendChild(pinaColadasEssay.makeDOMTree());
+
+  var hungry = new ScaleQuestion(
+      constants.QuestionType.VERTICAL_SCALE,
+      'How hungry are you?',
+      false,
+      ['I want to eat my hands', '', 'Medium', '', 'I hate food'],
+      constants.Randomize.ALL);
+  parentNode.appendChild(hungry.makeDOMTree());
+
+  var pizza = new ScaleQuestion(
+      constants.QuestionType.VERTICAL_SCALE,
+      'How delicious is pizza?',
+      false,
+      ['The best', '', 'Medium', '', 'Still pretty good', 'Mmm'],
+      constants.Randomize.ANCHOR_LAST);
+  parentNode.appendChild(pizza.makeDOMTree());
+
+  var adrienne = new ScaleQuestion(
+      constants.QuestionType.HORIZ_SCALE,
+      'How awesome is Adrienne?',
+      false,
+      ['Super duper', '', 'Blazing', '', 'Fantastical'],
+      constants.Randomize.ALL);
+  parentNode.appendChild(adrienne.makeDOMTree());
+
+  var kittens = new ScaleQuestion(
+      constants.QuestionType.MULT_HORIZ_SCALE,
+      'Wine is delicious.',
+      false,
+      ['Agree', '', '', '', 'Disagree'],
+      constants.Randomize.ALL);
+  kittens.setAttributes(['Red wine', 'White wine', 'Champagne']);
+  parentNode.appendChild(kittens.makeDOMTree());
 }
 
 /**
