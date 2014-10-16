@@ -245,7 +245,7 @@ ScaleQuestion.prototype.makeDOMTree = function() {
       floatScale.classList.add('horizontal-rowlabel');
       if (i == 0)
         floatScale.classList.add('first-rowlabel');
-      floatScale.innerText = shuffledAttributes[i] + ':';
+      floatScale.textContent = shuffledAttributes[i] + ':';
       container.appendChild(floatScale);
       var questionName =
           getDomNameFromValue(shuffledAttributes[i]) + shrunkenQuestion;
@@ -355,9 +355,7 @@ function knuthShuffle(arr, randomType) {
  * @returns {boolean} Returns true half the time.
  */
 function coinToss() {
-  if ((Math.random()) < 0.5)
-    return true;
-  return false;
+  return (Math.random() < 0.5);
 }
 
 /**

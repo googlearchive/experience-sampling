@@ -179,7 +179,7 @@ function addQuestions(parentNode) {
   var adrienne = new ScaleQuestion(
       constants.QuestionType.HORIZ_SCALE,
       'How awesome is Adrienne?',
-      false,
+      true,
       ['Super duper', '', 'Blazing', '', 'Fantastical'],
       constants.Randomize.ALL);
   parentNode.appendChild(adrienne.makeDOMTree());
