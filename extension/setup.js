@@ -182,7 +182,7 @@ function addQuestions(parentNode) {
         'Mac',
         'Windows',
         'Linux',
-        'ChromeOS',
+        'Chromebook',
         'I don\'t know',
         constants.OTHER
       ],
