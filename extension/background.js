@@ -100,12 +100,10 @@ chrome.runtime.onInstalled.addListener(setupState);
 // SURVEY HANDLING
 
 /**
- * Clears our existing notification(s). Unfortunately, this isn't supported
- * in Linux HTML5 notifications.
+ * Clears our existing notification(s).
  */
-function clearNotifications(ignored) {
-  if (cesp.operatingSystem != 'linux')
-    chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(cleared) {});
+function clearNotifications(unused) {
+  chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
   chrome.alarms.clearAll();
 }
 
@@ -120,46 +118,30 @@ function showSurveyNotification(element, decision) {
   clearNotifications();
 
   var timePromptShown = new Date();
-  var clickHandler = function(id) {
+  var clickHandler = function(unused) {
     var timePromptClicked = new Date();
     loadSurvey(element, decision, timePromptShown, timePromptClicked);
     clearNotifications();
   };
 
-  if (cesp.operatingSystem == 'linux') {
-    // Use HTML5 notifications for Linux. In some corner cases, these
-    // notifications might be buggy because the event page has been killed
-    // (so timeouts etc. won't work).
-    var opt = {
-      body: cesp.NOTIFICATION_TITLE,
-      icon: cesp.ICON_FILE,
-      tag: cesp.NOTIFICATION_TAG
-    };
-    var notification = new window.Notification(cesp.NOTIFICATION_TITLE, opt);
-    notification.onshow = function() {
-      setTimeout(notification.close, cesp.NOTIFICATION_DEFAULT_TIMEOUT);
-    };
-    notification.onclick = clickHandler;
-  } else {
-    var opt = {
-      type: 'basic',
-      iconUrl: cesp.ICON_FILE,
-      title: cesp.NOTIFICATION_TITLE,
-      message: cesp.NOTIFICATION_BODY,
-      eventTime: Date.now(),
-      buttons: [{title: cesp.NOTIFICATION_BUTTON}]
-    };
-    chrome.notifications.create(
-        cesp.NOTIFICATION_TAG,
-        opt,
-        function(id) {
-          chrome.alarms.create(
-              cesp.ALARM_NAME,
-              {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
-        });
-    chrome.notifications.onClicked.addListener(clickHandler);
-    chrome.notifications.onButtonClicked.addListener(clickHandler);
-  }
+  var opt = {
+    type: 'basic',
+    iconUrl: cesp.ICON_FILE,
+    title: cesp.NOTIFICATION_TITLE,
+    message: cesp.NOTIFICATION_BODY,
+    eventTime: Date.now(),
+    buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+  };
+  chrome.notifications.create(
+      cesp.NOTIFICATION_TAG,
+      opt,
+      function(id) {
+        chrome.alarms.create(
+            cesp.ALARM_NAME,
+            {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
+      });
+  chrome.notifications.onClicked.addListener(clickHandler);
+  chrome.notifications.onButtonClicked.addListener(clickHandler);
 }
 
 /**
@@ -183,6 +165,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
       break;
     case constants.EventType.UNKNOWN:
       console.log('Unknown event type');
+      break;
   }
 }
 
