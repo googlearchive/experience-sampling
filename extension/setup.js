@@ -3,7 +3,6 @@
  */
 
 var setupSurvey = {};  // Namespace variable
-setupSurvey.CLOSE_TIME = 3000;  // Three seconds, in milliseconds
 setupSurvey.status = constants.SETUP_PENDING;
 
 /**
@@ -21,46 +20,84 @@ function setSetupStorageValue(newState) {
  * @param {Object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
+  // TODO: Uninstall if user selects age <= 17.
   var age = new FixedQuestion(
       constants.QuestionType.RADIO,
       'What is your age?',
       true,
-      ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
+      [
+        '17 years old or younger',
+        '18-24',
+        '25-34',
+        '35-44',
+        '45-54',
+        '55-64',
+        '65 or older'
+      ],
       constants.Randomize.NONE);
   parentNode.appendChild(age.makeDOMTree());
-
-  var realAge = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'What is your REAL age?',
-      true,
-      ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
-      constants.Randomize.ALL);
-  parentNode.appendChild(realAge.makeDOMTree());
 
   var gender = new FixedQuestion(
       constants.QuestionType.CHECKBOX,
       'What is your gender?',
       true,
-      ['Female', 'Male', constants.OTHER],
-      constants.Randomize.ANCHOR_LAST);
+      [
+        'Female',
+        'Male',
+        constants.OTHER,
+        'I prefer not to answer'
+      ],
+      constants.Randomize.NONE);
   parentNode.appendChild(gender.makeDOMTree());
 
-  var source = new FixedQuestion(
+  var education = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'How did you learn about this study?',
+      'What is the highest degree or level of school that you have completed?',
       true,
       [
-        'Web advertisement',
-        'Chrome blog',
-        'Social media (Twitter, Facebook, Google+, etc.)',
-        'Word of mouth'
+        'Graduate degree',
+        'Bachelors degree (for example, BS, BA)',
+        'Associates degree (for example, AS, AA)',
+        'Some university, no degree',
+        'Technical/trade school',
+        'High school or equivalent',
+        'Some high school',
+        constants.OTHER
       ],
-      constants.Randomize.ALL);
-  parentNode.appendChild(source.makeDOMTree());
+      constants.Randomize.NONE);
+  parentNode.appendChild(education.makeDOMTree());
 
-  var source = new FixedQuestion(
+  var occupation = new EssayQuestion(
+      constants.QuestionType.SHORT_STRING,
+      'What is your occupation?',
+      true);
+  parentNode.appendChild(occupation.makeDOMTree());
+
+  // TODO: Get a proper list of countries.
+  var country = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
-      'What state do you live in?',
+      'In what country do you live?',
+      true,
+      [
+        'Alabama',
+        'Alaska',
+        'Arizona',
+        'Arkansas',
+        'California',
+        'Colorado',
+        'Connecticut',
+        'Delaware',
+        'Florida',
+        'Georgia'
+      ],
+      constants.Randomize.NONE);
+  parentNode.appendChild(country.makeDOMTree());
+
+  // TODO: Make this question appear only if the U.S. is the answer to the
+  // previous question.
+  var state = new FixedQuestion(
+      constants.QuestionType.DROPDOWN,
+      'Which state?',
       true,
       [
         'Alabama',
@@ -121,77 +158,62 @@ function addQuestions(parentNode) {
         'Northern Mariana Islands'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(source.makeDOMTree());
+  parentNode.appendChild(state.makeDOMTree());
 
   var source = new FixedQuestion(
-      constants.QuestionType.DROPDOWN,
-      'Are these states randomized?',
-      false,
+      constants.QuestionType.RADIO,
+      'How did you learn about this study?',
+      true,
       [
-        'Alabama',
-        'Alaska',
-        'Arizona',
-        'Arkansas',
-        'California',
-        'Colorado',
-        'Connecticut',
-        'Delaware',
-        'Florida',
-        'Georgia'
+        'Web advertisement',
+        'Chrome blog',
+        'Social media (Twitter, Facebook, Google+, etc.)',
+        'Word of mouth',
+        constants.OTHER
       ],
-      constants.Randomize.ALL);
+      constants.Randomize.ANCHOR_LAST);
   parentNode.appendChild(source.makeDOMTree());
 
-  var pinaColadas = new EssayQuestion(
-      constants.QuestionType.SHORT_STRING,
-      'How much do you like pina coladas?',
-      true);
-  parentNode.appendChild(pinaColadas.makeDOMTree());
-
-  var pinaColadasDetails = new EssayQuestion(
-      constants.QuestionType.SHORT_ESSAY,
-      'What is your favorite thing about pina coladas?',
-      true);
-  parentNode.appendChild(pinaColadasDetails.makeDOMTree());
-
-  var pinaColadasEssay = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'Please compare and contrast pina coladas and mimosas.',
-      false);
-  parentNode.appendChild(pinaColadasEssay.makeDOMTree());
-
-  var hungry = new ScaleQuestion(
-      constants.QuestionType.VERTICAL_SCALE,
-      'How hungry are you?',
-      false,
-      ['I want to eat my hands', '', 'Medium', '', 'I hate food'],
-      constants.Randomize.ALL);
-  parentNode.appendChild(hungry.makeDOMTree());
-
-  var pizza = new ScaleQuestion(
-      constants.QuestionType.VERTICAL_SCALE,
-      'How delicious is pizza?',
-      false,
-      ['The best', '', 'Medium', '', 'Still pretty good', 'Mmm'],
-      constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(pizza.makeDOMTree());
-
-  var adrienne = new ScaleQuestion(
-      constants.QuestionType.HORIZ_SCALE,
-      'How awesome is Adrienne?',
+  var computer = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'What kind of computer are you using?',
       true,
-      ['Super duper', '', 'Blazing', '', 'Fantastical'],
-      constants.Randomize.ALL);
-  parentNode.appendChild(adrienne.makeDOMTree());
+      [
+        'Mac',
+        'Windows',
+        'Linux',
+        'ChromeOS',
+        'I don\'t know',
+        constants.OTHER
+      ],
+      constants.Randomize.NONE);
+  parentNode.appendChild(computer.makeDOMTree());
 
-  var kittens = new ScaleQuestion(
-      constants.QuestionType.MULT_HORIZ_SCALE,
-      'Wine is delicious.',
-      false,
-      ['Agree', '', '', '', 'Disagree'],
-      constants.Randomize.ALL);
-  kittens.setAttributes(['Red wine', 'White wine', 'Champagne']);
-  parentNode.appendChild(kittens.makeDOMTree());
+  var computerOwner = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Whose computer is it?',
+      true,
+      [
+        'Mine',
+        'A friend or family member\'s',
+        'My employer\'s',
+        'A library\'s',
+        constants.OTHER
+      ],
+      constants.Randomize.NONE);
+  parentNode.appendChild(computerOwner.makeDOMTree());
+
+  var antivirus = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Does your computer have anti-virus software running on it?',
+      true,
+      [
+        'Yes',
+        'No',
+        'I don\'t know'
+      ],
+      constants.Randomize.NONE);
+  parentNode.appendChild(antivirus.makeDOMTree());
 }
 
 /**
@@ -218,7 +240,7 @@ function setupSurveyForm(savedState) {
   } else if (setupSurvey.status == constants.SETUP_COMPLETED) {
     // Show a notice that the survey was already completed.
     $('already-completed').classList.remove('hidden');
-    setTimeout(window.close, setupSurvey.CLOSE_TIME);
+    setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
   }
 }
 
@@ -232,7 +254,7 @@ function setupFormSubmitted(event) {
   $('explanation').classList.add('hidden');
   $('survey-container').classList.add('hidden');
   $('thank-you').classList.remove('hidden');
-  setTimeout(window.close, setupSurvey.CLOSE_TIME);
+  setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
 }
 
 /**

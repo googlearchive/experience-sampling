@@ -2,80 +2,32 @@
 <html>
 <head>
 <title>Survey Example</title>
-<link rel="stylesheet" type="text/css" href="survey-example.css">
+<link rel="stylesheet" type="text/css" href="survey-style.css">
+<script src="../constants.js"></script>
+<script src="surveygenerator.js"></script>
+<script src="example.js"></script>
 </head>
 
 <body>
-<div id="study-title">
-<h1>
-Chrome Experience Sampling Survey [DRAFT]
-</h1>
-</div>
+  <div class="centered inner-centering">
+    <h1>This is a survey title</h1>
+  </div>
 
-<div id="study-information">
-<h3>Please fill out this survey about the screen you just interacted with</h3>
-All questions are optional, but will help us better understand our participant population.
-</div>
+  <div class="centered inner-centering alert hidden" id="explanation">
+    <b>Here is a blurb to describe what we're asking about.</b>
+    <br>
+    And here is another blurb that explains this in a little more detail.
+  </div>
 
-<div id="survey-form">
-<p>You were just presented with a screen that looked like this:</p>
+  <div class="centered inner-centering alert hidden" id="thank-you">
+    <b>Thank you for participating!</b>
+    <br>
+    This window will close in a few seconds.
+  </div>
 
-<div class="preview">
-<img class="screenshot" src="screenshots/ssl-nonblocking-warning.png" />
-</div>
-
-<form>
-<fieldset>
-<legend>You choose the "Proceed anyway" option. Can you tell us how you chose that option?</legend>
-<textarea name="why" cols="50" rows="5">
-</textarea>
-</fieldset>
-
-<fieldset>
-<legend>Did you do a Web search to help make your decision?</legend>
-<input name="didsearch" type="radio" value="yes" required /><label for="didsearch">Yes</label><br />
-<input name="didsearch" type="radio" value="no" /><label for="didsearch">No</label>
-</fieldset>
-
-<fieldset>
-<legend>Which of the following influenced your decision to choose "Proceed anyway"?</legend>
-<input type="checkbox" name="mac-is-safe" /><label for="mac-is-safe">I have a Mac, so security is not a problem for me</label><br />
-<input type="checkbox" name="see-a-lot" /><label for="see-a-lot">I see this warning every time I visit this website, so I ignore it</label><br />
-<input type="checkbox" name="only-way" /><label for "only-way">I can't find any othe rway to get to this website</label><br />
-<input type="checkbox" name="antivirus" /><label for "antivirus">I run anti-virus software, so security is not a problem for me</label>
-</fieldset>
-
-<fieldset>
-<legend>How did you get to the site you're about to visit?</legend>
-<input type="checkbox" name="link-other-site" /><label for="link-other-site">From a link on another site</label><br />
-<input type="checkbox" name="link-email-chat" /><label for="link-email-chat">From a link in email or a chat window</label><br />
-<input type="checkbox" name="google-search" /><label for="google-search">From a Google search</label><br />
-<input type="checkbox" name="address-bar" /><label for="address-bar">I entered the address directly in the address bar</label><br />
-<input type="checkbox" name="bookmark" /><label for="bookmark">From one of my bookmarks</label><br />
-<input type="text" name="other" /><label for="other">Other (please explain)</label>
-</fieldset>
-
-<fieldset>
-<legend>What did you think this warning was trying to tell you?</legend>
-<input type="checkbox" name="virus" /><label for="virus">That the site had a virus on it</label><br />
-<input type="checkbox" name="unsafe-wifi" /><label for="unsafe-wifi">That it was not safe to use the Wifi here</label><br />
-<input type="checkbox" name="unsafe-password" /><label for="unsafe-password">That I shouldn't enter my password here</label><br />
-<input type="text" name="other" /><label for="other">Other (please explain)</label>
-</fieldset>
-
-<fieldset>
-<legend>What device are you using?</legend>
-<input type="radio" name="pc" required /><label for="pc">My personal computer</label><br />
-<input type="radio" name="work" /><label for="work">A computer at work</label><br />
-<input type="radio" name="friend" /><label for="friend">A friend's computer</label><br />
-<input type="radio" name="phone" /><label for="phone">My mobile phone</label><br />
-<input type="radio" name="tablet" /><label for="tablet">My Android tablet</label>
-</fieldset>
-
-<fieldset class="submit">
-  <input type="submit" value="Submit" />
-</fieldset>
-</form>
-</div>
-
+  <div class="centered hidden" id="survey-container">
+    <form name="survey-form" id="survey-form"></form>
+  </div>
+  
+</body>
 </html>
