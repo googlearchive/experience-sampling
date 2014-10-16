@@ -63,5 +63,8 @@ constants.FindEventType = function(str) {
   return constants.EventType.UNKNOWN;
 };
 
+// After a survey is completed, automatically close the survey after a pause.
+constants.SURVEY_CLOSE_TIME = 3000;  // Three seconds, in milliseconds.
+
 // An element lookup shortcut, per convention.
 var $ = function(id) { return document.getElementById(id); };
