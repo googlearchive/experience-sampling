@@ -11,6 +11,7 @@
   },
 
   "permissions": [
+    "alarms",
     "experienceSamplingPrivate",
     "notifications",
     "storage",

@@ -43,5 +43,25 @@ constants.Randomize = {
 // Handle "other" specially.
 constants.OTHER = 'Other: ';
 
+// The different types of event types.
+constants.EventType = {
+  UNKNOWN: 'unknown',
+  SSL: 'ssl_interstitial',
+};
+
+/**
+ * The chrome.experienceSamplingPrivate event types are often post-fixed, e.g.,
+ * ssl_interstitial_overridable_net::ERR_CERT_COMMON_NAME_INVALID. This
+ * is a convenience method for mapping an event type string to an EventType.
+ * @param {string} str The string event type.
+ * @returns {string} The matching EventType.
+ */
+constants.FindEventType = function(str) {
+  var re = new RegExp('^' + constants.EventType.SSL);
+  if (str.match(re))
+    return constants.EventType.SSL;
+  return constants.EventType.UNKNOWN;
+};
+
 // An element lookup shortcut, per convention.
 var $ = function(id) { return document.getElementById(id); };
