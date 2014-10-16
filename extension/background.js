@@ -11,16 +11,39 @@
 var cesp = {};  // namespace variable
 
 cesp.readyForSurveys = false;
+cesp.operatingSystem = "";
 
 // Settings.
-cesp.SERVER_URL = "https://chrome-experience-sampling.appspot.com";
-cesp.SUBMIT_SURVEY_ACTION = "/_ah/api/cesp/v1/submitsurvey";
+cesp.SERVER_URL = 'https://chrome-experience-sampling.appspot.com';
+cesp.SUBMIT_SURVEY_ACTION = '/_ah/api/cesp/v1/submitsurvey';
 cesp.XHR_TIMEOUT = 4000;
-cesp.NOTIFICATION_TITLE = "New survey available";
-cesp.NOTIFICATION_BODY =
-    "Click here to take a survey about the screen you just saw";
-cesp.ICON_FILE = "icon.png";
-cesp.NOTIFICATION_DEFAULT_TIMEOUT = 15000;  // milliseconds
+cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
+cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
+cesp.NOTIFICATION_BUTTON = 'Take survey!';
+cesp.ICON_FILE = 'icon.png';
+cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // Minutes
+cesp.NOTIFICATION_TAG = 'chromeSurvey';
+cesp.ALARM_NAME = 'notificationTimeout';
+
+// SETUP: INITIAL VALUES
+
+/**
+ * Sets the operating system. This is a callback for runtime.getPlatformInfo.
+ * @param {Object} platformInfo An object with info about the client platform.
+ */
+function setOperatingSystem(platformInfo) {
+  cesp.operatingSystem = platformInfo.os;
+}
+
+/**
+ * Sets up basic state for the extension. Called when extension is installed.
+ */
+function setupState() {
+  chrome.storage.local.set({'pending_responses': []});
+  chrome.runtime.getPlatformInfo(setOperatingSystem);
+}
+
+// SETUP: CONSENT AND DEMOGRAPHICS
 
 /**
  * Retrieves the registration status from Local Storage.
@@ -36,7 +59,6 @@ function getConsentStatus() {
 function maybeShowConsentForm(consentLookup) {
   if (!consentLookup || consentLookup[constants.CONSENT_KEY] == null ||
       consentLookup[constants.CONSENT_KEY] == constants.CONSENT_PENDING) {
-    chrome.storage.local.set({'pending_responses': []});
     chrome.storage.onChanged.addListener(storageUpdated);
     chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
   } else if (consentLookup[constants.CONSENT_KEY] ==
@@ -81,27 +103,71 @@ function storageUpdated(changes, areaName) {
 // Performs consent and registration checks on startup and install.
 chrome.runtime.onInstalled.addListener(getConsentStatus);
 chrome.runtime.onStartup.addListener(getConsentStatus);
+chrome.runtime.onInstalled.addListener(setupState);
+
+// SURVEY HANDLING
 
 /**
- * Creates a new HTML5 notification to prompt the participant to take an
- * experience sampling survey.
+ * Clears our existing notification(s). Unfortunately, this isn't supported
+ * in Linux HTML5 notifications.
+ */
+function clearNotifications(ignored) {
+  if (cesp.operatingSystem != 'linux')
+    chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(cleared) {});
+  chrome.alarms.clearAll();
+}
+
+/**
+ * Creates a new notification to prompt the participant to take an experience
+ * sampling survey.
  * @param {object} element The browser element of interest.
  * @param {object} decision The decision the participant made.
  */
-function showSurveyPrompt(element, decision) {
+function showSurveyNotification(element, decision) {
   if (!cesp.readyForSurveys) return;
+  clearNotifications();
+
   var timePromptShown = new Date();
-  var opt = {body: cesp.NOTIFICATION_TITLE,
-             icon: cesp.ICON_FILE,
-             tag: cesp.notificationTag};
-  var notification = new window.Notification(cesp.NOTIFICATION_TITLE, opt);
-  notification.onshow = function() {
-    setTimeout(notification.close, cesp.NOTIFICATION_DEFAULT_TIMEOUT);
-  };
-  notification.onclick = function() {
+  var clickHandler = function(id) {
     var timePromptClicked = new Date();
     loadSurvey(element, decision, timePromptShown, timePromptClicked);
+    clearNotifications();
   };
+
+  if (cesp.operatingSystem == 'linux') {
+    // Use HTML5 notifications for Linux. In some corner cases, these
+    // notifications might be buggy because the event page has been killed
+    // (so timeouts etc. won't work).
+    var opt = {
+      body: cesp.NOTIFICATION_TITLE,
+      icon: cesp.ICON_FILE,
+      tag: cesp.NOTIFICATION_TAG
+    };
+    var notification = new window.Notification(cesp.NOTIFICATION_TITLE, opt);
+    notification.onshow = function() {
+      setTimeout(notification.close, cesp.NOTIFICATION_DEFAULT_TIMEOUT);
+    };
+    notification.onclick = clickHandler;
+  } else {
+    var opt = {
+      type: 'basic',
+      iconUrl: cesp.ICON_FILE,
+      title: cesp.NOTIFICATION_TITLE,
+      message: cesp.NOTIFICATION_BODY,
+      eventTime: Date.now(),
+      buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+    };
+    chrome.notifications.create(
+        cesp.NOTIFICATION_TAG,
+        opt,
+        function(id) {
+          chrome.alarms.create(
+              cesp.ALARM_NAME,
+              {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
+        });
+    chrome.notifications.onClicked.addListener(clickHandler);
+    chrome.notifications.onButtonClicked.addListener(clickHandler);
+  }
 }
 
 /**
@@ -115,14 +181,24 @@ function showSurveyPrompt(element, decision) {
  */
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   if (!cesp.readyForSurveys) return;
-  var surveyURL = "survey-example.html";
-  chrome.tabs.create({'url': chrome.extension.getURL("surveys/" + surveyURL)},
-      function() { console.log("Opened survey."); });
+  var eventType = constants.FindEventType(element['name']);
+  switch (eventType) {
+    case constants.EventType.SSL:
+      var surveyURL = 'survey-example.html';
+      chrome.tabs.create(
+          {'url': chrome.extension.getURL('surveys/' + surveyURL)},
+          function() { console.log('Opened survey.'); });
+      break;
+    case constants.EventType.UNKNOWN:
+      console.log('Unknown event type');
+  }
 }
 
 // Trigger the new survey prompt when the participant makes a decision about an
 // experience sampling element.
-chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyPrompt);
+chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
+// Clear the notification state when the survey times out.
+chrome.alarms.onAlarm.addListener(clearNotifications);
 
 /**
  * A survey response (question and answer).
