@@ -101,7 +101,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
       if (this.randomize != constants.Randomize.NONE)
         answerChoices = knuthShuffle(answerChoices, this.randomize);
       for (var i = 0; i < answerChoices.length; i++)
-        container.appendChild(answerChoices[i])
+        container.appendChild(answerChoices[i]);
       break;
     case constants.QuestionType.DROPDOWN:
       var select = document.createElement('select');
@@ -133,14 +133,139 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
 // SCALE
 
-// TODO(felt): Implement and document this.
-function ScaleQuestion(
-    questionType, question, required, direction, labels, randomize) {
+/**
+ * Represents scale questions. Currently supports HORIZONTAL_SCALE and
+ * VERTICAL_SCALE question types. Randomization simply flips the order to
+ * preserve the scale structure.
+ * @param {string} questionType Question presentation (constants.QuestionType).
+ * @param {string} question The question to be asked.
+ * @param {boolean} required Whether the question needs to be answered.
+ * @param {Array.string} scale The labels for each point on the scale.
+ * @param {String} randomize Type of randomization (constants.Randomize).
+ */
+function ScaleQuestion(questionType, question, required, scale, randomize) {
   Question.call(this, questionType, question, required);
+  this.scale = scale;
+  this.randomize = randomize;
+  this.attributes = [];
 }
 
 ScaleQuestion.prototype = Object.create(Question.prototype);
 ScaleQuestion.prototype.constructor = ScaleQuestion;
+
+/**
+ * For multiple horizontal scales, like this:
+ *    How are you feeling?
+ *    - Sad 1 2 3 4 5
+ *    - Happy 1 2 3 4 5
+ * Here the adjectives "Sad" and "Happy" are attributes. This must be set
+ * before makeDOMTree().
+ * @param {Array.string} attributes The attributes that the user is rating.
+ */
+ScaleQuestion.prototype.setAttributes = function(attributes) {
+  if (this.questionType != constants.QuestionType.MULT_HORIZ_SCALE)
+    throw new Error('Only set attributes for MULT_HORIZ_SCALE questions.');
+  this.attributes = attributes;
+};
+
+/**
+ * A helper method for makeDOMTree.
+ * @param {boolean} horizontal Whether it is a horizontal scale.
+ * @param {string} questionName The DOM-ready question name.
+ * @param {boolean} reverse Whether to flip the array.
+ * @param {boolean} showLabels If horizontal, whether to show the labels.
+ * @private
+ */
+ScaleQuestion.prototype.makeSingleRow =
+    function(horizontal, questionName, reverse, showLabels) {
+  var container = document.createElement('div');
+  var scaleElements = [];
+  for (var i = 0; i < this.scale.length; i++) {
+    var answer = document.createElement('div');
+    if (horizontal)
+      answer.classList.add('horizontal-scale');
+    var shrunkenAnswer = i + '-' + getDomNameFromValue(this.scale[i]);
+
+    var radio = document.createElement('input');
+    radio.setAttribute('id', shrunkenAnswer);
+    radio.setAttribute('name', questionName);
+    radio.setAttribute('type', 'radio');
+    radio.setAttribute('value', shrunkenAnswer);
+    if (this.required)
+      radio.setAttribute('required', this.required);
+
+    var label = document.createElement('label');
+    label.setAttribute('for', shrunkenAnswer);
+    label.textContent = this.scale[i];
+
+    if (horizontal) {
+      if (showLabels) {
+        answer.appendChild(label);
+        answer.appendChild(document.createElement('br'));
+      }
+      answer.appendChild(radio);
+    } else {
+      answer.appendChild(radio);
+      answer.appendChild(label);
+    }
+    scaleElements.push(answer);
+  }
+  if (reverse) {
+    scaleElements = flipArray(
+        scaleElements, (this.randomize == constants.Randomize.ANCHOR_LAST));
+  }
+  for (var i = 0; i < scaleElements.length; i++)
+    container.appendChild(scaleElements[i]);
+
+  if (horizontal) {
+    var clearDiv = document.createElement('div');
+    clearDiv.classList.add('clear-div');
+    container.appendChild(clearDiv);
+  }
+  return container;
+};
+
+/**
+ * Creates the DOM representation of a ScaleQuestion.
+ * @return {Object} The DOM node that contains the question.
+ */
+ScaleQuestion.prototype.makeDOMTree = function() {
+  var horizontal =
+      this.questionType == constants.QuestionType.HORIZ_SCALE ||
+      this.questionType == constants.QuestionType.MULT_HORIZ_SCALE;
+  var multi =
+      (this.questionType == constants.QuestionType.MULT_HORIZ_SCALE) &&
+      this.attributes.length > 0;
+  var container = document.createElement('div');
+  container.classList.add('fieldset');
+
+  var legend = document.createElement('legend');
+  legend.textContent = this.question;
+  container.appendChild(legend);
+
+  var reverse = this.randomize == constants.Randomize.NONE ? false : coinToss();
+  var shrunkenQuestion = getDomNameFromValue(this.question);
+  if (multi) {
+    var shuffledAttributes =
+        knuthShuffle(this.attributes, constants.Randomize.ALL);
+    for (var i = 0; i < shuffledAttributes.length; i++) {
+      var floatScale = document.createElement('div');
+      floatScale.classList.add('horizontal-rowlabel');
+      if (i == 0)
+        floatScale.classList.add('first-rowlabel');
+      floatScale.textContent = shuffledAttributes[i] + ':';
+      container.appendChild(floatScale);
+      var questionName =
+          getDomNameFromValue(shuffledAttributes[i]) + shrunkenQuestion;
+      container.appendChild(
+          this.makeSingleRow(horizontal, questionName, reverse, (i == 0)));
+    }
+  } else {
+    container.appendChild(
+        this.makeSingleRow(horizontal, shrunkenQuestion, reverse, true));
+  }
+  return container;
+};
 
 // ESSAY
 
@@ -231,6 +356,30 @@ function knuthShuffle(arr, randomType) {
     arr[randomIndex] = swapTemp;
   }
   return arr;
+}
+
+/**
+ * A wrapper method for Math.random.
+ * @returns {boolean} Returns true half the time.
+ */
+function coinToss() {
+  return (Math.random() < 0.5);
+}
+
+/**
+ * Flip an array.
+ * @param {Array.Object} arr The array to flip.
+ * @param {bool} anchorLast Whether to anchor the last element.
+ * @returns {Array.Object} The flipped array.
+ */
+function flipArray(arr, anchorLast) {
+  var end = anchorLast ? arr.length - 1 : arr.length;
+  var reverseArr = [];
+  for (var i = end - 1; i >= 0; i--)
+    reverseArr.push(arr[i]);
+  if (anchorLast)
+    reverseArr.push(arr[arr.length - 1]);
+  return reverseArr;
 }
 
 /**

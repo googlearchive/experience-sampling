@@ -12,6 +12,12 @@
     'chrome-extension://__MSG_@@extension_id__/open-sans/OpenSans-Bold.ttf');
 }
 
+@font-face {
+  font-family: 'OpenSansSemibold';
+  src: url(
+    'chrome-extension://__MSG_@@extension_id__/open-sans/OpenSans-Semibold.ttf');
+}
+
 .alert {
   color: #DB4437;
 }
@@ -32,6 +38,10 @@ body {
   width: 800px;
 }
 
+.clear-div {
+  clear: both;
+}
+
 .fieldset {
   background-color: #ECF3FE;
   border: none;
@@ -39,8 +49,27 @@ body {
   padding: 8px;
 }
 
+.first-rowlabel {
+  padding-top: 1.2em;
+}
+
 .hidden {
   display: none;
+}
+
+.horizontal-rowlabel {
+  float: left;
+  font-family: 'OpenSansSemibold';
+  padding-bottom: 5px;
+  padding-right: 20px;
+  width: 90px;
+}
+
+.horizontal-scale {
+  float: left;
+  padding-bottom: 5px;
+  text-align: center;
+  width: 100px;
 }
 
 .inner-centering {
