@@ -21,29 +21,21 @@ cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.ICON_FILE = 'icon.png';
-cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // Minutes
+cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
 cesp.ALARM_NAME = 'notificationTimeout';
 
-// SETUP: INITIAL VALUES
-
-/**
- * Sets the operating system. This is a callback for runtime.getPlatformInfo.
- * @param {Object} platformInfo An object with info about the client platform.
- */
-function setOperatingSystem(platformInfo) {
-  cesp.operatingSystem = platformInfo.os;
-}
+// SETUP
 
 /**
  * Sets up basic state for the extension. Called when extension is installed.
  */
 function setupState() {
   chrome.storage.local.set({'pending_responses': []});
-  chrome.runtime.getPlatformInfo(setOperatingSystem);
+  chrome.runtime.getPlatformInfo(function(platformInfo) {
+    cesp.operatingSystem = platformInfo.os;
+  });
 }
-
-// SETUP: CONSENT AND DEMOGRAPHICS
 
 /**
  * Retrieves the registration status from Local Storage.
