@@ -50,7 +50,7 @@ body {
 }
 
 .first-rowlabel {
-  padding-top: 1.2em;
+  padding-top: 1.1em;
 }
 
 .hidden {
@@ -67,9 +67,10 @@ body {
 
 .horizontal-scale {
   float: left;
+  font-size: .8em;
   padding-bottom: 5px;
   text-align: center;
-  width: 100px;
+  width: 130px;
 }
 
 .inner-centering {

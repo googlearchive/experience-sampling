@@ -155,18 +155,25 @@ function showSurveyNotification(element, decision) {
  */
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   if (!cesp.readyForSurveys) return;
+
+  var surveyLocations = {
+    SSL: 'ssl.html',
+    EXAMPLE: 'survey-example.html'
+  };
+  var surveyURL;
   var eventType = constants.FindEventType(element['name']);
   switch (eventType) {
     case constants.EventType.SSL:
-      var surveyURL = 'survey-example.html';
-      chrome.tabs.create(
-          {'url': chrome.extension.getURL('surveys/' + surveyURL)},
-          function() { console.log('Opened survey.'); });
+      surveyURL = surveyLocations.SSL;
       break;
     case constants.EventType.UNKNOWN:
-      console.log('Unknown event type');
+      surveyURL = surveyLocations.EXAMPLE;
+      console.log('Unknown event type: ' + element['name']);
       break;
   }
+  chrome.tabs.create(
+      {'url': chrome.extension.getURL('surveys/' + surveyURL)},
+      function() { console.log('Opened survey.'); });
 }
 
 // Trigger the new survey prompt when the participant makes a decision about an
