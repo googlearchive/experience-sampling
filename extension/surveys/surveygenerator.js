@@ -204,8 +204,10 @@ ScaleQuestion.prototype.makeSingleRow =
     }
     scaleElements.push(answer);
   }
-  if (reverse)
-    scaleElements = flipArray(scaleElements, this.randomize);
+  if (reverse) {
+    scaleElements = flipArray(
+        scaleElements, (this.randomize == constants.Randomize.ANCHOR_LAST));
+  }
   for (var i = 0; i < scaleElements.length; i++)
     container.appendChild(scaleElements[i]);
 
@@ -359,18 +361,17 @@ function coinToss() {
 }
 
 /**
- * Flip an array. Will anchor the last element for ANCHOR_LAST.
+ * Flip an array.
  * @param {Array.Object} arr The array to flip.
- * @param {string} randomType The type of randomization (constants.Randomize)
+ * @param {bool} anchorLast Whether to anchor the last element.
  * @returns {Array.Object} The flipped array.
  */
-function flipArray(arr, randomType) {
-  var end = randomType == constants.Randomize.ANCHOR_LAST ?
-            arr.length - 1 : arr.length;
+function flipArray(arr, anchorLast) {
+  var end = anchorLast ? arr.length - 1 : arr.length;
   var reverseArr = [];
   for (var i = end - 1; i >= 0; i--)
     reverseArr.push(arr[i]);
-  if (randomType == constants.Randomize.ANCHOR_LAST)
+  if (anchorLast)
     reverseArr.push(arr[arr.length - 1]);
   return reverseArr;
 }
