@@ -26,11 +26,12 @@
   color: #4285F4;
 }
 
-body {
+html, body {
   color: #656565;
-  padding: 2em;
+  padding: 0;
   font-family: 'OpenSans';
   font-size: .9em;
+  height: 100%;
 }
 
 .centered {
@@ -40,6 +41,10 @@ body {
 
 .clear-div {
   clear: both;
+}
+
+#explanation {
+  padding-bottom: 20px;
 }
 
 .fieldset {
@@ -87,12 +92,26 @@ legend {
   padding-bottom: .3em;
 }
 
+.scroll-constant {
+  height: 330px;
+}
+
+.scroll-holder {
+  height: 100%;
+  position: relative;
+}
+
+.scroll-scroll {
+  bottom: 0;
+  left: 0;
+  overflow-x: auto;
+  position: absolute;
+  right: 0;
+  top: 330px;
+}
+
 .submit {
   background-color: none;
   border: none;
   text-align: center;
-}
-
-#survey-container {
-  padding-top: 30px;
 }
