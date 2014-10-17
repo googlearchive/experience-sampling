@@ -166,9 +166,21 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
     case constants.EventType.SSL:
       surveyURL = surveyLocations.SSL;
       break;
-    case constants.EventType.UNKNOWN:
+    case constants.EventType.MALWARE:
+    case constants.EventType.PHISHING:
+    case constants.EventType.DOWNLOAD_MALICIOUS:
+    case constants.EventType.EXTENSION_INSTALL:
+      // TODO: Make surveys for each of these.
       surveyURL = surveyLocations.EXAMPLE;
-      console.log('Unknown event type: ' + element['name']);
+      break;
+    case constants.EventType.HARMFUL:
+    case constants.EventType.SB_OTHER:
+    case constants.EventType.DOWNLOAD_DANGEROUS:
+    case constants.EventType.DOWNLOAD_DANGER_PROMPT:
+      // Don't survey about these.
+      return;
+    case constants.EventType.UNKNOWN:
+      throw new Error('Unknown event type: ' + element['name']);
       break;
   }
   chrome.tabs.create(
