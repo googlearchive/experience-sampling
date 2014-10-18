@@ -25,6 +25,7 @@ cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
 cesp.ALARM_NAME = 'notificationTimeout';
+cesp.SURVEY_COUNT_RESET_ALARM_NAME = 'surveyCountReset';
 
 // SETUP
 
@@ -41,6 +42,17 @@ function setupState() {
   chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
       {delayInMinutes: 5, periodInMinutes: 1440});
 }
+
+/**
+ * Resets the count of surveys shown to 0.
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
+ */
+function resetSurveyCount(alarm) {
+  if (alarm.name === cesp.SURVEY_THROTTLE_RESET_ALARM) {
+    chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
+  }
+}
+chrome.alarms.onAlarm.addListener(resetSurveyCount);
 
 /**
  * Retrieves the registration status from Local Storage.
