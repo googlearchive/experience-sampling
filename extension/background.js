@@ -35,6 +35,10 @@ function setupState() {
   chrome.runtime.getPlatformInfo(function(platformInfo) {
     cesp.operatingSystem = platformInfo.os;
   });
+  // Set the count of surveys shown to 0, and reset it each day.
+  chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
+  chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
+      {delayInMinutes: 5, periodInMinutes: 1440});
 }
 
 /**
@@ -115,33 +119,44 @@ function clearNotifications(unused) {
  */
 function showSurveyNotification(element, decision) {
   if (!cesp.readyForSurveys) return;
-  clearNotifications();
 
-  var timePromptShown = new Date();
-  var clickHandler = function(unused) {
-    var timePromptClicked = new Date();
-    loadSurvey(element, decision, timePromptShown, timePromptClicked);
+  chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
+    if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
+      return;
+    }
+
     clearNotifications();
-  };
 
-  var opt = {
-    type: 'basic',
-    iconUrl: cesp.ICON_FILE,
-    title: cesp.NOTIFICATION_TITLE,
-    message: cesp.NOTIFICATION_BODY,
-    eventTime: Date.now(),
-    buttons: [{title: cesp.NOTIFICATION_BUTTON}]
-  };
-  chrome.notifications.create(
-      cesp.NOTIFICATION_TAG,
-      opt,
-      function(id) {
-        chrome.alarms.create(
-            cesp.ALARM_NAME,
-            {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
-      });
-  chrome.notifications.onClicked.addListener(clickHandler);
-  chrome.notifications.onButtonClicked.addListener(clickHandler);
+    var timePromptShown = new Date();
+    var clickHandler = function(unused) {
+      var timePromptClicked = new Date();
+      loadSurvey(element, decision, timePromptShown, timePromptClicked);
+      clearNotifications();
+    };
+
+    var opt = {
+      type: 'basic',
+      iconUrl: cesp.ICON_FILE,
+      title: cesp.NOTIFICATION_TITLE,
+      message: cesp.NOTIFICATION_BODY,
+      eventTime: Date.now(),
+      buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+    };
+    chrome.notifications.create(
+        cesp.NOTIFICATION_TAG,
+        opt,
+        function(id) {
+          chrome.alarms.create(
+              cesp.ALARM_NAME,
+              {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
+        });
+    chrome.notifications.onClicked.addListener(clickHandler);
+    chrome.notifications.onButtonClicked.addListener(clickHandler);
+
+    chrome.storage.local.set({
+      cesp.SURVEYS_SHOWN_TODAY: items[cesp.SURVEYS_SHOWN_TODAY] + 1
+    });
+  }
 }
 
 /**
