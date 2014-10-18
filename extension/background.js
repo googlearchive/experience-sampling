@@ -29,12 +29,17 @@ cesp.ALARM_NAME = 'notificationTimeout';
 
 /**
  * Sets up basic state for the extension. Called when extension is installed.
+ * @param {object} details The details of the chrome.runtime.onInstalled event.
  */
-function setupState() {
-  chrome.storage.local.set({'pending_responses': []});
-  chrome.runtime.getPlatformInfo(function(platformInfo) {
-    cesp.operatingSystem = platformInfo.os;
-  });
+function setupState(details) {
+  // We check the event reason because onInstalled can trigger for other
+  // reasons (extension or browser update).
+  if (details.reason === 'install') {
+    chrome.storage.local.set({'pending_responses': []});
+    chrome.runtime.getPlatformInfo(function(platformInfo) {
+      cesp.operatingSystem = platformInfo.os;
+    });
+  }
 }
 
 /**
