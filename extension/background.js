@@ -20,37 +20,54 @@ cesp.XHR_TIMEOUT = 4000;
 cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
-cesp.MAX_SURVEYS_PER_DAY = 10;  // TODO: Is this a sane number per day?
+cesp.MAX_SURVEYS_PER_DAY = 2;
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
-cesp.ALARM_NAME = 'notificationTimeout';
 cesp.SURVEY_COUNT_RESET_ALARM_NAME = 'surveyCountReset';
+cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
+cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 
 // SETUP
 
 /**
  * Sets up basic state for the extension. Called when extension is installed.
+ * @param {object} details The details of the chrome.runtime.onInstalled event.
  */
-function setupState() {
-  chrome.storage.local.set({'pending_responses': []});
-  chrome.runtime.getPlatformInfo(function(platformInfo) {
-    cesp.operatingSystem = platformInfo.os;
-  });
-  // Set the count of surveys shown to 0, and reset it each day.
-  chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
-  chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
-      {delayInMinutes: 5, periodInMinutes: 1440});
+function setupState(details) {
+  // We check the event reason because onInstalled can trigger for other
+  // reasons (extension or browser update).
+  if (details.reason === 'install') {
+    chrome.storage.local.set({'pending_responses': []});
+    chrome.runtime.getPlatformInfo(function(platformInfo) {
+      cesp.operatingSystem = platformInfo.os;
+    });
+    // Automatically uninstall the extension after 120 days.
+    chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
+    // Set the count of surveys shown to 0, and reset it each day.
+    chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
+    chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
+        {delayInMinutes: 5, periodInMinutes: 1440});
+  }
 }
+
+/**
+ * Handles the uninstall alarm.
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
+*/
+function handleUninstallAlarm(alarm) {
+  if (alarm.name === cesp.UNINSTALL_ALARM_NAME)
+    chrome.management.uninstallSelf();
+}
+chrome.alarms.onAlarm.addListener(handleUninstallAlarm);
 
 /**
  * Resets the count of surveys shown to 0.
  * @param {Alarm} alarm The alarm object from the onAlarm event.
  */
 function resetSurveyCount(alarm) {
-  if (alarm.name === cesp.SURVEY_THROTTLE_RESET_ALARM) {
+  if (alarm.name === cesp.SURVEY_THROTTLE_RESET_ALARM)
     chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
-  }
 }
 chrome.alarms.onAlarm.addListener(resetSurveyCount);
 
@@ -118,11 +135,17 @@ chrome.runtime.onInstalled.addListener(setupState);
 
 /**
  * Clears our existing notification(s).
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
  */
-function clearNotifications(unused) {
-  chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
-  chrome.alarms.clearAll();
+function clearNotifications(alarm) {
+  if (alarm.name === cesp.NOTIFICATION_ALARM_NAME) {
+    chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
+    chrome.alarms.clear(cesp.NOTIFICATION_ALARM_NAME);
+  }
 }
+// Clear the notification state when the survey times out.
+chrome.alarms.onAlarm.addListener(clearNotifications);
+
 
 /**
  * Creates a new notification to prompt the participant to take an experience
@@ -160,7 +183,7 @@ function showSurveyNotification(element, decision) {
         opt,
         function(id) {
           chrome.alarms.create(
-              cesp.ALARM_NAME,
+              cesp.NOTIFICATION_ALARM_NAME,
               {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
         });
     chrome.notifications.onClicked.addListener(clickHandler);
@@ -194,9 +217,21 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
     case constants.EventType.SSL:
       surveyURL = surveyLocations.SSL;
       break;
-    case constants.EventType.UNKNOWN:
+    case constants.EventType.MALWARE:
+    case constants.EventType.PHISHING:
+    case constants.EventType.DOWNLOAD_MALICIOUS:
+    case constants.EventType.EXTENSION_INSTALL:
+      // TODO: Make surveys for each of these.
       surveyURL = surveyLocations.EXAMPLE;
-      console.log('Unknown event type: ' + element['name']);
+      break;
+    case constants.EventType.HARMFUL:
+    case constants.EventType.SB_OTHER:
+    case constants.EventType.DOWNLOAD_DANGEROUS:
+    case constants.EventType.DOWNLOAD_DANGER_PROMPT:
+      // Don't survey about these.
+      return;
+    case constants.EventType.UNKNOWN:
+      throw new Error('Unknown event type: ' + element['name']);
       break;
   }
   chrome.tabs.create(
@@ -207,8 +242,6 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 // Trigger the new survey prompt when the participant makes a decision about an
 // experience sampling element.
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
-// Clear the notification state when the survey times out.
-chrome.alarms.onAlarm.addListener(clearNotifications);
 
 /**
  * A survey response (question and answer).
