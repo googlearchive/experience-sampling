@@ -23,7 +23,8 @@ cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
-cesp.ALARM_NAME = 'notificationTimeout';
+cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
+cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 
 // SETUP
 
@@ -39,8 +40,20 @@ function setupState(details) {
     chrome.runtime.getPlatformInfo(function(platformInfo) {
       cesp.operatingSystem = platformInfo.os;
     });
+    // Automatically uninstall the extension after 120 days.
+    chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
   }
 }
+
+/**
+ * Handles the uninstall alarm.
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
+*/
+function handleUninstallAlarm(alarm) {
+  if (alarm.name === cesp.UNINSTALL_ALARM_NAME)
+    chrome.management.uninstallSelf();
+}
+chrome.alarms.onAlarm.addListener(handleUninstallAlarm);
 
 /**
  * Retrieves the registration status from Local Storage.
@@ -106,11 +119,17 @@ chrome.runtime.onInstalled.addListener(setupState);
 
 /**
  * Clears our existing notification(s).
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
  */
-function clearNotifications(unused) {
-  chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
-  chrome.alarms.clearAll();
+function clearNotifications(alarm) {
+  if (alarm.name === cesp.NOTIFICATION_ALARM_NAME) {
+    chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
+    chrome.alarms.clear(cesp.NOTIFICATION_ALARM_NAME);
+  }
 }
+// Clear the notification state when the survey times out.
+chrome.alarms.onAlarm.addListener(clearNotifications);
+
 
 /**
  * Creates a new notification to prompt the participant to take an experience
@@ -142,7 +161,7 @@ function showSurveyNotification(element, decision) {
       opt,
       function(id) {
         chrome.alarms.create(
-            cesp.ALARM_NAME,
+            cesp.NOTIFICATION_ALARM_NAME,
             {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
       });
   chrome.notifications.onClicked.addListener(clickHandler);
@@ -196,8 +215,6 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 // Trigger the new survey prompt when the participant makes a decision about an
 // experience sampling element.
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
-// Clear the notification state when the survey times out.
-chrome.alarms.onAlarm.addListener(clearNotifications);
 
 /**
  * A survey response (question and answer).
