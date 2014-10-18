@@ -43,10 +43,21 @@ constants.Randomize = {
 // Handle "other" specially.
 constants.OTHER = 'Other: ';
 
-// The different types of event types.
+// The different types of events that trigger survey notifications.
 constants.EventType = {
-  UNKNOWN: 'unknown',
   SSL: 'ssl_interstitial',
+  MALWARE: 'safebrowsing_interstitial',
+  PHISHING: 'phishing_interstitial',
+  HARMFUL: 'harmful_interstitial',
+  SB_OTHER: 'safebrowsing_other',
+
+  DOWNLOAD_MALICIOUS: 'download_warning_malicious',
+  DOWNLOAD_DANGEROUS: 'download_warning_dangerous',
+  DOWNLOAD_DANGER_PROMPT: 'download_danger_prompt',
+
+  EXTENSION_INSTALL: 'extension_install_dialog',
+
+  UNKNOWN: 'unknown',
 };
 
 /**
@@ -57,9 +68,11 @@ constants.EventType = {
  * @returns {string} The matching EventType.
  */
 constants.FindEventType = function(str) {
-  var re = new RegExp('^' + constants.EventType.SSL);
-  if (str.match(re))
-    return constants.EventType.SSL;
+  for (var evt in constants.EventType) {
+    var re = new RegExp('^' + constants.EventType[evt]);
+    if (str.match(re))
+      return constants.EventType[evt];
+  }
   return constants.EventType.UNKNOWN;
 };
 
