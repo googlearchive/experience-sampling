@@ -23,7 +23,8 @@ cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
-cesp.ALARM_NAME = 'notificationTimeout';
+cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
+cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 
 // SETUP
 
@@ -104,7 +105,7 @@ chrome.runtime.onInstalled.addListener(setupState);
  */
 function clearNotifications(unused) {
   chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
-  chrome.alarms.clearAll();
+  chrome.alarms.clear(cesp.NOTIFICATION_ALARM_NAME);
 }
 
 /**
@@ -137,7 +138,7 @@ function showSurveyNotification(element, decision) {
       opt,
       function(id) {
         chrome.alarms.create(
-            cesp.ALARM_NAME,
+            cesp.NOTIFICATION_ALARM_NAME,
             {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
       });
   chrome.notifications.onClicked.addListener(clickHandler);
