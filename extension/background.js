@@ -50,9 +50,8 @@ function setupState(details) {
  * @param {Alarm} alarm The alarm object from the onAlarm event.
 */
 function handleUninstallAlarm(alarm) {
-  if (alarm.name === cesp.UNINSTALL_ALARM_NAME) {
+  if (alarm.name === cesp.UNINSTALL_ALARM_NAME)
     chrome.management.uninstallSelf();
-  }
 }
 chrome.alarms.onAlarm.addListener(handleUninstallAlarm);
 
