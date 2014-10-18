@@ -30,11 +30,13 @@ cesp.ALARM_NAME = 'notificationTimeout';
 /**
  * Sets up basic state for the extension. Called when extension is installed.
  */
-function setupState() {
-  chrome.storage.local.set({'pending_responses': []});
-  chrome.runtime.getPlatformInfo(function(platformInfo) {
-    cesp.operatingSystem = platformInfo.os;
-  });
+function setupState(details) {
+  if (details.reason === 'install') {
+    chrome.storage.local.set({'pending_responses': []});
+    chrome.runtime.getPlatformInfo(function(platformInfo) {
+      cesp.operatingSystem = platformInfo.os;
+    });
+  }
 }
 
 /**
