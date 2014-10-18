@@ -20,6 +20,7 @@ cesp.XHR_TIMEOUT = 4000;
 cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
+cesp.MAX_SURVEYS_PER_DAY = 10;  // TODO: Is this a sane number per day?
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
