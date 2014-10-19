@@ -20,9 +20,11 @@ cesp.XHR_TIMEOUT = 4000;
 cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
+cesp.MAX_SURVEYS_PER_DAY = 2;
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
+cesp.SURVEY_COUNT_RESET_ALARM_NAME = 'surveyCountReset';
 cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 
@@ -42,6 +44,13 @@ function setupState(details) {
     });
     // Automatically uninstall the extension after 120 days.
     chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
+    // Set the count of surveys shown to 0, and reset it each day at midnight.
+    chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
+    var midnight = new Date();
+    midnight.setHours(0, 0, 0, 0);
+    // midnight is the last midnight, so we set the alarm for one day from it.
+    chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
+        {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
   }
 }
 
@@ -54,6 +63,16 @@ function handleUninstallAlarm(alarm) {
     chrome.management.uninstallSelf();
 }
 chrome.alarms.onAlarm.addListener(handleUninstallAlarm);
+
+/**
+ * Resets the count of surveys shown to 0.
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
+ */
+function resetSurveyCount(alarm) {
+  if (alarm.name === cesp.SURVEY_THROTTLE_RESET_ALARM)
+    chrome.storage.local.set({cesp.SURVEYS_SHOWN_TODAY: 0});
+}
+chrome.alarms.onAlarm.addListener(resetSurveyCount);
 
 /**
  * Retrieves the registration status from Local Storage.
@@ -139,33 +158,44 @@ chrome.alarms.onAlarm.addListener(clearNotifications);
  */
 function showSurveyNotification(element, decision) {
   if (!cesp.readyForSurveys) return;
-  clearNotifications();
 
-  var timePromptShown = new Date();
-  var clickHandler = function(unused) {
-    var timePromptClicked = new Date();
-    loadSurvey(element, decision, timePromptShown, timePromptClicked);
+  chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
+    if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
+      return;
+    }
+
     clearNotifications();
-  };
 
-  var opt = {
-    type: 'basic',
-    iconUrl: cesp.ICON_FILE,
-    title: cesp.NOTIFICATION_TITLE,
-    message: cesp.NOTIFICATION_BODY,
-    eventTime: Date.now(),
-    buttons: [{title: cesp.NOTIFICATION_BUTTON}]
-  };
-  chrome.notifications.create(
-      cesp.NOTIFICATION_TAG,
-      opt,
-      function(id) {
-        chrome.alarms.create(
-            cesp.NOTIFICATION_ALARM_NAME,
-            {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
-      });
-  chrome.notifications.onClicked.addListener(clickHandler);
-  chrome.notifications.onButtonClicked.addListener(clickHandler);
+    var timePromptShown = new Date();
+    var clickHandler = function(unused) {
+      var timePromptClicked = new Date();
+      loadSurvey(element, decision, timePromptShown, timePromptClicked);
+      clearNotifications();
+    };
+
+    var opt = {
+      type: 'basic',
+      iconUrl: cesp.ICON_FILE,
+      title: cesp.NOTIFICATION_TITLE,
+      message: cesp.NOTIFICATION_BODY,
+      eventTime: Date.now(),
+      buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+    };
+    chrome.notifications.create(
+        cesp.NOTIFICATION_TAG,
+        opt,
+        function(id) {
+          chrome.alarms.create(
+              cesp.NOTIFICATION_ALARM_NAME,
+              {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
+        });
+    chrome.notifications.onClicked.addListener(clickHandler);
+    chrome.notifications.onButtonClicked.addListener(clickHandler);
+
+    chrome.storage.local.set({
+      cesp.SURVEYS_SHOWN_TODAY: items[cesp.SURVEYS_SHOWN_TODAY] + 1
+    });
+  }
 }
 
 /**
