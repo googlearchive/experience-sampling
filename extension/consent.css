@@ -1,0 +1,22 @@
+#consent-form-holder {
+  padding: 10px 0 10px 0;
+}
+
+#give-consent {
+  color: #4285F4;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+html, body {
+  height: auto;
+  margin: 1em;
+}
+
+#no-consent {
+  color: #656565;
+}
+
+#uninstall {
+  color: #C53D32;
+}

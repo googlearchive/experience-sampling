@@ -2,6 +2,7 @@
 <head>
 <title>Consent to Participate</title>
 <link rel="stylesheet" type="text/css" href="surveys/survey-style.css">
+<link rel="stylesheet" type="text/css" href="consent.css">
 <script src="constants.js"></script>
 <script src="surveys/surveygenerator.js"></script>
 <script src="consent.js"></script>
@@ -10,12 +11,14 @@
 <body>
   <div id="consent-text">
     <div class="centered inner-centering">
-      <h1>Informed consent for Safe Browsing Study</h1>
+      <h1>Google Chrome Web-Browsing Event Study</h1>
     </div>
 
     <div class="centered inner-centering alert-gentle hidden" id="top-blurb">
-      Thank you for your participation in our research study.<br> It is being
-      conducted by members of the Chrome team at Google Inc ("Google").
+      <b>Thank you for your participation in our research study.</b>
+      <br>
+      It is being conducted by members of the Chrome team at Google Inc
+      ("Google").
     </div>
 
     <div id="study-information" class="hidden centered">
@@ -72,14 +75,20 @@
     </div>
   </div>
 
-  <div id="consent-form-holder" class="hidden centered">
-    <form name="consent-form" id="consent-form"></form>
+  <div id="consent-form-holder" class="hidden centered inner-centering">
+    <a href="surveys/setup.html" id="give-consent" class="consent-link">I
+        acknowledge that I have read this informed consent and agree to the
+        terms</a>
+    <br>
+    <a href="#" id="no-consent" class="consent-link">No thanks, I prefer not to
+        participate</a>
   </div>
 
-  <div id="retract-consent" class="hidden alert centered">
+  <div id="retract-consent" class="hidden alert centered inner-centering">
     <p>You previously signed this consent form. If you no longer want to
-    participate, you should <a href="chrome://extensions">uninstall this
-    extension</a>.</p>
+    participate, you should <a
+    href="https://support.google.com/chrome/answer/113907?hl=en"
+    id="uninstall">uninstall</a> this extension.</p>
   </div>
 
 </body>
