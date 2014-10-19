@@ -10,20 +10,11 @@
 
 <body>
 <div class="scroll-holder">
-  <div class="scroll-constant">
-    <div class="centered inner-centering">
-      <h2 class="scroll-heading">Chrome Survey</h2>
+    <div class="centered inner-centering alert hidden" id="explanation">
+      <img src="screenshots/ssl-nonblocking-warning.png" class="example"
+          height="200px">
     </div>
 
-    <div class="centered inner-centering alert hidden" id="explanation">
-      <img src="screenshots/ssl-nonblocking-warning.png" height="200px">
-      <p>
-        <b>You recently saw a page like the one pictured above.</b>
-        <br>
-        The following questions are about that page.
-      </p>
-    </div>
-  
     <div class="centered inner-centering alert hidden" id="thank-you">
       <b>Thank you for participating!</b>
       <br>
@@ -32,6 +23,13 @@
   </div>
 
   <div class="centered hidden scroll-scroll" id="survey-container">
+    <div class="alert centered inner-centering">
+      <p>
+        <b>You recently saw a page like the one pictured above.</b>
+        <br>
+        The following questions are about that page.
+      </p>
+    </div>
     <form name="survey-form" id="survey-form"></form>
   </div>
 </div>
