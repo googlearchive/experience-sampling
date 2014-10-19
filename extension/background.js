@@ -119,13 +119,13 @@ chrome.runtime.onInstalled.addListener(setupState);
 
 /**
  * Clears our existing notification(s).
- * @param {Alarm} alarm The alarm object from the onAlarm event.
+ * @param {Alarm} alarm The alarm object from the onAlarm event (optional).
  */
 function clearNotifications(alarm) {
-  if (alarm.name === cesp.NOTIFICATION_ALARM_NAME) {
-    chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
-    chrome.alarms.clear(cesp.NOTIFICATION_ALARM_NAME);
-  }
+  if (alarm && alarm.name !== cesp.NOTIFICATION_ALARM_NAME)
+    return;
+  chrome.notifications.clear(cesp.NOTIFICATION_TAG, function(unused) {});
+  chrome.alarms.clear(cesp.NOTIFICATION_ALARM_NAME);
 }
 // Clear the notification state when the survey times out.
 chrome.alarms.onAlarm.addListener(clearNotifications);
