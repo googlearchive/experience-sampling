@@ -36,7 +36,7 @@ cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
  */
 function setSurveysShownStorageValue(newCount) {
   var items = {};
-  items[cesp.SURVEYS_SHOWN_TODAY] = newState;
+  items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
   chrome.storage.local.set(items);
 }
 
@@ -203,7 +203,7 @@ function showSurveyNotification(element, decision) {
     chrome.notifications.onButtonClicked.addListener(clickHandler);
 
     setSurveysShownStorageValue(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
-  }
+  });
 }
 
 /**
