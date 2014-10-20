@@ -10,7 +10,6 @@
 
 var cesp = {};  // namespace variable
 
-cesp.readyForSurveys = false;
 cesp.operatingSystem = "";
 
 // Settings.
@@ -27,8 +26,20 @@ cesp.NOTIFICATION_TAG = 'chromeSurvey';
 cesp.SURVEY_COUNT_RESET_ALARM_NAME = 'surveyCountReset';
 cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
+cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 
 // SETUP
+
+
+/**
+ * A helper method for updating the value in local storage.
+ * @param {bool} newState The desired new state for the ready for surveys flag.
+ */
+function setReadyForSurveysStorageValue(newState) {
+  var items = {};
+  items[cesp.READY_FOR_SURVEYS] = newState;
+  chrome.storage.local.set(items);
+}
 
 /**
  * A helper method for updating the value in local storage.
@@ -48,6 +59,7 @@ function setupState(details) {
   // We check the event reason because onInstalled can trigger for other
   // reasons (extension or browser update).
   if (details.reason === 'install') {
+    setReadyForSurveysStorageValue(false);
     chrome.storage.local.set({'pending_responses': []});
     chrome.runtime.getPlatformInfo(function(platformInfo) {
       cesp.operatingSystem = platformInfo.os;
@@ -122,7 +134,7 @@ function maybeShowSetupSurvey(setupLookup) {
       setupLookup[constants.SETUP_KEY] == constants.SETUP_PENDING) {
     chrome.tabs.create({'url': chrome.extension.getURL('surveys/setup.html')});
   } else if (setupLookup[constants.SETUP_KEY] == constants.SETUP_COMPLETED) {
-    cesp.readyForSurveys = true;
+    setReadyForSurveysStorageValue(true);
   }
 }
 
@@ -135,7 +147,7 @@ function maybeShowSetupSurvey(setupLookup) {
 function storageUpdated(changes, areaName) {
   if (changes && changes[constants.SETUP_KEY] &&
       changes[constants.SETUP_KEY].newValue == constants.SETUP_COMPLETED) {
-    cesp.readyForSurveys = true;
+    setReadyForSurveysStorageValue(true);
   }
 }
 
@@ -167,42 +179,43 @@ chrome.alarms.onAlarm.addListener(clearNotifications);
  * @param {object} decision The decision the participant made.
  */
 function showSurveyNotification(element, decision) {
-  if (!cesp.readyForSurveys) return;
+  chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
+    if (!items[cesp.READY_FOR_SURVEYS]) return;
 
-  chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
-    if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
-      return;
-    }
+    chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
+      if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
+        return;
+      }
 
-    clearNotifications();
-
-    var timePromptShown = new Date();
-    var clickHandler = function(unused) {
-      var timePromptClicked = new Date();
-      loadSurvey(element, decision, timePromptShown, timePromptClicked);
       clearNotifications();
-    };
 
-    var opt = {
-      type: 'basic',
-      iconUrl: cesp.ICON_FILE,
-      title: cesp.NOTIFICATION_TITLE,
-      message: cesp.NOTIFICATION_BODY,
-      eventTime: Date.now(),
-      buttons: [{title: cesp.NOTIFICATION_BUTTON}]
-    };
-    chrome.notifications.create(
-        cesp.NOTIFICATION_TAG,
-        opt,
-        function(id) {
-          chrome.alarms.create(
-              cesp.NOTIFICATION_ALARM_NAME,
-              {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
-        });
-    chrome.notifications.onClicked.addListener(clickHandler);
-    chrome.notifications.onButtonClicked.addListener(clickHandler);
+      var timePromptShown = new Date();
+      var clickHandler = function(unused) {
+        var timePromptClicked = new Date();
+        loadSurvey(element, decision, timePromptShown, timePromptClicked);
+        clearNotifications();
+      };
 
-    setSurveysShownStorageValue(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
+      var opt = {
+        type: 'basic',
+        iconUrl: cesp.ICON_FILE,
+        title: cesp.NOTIFICATION_TITLE,
+        message: cesp.NOTIFICATION_BODY,
+        eventTime: Date.now(),
+        buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+      };
+      chrome.notifications.create(
+          cesp.NOTIFICATION_TAG,
+          opt,
+          function(id) {
+            chrome.alarms.create(
+                cesp.NOTIFICATION_ALARM_NAME,
+                {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
+          });
+      chrome.notifications.onClicked.addListener(clickHandler);
+      chrome.notifications.onButtonClicked.addListener(clickHandler);
+      setSurveysShownStorageValue(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
+    });
   });
 }
 
@@ -216,38 +229,40 @@ function showSurveyNotification(element, decision) {
  *     clicked the survey prompt notification.
  */
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
-  if (!cesp.readyForSurveys) return;
+  chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
+    if (!items[cesp.READY_FOR_SURVEYS]) return;
 
-  var surveyLocations = {
-    SSL: 'ssl.html',
-    EXAMPLE: 'survey-example.html'
-  };
-  var surveyURL;
-  var eventType = constants.FindEventType(element['name']);
-  switch (eventType) {
-    case constants.EventType.SSL:
-      surveyURL = surveyLocations.SSL;
-      break;
-    case constants.EventType.MALWARE:
-    case constants.EventType.PHISHING:
-    case constants.EventType.DOWNLOAD_MALICIOUS:
-    case constants.EventType.EXTENSION_INSTALL:
-      // TODO: Make surveys for each of these.
-      surveyURL = surveyLocations.EXAMPLE;
-      break;
-    case constants.EventType.HARMFUL:
-    case constants.EventType.SB_OTHER:
-    case constants.EventType.DOWNLOAD_DANGEROUS:
-    case constants.EventType.DOWNLOAD_DANGER_PROMPT:
-      // Don't survey about these.
-      return;
-    case constants.EventType.UNKNOWN:
-      throw new Error('Unknown event type: ' + element['name']);
-      break;
-  }
-  chrome.tabs.create(
-      {'url': chrome.extension.getURL('surveys/' + surveyURL)},
-      function() { console.log('Opened survey.'); });
+    var surveyLocations = {
+      SSL: 'ssl.html',
+      EXAMPLE: 'survey-example.html'
+    };
+    var surveyURL;
+    var eventType = constants.FindEventType(element['name']);
+    switch (eventType) {
+      case constants.EventType.SSL:
+        surveyURL = surveyLocations.SSL;
+        break;
+      case constants.EventType.MALWARE:
+      case constants.EventType.PHISHING:
+      case constants.EventType.DOWNLOAD_MALICIOUS:
+      case constants.EventType.EXTENSION_INSTALL:
+        // TODO: Make surveys for each of these.
+        surveyURL = surveyLocations.EXAMPLE;
+        break;
+      case constants.EventType.HARMFUL:
+      case constants.EventType.SB_OTHER:
+      case constants.EventType.DOWNLOAD_DANGEROUS:
+      case constants.EventType.DOWNLOAD_DANGER_PROMPT:
+        // Don't survey about these.
+        return;
+      case constants.EventType.UNKNOWN:
+        throw new Error('Unknown event type: ' + element['name']);
+        break;
+    }
+    chrome.tabs.create(
+        {'url': chrome.extension.getURL('surveys/' + surveyURL)},
+        function() { console.log('Opened survey.'); });
+  });
 }
 
 // Trigger the new survey prompt when the participant makes a decision about an
