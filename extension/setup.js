@@ -20,7 +20,6 @@ function setSetupStorageValue(newState) {
  * @param {Object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  // TODO: Uninstall if user selects age <= 17.
   var age = new FixedQuestion(
       constants.QuestionType.RADIO,
       'What is your age?',
@@ -250,6 +249,14 @@ function setupSurveyForm(savedState) {
  */
 function setupFormSubmitted(event) {
   event.preventDefault();
+
+  // Check whether the participant is underage.
+  var ageQuestion = document['survey-form']['Whatisyourage'];
+  if (ageQuestion.value === '0-17yearsoldoryounger') {
+    chrome.management.uninstallSelf();
+    return;
+  }
+
   setSetupStorageValue(constants.SETUP_COMPLETED);
   $('explanation').classList.add('hidden');
   $('survey-container').classList.add('hidden');
