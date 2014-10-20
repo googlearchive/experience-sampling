@@ -67,7 +67,7 @@ function userRejectConsent(event) {
   console.log('Consent rejected');
   setConsentStorageValue(constants.CONSENT_REJECTED);
   $('consent-form-holder').classList.add('hidden');
-  chrome.management.uninstallSelf;
+  chrome.management.uninstallSelf();
 }
 
 /**
