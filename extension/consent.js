@@ -4,8 +4,6 @@
 
 var consentForm = {};  // Namespace variable
 
-consentForm.UNINSTALL_TIME =  200;   // Milliseconds
-
 consentForm.status = constants.CONSENT_PENDING;
 
 /**
@@ -16,32 +14,6 @@ function setConsentStorageValue(newState) {
   var items = {};
   items[constants.CONSENT_KEY] = newState;
   chrome.storage.local.set(items);
-}
-
-/**
- * Adds the consent question at the bottom of the consent form. This form is
- * slightly custom: it doesn't actually have a question, and the JavaScript
- * in the form submit handler expects the "Yes" and "No" responses to be in a
- * certain order.
- * @param {Object} parentNode The DOM node to attach the question to
- */
-function addConsentForm(parentNode) {
-  var consentQuestion = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'consent',  // No question.
-      true,
-      [
-        // The "Yes" answer should come first.
-        'Yes, Adrienne is a rock star',
-        'No, please uninstall this extension'
-      ],
-      constants.Randomize.NONE);
-  // Remove the unneeded question label.
-  var domNode = consentQuestion.makeDOMTree();
-  var framesetDiv = domNode.childNodes[0];
-  var unneededLabel = framesetDiv.childNodes[0];
-  framesetDiv.removeChild(unneededLabel);
-  parentNode.appendChild(domNode);
 }
 
 /**
@@ -62,10 +34,8 @@ function setupConsentForm(savedState) {
     $('study-information').classList.remove('hidden');
     $('top-blurb').classList.remove('hidden');
     $('consent-form-holder').classList.remove('hidden');
-    addConsentForm($('consent-form'));
-    $('consent-form').appendChild(makeSubmitButtonDOM());
-    document.forms['consent-form'].addEventListener(
-        'submit', consentFormSubmitted);
+    $('give-consent').addEventListener('click', userGrantConsent);
+    $('no-consent').addEventListener('click', userRejectConsent)
   } else if (consentForm.status == constants.CONSENT_GRANTED) {
     // Show the consent form and the user's decision.
     $('study-information').classList.remove('hidden');
@@ -79,26 +49,25 @@ function setupConsentForm(savedState) {
 }
 
 /**
- * Handles the submission of the consent form.
- * @param {object} The submission button click event.
+ * Handles the user giving consent.
+ * @param {object} The link click event.
  */
-function consentFormSubmitted(event) {
+function userGrantConsent(event) {
+  console.log('Consent granted');
+  setConsentStorageValue(constants.CONSENT_GRANTED);
+  $('consent-form-holder').classList.add('hidden');
+}
+
+/**
+ * Handles the user withdrawing consent.
+ * @param {object} The link click event.
+ */
+function userRejectConsent(event) {
   event.preventDefault();
-  var consentRadio = document['consent-form']['consent'];
-  console.log('Consent form submitted: ' + consentRadio.value);
-  if (consentRadio.value.match(/^0/)) {  // YES
-    setConsentStorageValue(constants.CONSENT_GRANTED);
-    $('consent-form-holder').classList.add('hidden');
-    window.location.href = 'surveys/setup.html';
-  } else if (consentRadio.value.match(/^1/)) {  // NO
-    setConsentStorageValue(constants.CONSENT_REJECTED);
-    $('consent-form-holder').classList.add('hidden');
-    // It's unpleasant to close the window too fast after clicking the
-    // button. This adds a just-barely-perceptible delay.
-    setTimeout(chrome.management.uninstallSelf, consentForm.UNINSTALL_TIME);
-  } else {
-    $('set-value').classList.remove('hidden');
-  }
+  console.log('Consent rejected');
+  setConsentStorageValue(constants.CONSENT_REJECTED);
+  $('consent-form-holder').classList.add('hidden');
+  chrome.management.uninstallSelf();
 }
 
 /**
