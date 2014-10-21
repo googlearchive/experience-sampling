@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-<title>Survey Example</title>
+<title>Chrome Survey</title>
 <link rel="stylesheet" type="text/css" href="survey-style.css">
 <script src="../constants.js"></script>
 <script src="surveygenerator.js"></script>
@@ -9,25 +9,30 @@
 </head>
 
 <body>
-  <div class="centered inner-centering">
-    <h1>This is a survey title</h1>
+<div class="scroll-holder">
+    <div class="centered inner-centering alert hidden" id="explanation">
+      <img src="screenshots/ssl-nonblocking-warning.png" class="example"
+          height="200px">
+    </div>
+
+    <div class="centered inner-centering alert hidden" id="thank-you">
+      <b>Thank you for participating!</b>
+      <br>
+      This window will close in a few seconds.
+    </div>
   </div>
 
-  <div class="centered inner-centering alert hidden" id="explanation">
-    <b>Here is a blurb to describe what we're asking about.</b>
-    <br>
-    And here is another blurb that explains this in a little more detail.
-  </div>
-
-  <div class="centered inner-centering alert hidden" id="thank-you">
-    <b>Thank you for participating!</b>
-    <br>
-    This window will close in a few seconds.
-  </div>
-
-  <div class="centered hidden" id="survey-container">
+  <div class="centered hidden scroll-scroll" id="survey-container">
+    <div class="alert centered inner-centering">
+      <p>
+        <b>You recently saw a page like the one pictured above.</b>
+        <br>
+        The following questions are about that page.
+      </p>
+    </div>
     <form name="survey-form" id="survey-form"></form>
   </div>
+</div>
   
 </body>
 </html>
