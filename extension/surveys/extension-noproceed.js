@@ -1,5 +1,5 @@
 /**
- * Example survey.
+ * Extension (didn't install) survey.
  */
 
 /**

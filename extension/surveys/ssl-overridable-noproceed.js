@@ -1,5 +1,5 @@
 /**
- * SSL survey.
+ * SSL overridable (didn't proceed) survey.
  */
 
 /**

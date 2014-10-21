@@ -1,5 +1,5 @@
 /**
- * Example survey.
+ * Phishing (didn't proceed) survey.
  */
 
 /**

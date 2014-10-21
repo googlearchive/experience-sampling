@@ -1,5 +1,5 @@
 /**
- * SSL survey.
+ * SSL overridable (proceed) survey.
  */
 
 /**
