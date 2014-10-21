@@ -11,7 +11,7 @@ function addQuestions(parentNode) {
   // TODO: FILL IN CORRECT WEBSITE NAME!
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'You chose "Proceed to www.example.com" instead of "Back to safety."' +
+      'You chose "Back to safety" instead of "Proceed to www.example.com."' +
           ' How did you choose between the two options?',
       true);
   parentNode.appendChild(howChoose.makeDOMTree());

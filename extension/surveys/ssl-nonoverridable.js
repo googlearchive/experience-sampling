@@ -8,14 +8,6 @@
  */
 function addQuestions(parentNode) {
 
-  // TODO: FILL IN CORRECT WEBSITE NAME!
-  var howChoose = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'You chose "Proceed to www.example.com" instead of "Back to safety."' +
-          ' How did you choose between the two options?',
-      true);
-  parentNode.appendChild(howChoose.makeDOMTree());
-
   var meaning = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'What was the page trying to tell you, in your own words?',

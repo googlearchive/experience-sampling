@@ -7,177 +7,65 @@
  * @param {Object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  var age = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'What is your age?',
-      true,
-      ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
-      constants.Randomize.NONE);
-  parentNode.appendChild(age.makeDOMTree());
-
-  var realAge = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'What is your REAL age?',
-      true,
-      ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
-      constants.Randomize.ALL);
-  parentNode.appendChild(realAge.makeDOMTree());
-
-  var gender = new FixedQuestion(
-      constants.QuestionType.CHECKBOX,
-      'What is your gender?',
-      true,
-      ['Female', 'Male', constants.OTHER],
-      constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(gender.makeDOMTree());
-
-  var source = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'How did you learn about this study?',
-      true,
-      [
-        'Web advertisement',
-        'Chrome blog',
-        'Social media (Twitter, Facebook, Google+, etc.)',
-        'Word of mouth'
-      ],
-      constants.Randomize.ALL);
-  parentNode.appendChild(source.makeDOMTree());
-
-  var source = new FixedQuestion(
-      constants.QuestionType.DROPDOWN,
-      'What state do you live in?',
-      true,
-      [
-        'Alabama',
-        'Alaska',
-        'Arizona',
-        'Arkansas',
-        'California',
-        'Colorado',
-        'Connecticut',
-        'Delaware',
-        'Florida',
-        'Georgia',
-        'Hawaii',
-        'Idaho',
-        'Illinois',
-        'Indiana',
-        'Iowa',
-        'Kansas',
-        'Kentucky',
-        'Louisiana',
-        'Maine',
-        'Maryland',
-        'Massachusetts',
-        'Michigan',
-        'Minnesota',
-        'Mississippi',
-        'Missouri',
-        'Montana',
-        'Nebraska',
-        'Nevada',
-        'New Hampshire',
-        'New Jersey',
-        'New Mexico',
-        'New York',
-        'North Carolina',
-        'North Dakota',
-        'Ohio',
-        'Oklahoma',
-        'Oregon',
-        'Pennsylvania',
-        'Rhode Island',
-        'South Carolina',
-        'South Dakota',
-        'Tennessee',
-        'Texas',
-        'Utah',
-        'Vermont',
-        'Virginia',
-        'Washington',
-        'West Virginia',
-        'Wisconsin',
-        'Wyoming',
-        'District of Columbia',
-        'Puerto Rico',
-        'Guam',
-        'American Samoa',
-        'U.S. Virgin Islands',
-        'Northern Mariana Islands'
-      ],
-      constants.Randomize.NONE);
-  parentNode.appendChild(source.makeDOMTree());
-
-  var source = new FixedQuestion(
-      constants.QuestionType.DROPDOWN,
-      'Are these states randomized?',
-      false,
-      [
-        'Alabama',
-        'Alaska',
-        'Arizona',
-        'Arkansas',
-        'California',
-        'Colorado',
-        'Connecticut',
-        'Delaware',
-        'Florida',
-        'Georgia'
-      ],
-      constants.Randomize.ALL);
-  parentNode.appendChild(source.makeDOMTree());
-
-  var pinaColadas = new EssayQuestion(
-      constants.QuestionType.SHORT_STRING,
-      'How much do you like pina coladas?',
-      true);
-  parentNode.appendChild(pinaColadas.makeDOMTree());
-
-  var pinaColadasDetails = new EssayQuestion(
-      constants.QuestionType.SHORT_ESSAY,
-      'What is your favorite thing about pina coladas?',
-      true);
-  parentNode.appendChild(pinaColadasDetails.makeDOMTree());
-
-  var pinaColadasEssay = new EssayQuestion(
+  var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'Please compare and contrast pina coladas and mimosas.',
-      false);
-  parentNode.appendChild(pinaColadasEssay.makeDOMTree());
+      'You chose "Cancel" instead of "Add."' +
+          ' How did you choose between the two options?',
+      true);
+  parentNode.appendChild(howChoose.makeDOMTree());
 
-  var hungry = new ScaleQuestion(
-      constants.QuestionType.VERTICAL_SCALE,
-      'How hungry are you?',
-      false,
-      ['I want to eat my hands', '', 'Medium', '', 'I hate food'],
-      constants.Randomize.ALL);
-  parentNode.appendChild(hungry.makeDOMTree());
+  var meaning = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'What was the dialog trying to tell you, in your own words?',
+      true);
+  parentNode.appendChild(meaning.makeDOMTree());
 
-  var pizza = new ScaleQuestion(
-      constants.QuestionType.VERTICAL_SCALE,
-      'How delicious is pizza?',
-      false,
-      ['The best', '', 'Medium', '', 'Still pretty good', 'Mmm'],
-      constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(pizza.makeDOMTree());
+  var source = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'Who do you think the dialog was from?',
+      true);
+  parentNode.appendChild(source.makeDOMTree());
 
-  var adrienne = new ScaleQuestion(
-      constants.QuestionType.HORIZ_SCALE,
-      'How awesome is Adrienne?',
-      true,
-      ['Super duper', '', 'Blazing', '', 'Fantastical'],
-      constants.Randomize.ALL);
-  parentNode.appendChild(adrienne.makeDOMTree());
-
-  var kittens = new ScaleQuestion(
+  var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
-      'Wine is delicious.',
-      false,
-      ['Agree', '', '', '', 'Disagree'],
+      'To what degree do each of the following attributes describe' +
+          ' this dialog?',
+      true,
+      [
+        'Not at all',
+        'A little bit',
+        'A moderate amount',
+        'Very much',
+        'A great deal'
+      ],
       constants.Randomize.ALL);
-  kittens.setAttributes(['Red wine', 'White wine', 'Champagne']);
-  parentNode.appendChild(kittens.makeDOMTree());
+  attributes.setAttributes(
+      [
+        'annoying',
+        'comforting',
+        'scary',
+        'helpful',
+        'confusing',
+        'informative'
+      ]);
+  parentNode.appendChild(attributes.makeDOMTree());
+
+  // TODO: Fill in real extension name!
+  var extensionName = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'May we record the name of the extension you were trying to install, ' +
+          'Google Translate, with your responses?',
+      true,
+      ['Yes', 'No'],
+      constants.Randomize.NONE);
+  parentNode.appendChild(extensionName.makeDOMTree());
+
+  var extra = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'Please use this space to clarify any of your responses from above or ' +
+          'let us know how we can improve this survey.',
+      false);
+  parentNode.appendChild(extra.makeDOMTree());
 }
 
 /**
