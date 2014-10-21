@@ -46,7 +46,7 @@ constants.OTHER = 'Other: ';
 // The different types of events that trigger survey notifications.
 constants.EventType = {
   SSL_OVERRIDABLE: 'ssl_interstitial_overridable',
-  SSL_NOTOVERRIDABLE: 'ssl_interstitial_notoverridable',
+  SSL_NONOVERRIDABLE: 'ssl_interstitial_notoverridable',
   MALWARE: 'safebrowsing_interstitial',
   PHISHING: 'phishing_interstitial',
   HARMFUL: 'harmful_interstitial',

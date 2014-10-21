@@ -244,8 +244,8 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
       MALWARE_NOPROCEED: 'malware-noproceed.html',
       PHISHING_PROCEED: 'phishing-proceed.html',
       PHISHING_NOPROCEED: 'phishing-noproceed.html',
-      EXTENSION_PROCEED: 'download-proceed.html',
-      EXTENSION_NOPROCEED: 'download-noproceed.html'
+      EXTENSION_PROCEED: 'extension-proceed.html',
+      EXTENSION_NOPROCEED: 'extension-noproceed.html'
     };
     var surveyURL;
     var eventType = constants.FindEventType(element['name']);
@@ -255,14 +255,19 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
             surveyLocations.SSL_OVERRIDABLE_PROCEED :
             surveyLocations.SSL_OVERRIDABLE_NOPROCEED;
         break;
+      case constants.EventType.SSL_NONOVERRIDABLE:
+        surveyURL = surveyLocations.SSL_NONOVERRIDABLE;
+        break;
       case constants.EventType.MALWARE:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
             surveyLocations.MALWARE_PROCEED :
             surveyLocations.MALWARE_NOPROCEED;
+        break;
       case constants.EventType.PHISHING:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
             surveyLocations.PHISHING_PROCEED :
             surveyLocations.PHISHING_NOPROCEED;
+        break;
       case constants.EventType.EXTENSION_INSTALL:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
             surveyLocations.EXTENSION_PROCEED :
