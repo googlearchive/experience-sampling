@@ -30,7 +30,6 @@ cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 
 // SETUP
 
-
 /**
  * A helper method for updating the value in local storage.
  * @param {bool} newState The desired new state for the ready for surveys flag.
@@ -231,26 +230,47 @@ function showSurveyNotification(element, decision) {
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
+    var userDecision = decision['name'];
+    if (userDecision !== constants.DecisionType.PROCEED &&
+        userDecision !== constants.DecisionType.DENY) {
+      return;
+    }
 
     var surveyLocations = {
-      SSL: 'ssl.html',
-      EXAMPLE: 'survey-example.html'
+      SSL_OVERRIDABLE_PROCEED: 'ssl-overridable-proceed.html',
+      SSL_OVERRIDABLE_NOPROCEED: 'ssl-overridable-noproceed.html',
+      SSL_NONOVERRIDABLE: 'ssl-nonoverridable.html',
+      MALWARE_PROCEED: 'malware-proceed.html',
+      MALWARE_NOPROCEED: 'malware-noproceed.html',
+      PHISHING_PROCEED: 'phishing-proceed.html',
+      PHISHING_NOPROCEED: 'phishing-noproceed.html',
+      EXTENSION_PROCEED: 'download-proceed.html',
+      EXTENSION_NOPROCEED: 'download-noproceed.html'
     };
     var surveyURL;
     var eventType = constants.FindEventType(element['name']);
     switch (eventType) {
-      case constants.EventType.SSL:
-        surveyURL = surveyLocations.SSL;
+      case constants.EventType.SSL_OVERRIDABLE:
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            surveyLocations.SSL_OVERRIDABLE_PROCEED :
+            surveyLocations.SSL_OVERRIDABLE_NOPROCEED;
         break;
       case constants.EventType.MALWARE:
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            surveyLocations.MALWARE_PROCEED :
+            surveyLocations.MALWARE_NOPROCEED;
       case constants.EventType.PHISHING:
-      case constants.EventType.DOWNLOAD_MALICIOUS:
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            surveyLocations.PHISHING_PROCEED :
+            surveyLocations.PHISHING_NOPROCEED;
       case constants.EventType.EXTENSION_INSTALL:
-        // TODO: Make surveys for each of these.
-        surveyURL = surveyLocations.EXAMPLE;
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            surveyLocations.EXTENSION_PROCEED :
+            surveyLocations.EXTENSION_NOPROCEED;
         break;
       case constants.EventType.HARMFUL:
       case constants.EventType.SB_OTHER:
+      case constants.EventType.DOWNLOAD_MALICIOUS:
       case constants.EventType.DOWNLOAD_DANGEROUS:
       case constants.EventType.DOWNLOAD_DANGER_PROMPT:
         // Don't survey about these.

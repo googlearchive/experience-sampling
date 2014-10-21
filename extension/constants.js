@@ -45,7 +45,8 @@ constants.OTHER = 'Other: ';
 
 // The different types of events that trigger survey notifications.
 constants.EventType = {
-  SSL: 'ssl_interstitial',
+  SSL_OVERRIDABLE: 'ssl_interstitial_overridable',
+  SSL_NOTOVERRIDABLE: 'ssl_interstitial_notoverridable',
   MALWARE: 'safebrowsing_interstitial',
   PHISHING: 'phishing_interstitial',
   HARMFUL: 'harmful_interstitial',
@@ -58,6 +59,15 @@ constants.EventType = {
   EXTENSION_INSTALL: 'extension_install_dialog',
 
   UNKNOWN: 'unknown',
+};
+
+// The different types of user decisions.
+constants.DecisionType = {
+  PROCEED: 'proceed',
+  DENY: 'deny',
+  IGNORE: 'ignore',
+  CANCEL: 'cancel',
+  RELOAD: 'reload'
 };
 
 /**
