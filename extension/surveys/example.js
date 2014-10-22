@@ -180,6 +180,9 @@ function addQuestions(parentNode) {
   parentNode.appendChild(kittens.makeDOMTree());
 }
 
+// You can use driver.js instead of the following two methods, unless you need
+// to customize the contents.
+
 /**
  * Sets up the survey form.
  */
