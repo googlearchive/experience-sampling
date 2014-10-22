@@ -191,7 +191,7 @@ function showSurveyNotification(element, decision) {
 
       var timePromptShown = new Date();
       var clickHandler = function(notificationId, buttonIndex) {
-        if (buttonIndex && buttonIndex === 1) {
+        if (buttonIndex === 1) {
           chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
         } else {
           var timePromptClicked = new Date();
