@@ -18,3 +18,10 @@ function addQuestions(parentNode) {
   parentNode.appendChild(commonQuestions.createRecordUrlQuestion());
   parentNode.appendChild(commonQuestions.createClarificationQuestion());
 }
+
+/**
+ * Adds the screenshot for the survey.
+ */
+function setScreenshot() {
+  $('example-img').src = 'screenshots/phishing.png';
+}
