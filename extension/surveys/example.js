@@ -4,7 +4,7 @@
 
 /**
  * Adds the questions for the example survey.
- * @param {Object} parentNode The DOM node to attach the surveys to.
+ * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
   var age = new FixedQuestion(
@@ -179,6 +179,9 @@ function addQuestions(parentNode) {
   kittens.setAttributes(['Red wine', 'White wine', 'Champagne']);
   parentNode.appendChild(kittens.makeDOMTree());
 }
+
+// You can use driver.js instead of the following two methods, unless you need
+// to customize the contents.
 
 /**
  * Sets up the survey form.
