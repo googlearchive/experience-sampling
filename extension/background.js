@@ -19,6 +19,7 @@ cesp.XHR_TIMEOUT = 4000;
 cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
+cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
 cesp.MAX_SURVEYS_PER_DAY = 2;
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
@@ -69,7 +70,7 @@ function setupState(details) {
     setSurveysShownStorageValue(0);
     var midnight = new Date();
     midnight.setHours(0, 0, 0, 0);
-    // midnight is the last midnight, so we set the alarm for one day from it.
+    // Midnight is the last midnight, so we set the alarm for one day from it.
     chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
         {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
   }
@@ -189,19 +190,26 @@ function showSurveyNotification(element, decision) {
       clearNotifications();
 
       var timePromptShown = new Date();
-      var clickHandler = function(unused) {
-        var timePromptClicked = new Date();
-        loadSurvey(element, decision, timePromptShown, timePromptClicked);
-        clearNotifications();
+      var clickHandler = function(notificationId, buttonIndex) {
+        if (buttonIndex && buttonIndex === 1) {
+          chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
+        } else {
+          var timePromptClicked = new Date();
+          loadSurvey(element, decision, timePromptShown, timePromptClicked);
+          clearNotifications();
+        }
       };
-
       var opt = {
         type: 'basic',
         iconUrl: cesp.ICON_FILE,
         title: cesp.NOTIFICATION_TITLE,
         message: cesp.NOTIFICATION_BODY,
         eventTime: Date.now(),
-        buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+        buttons: [
+          {title: cesp.NOTIFICATION_BUTTON},
+          {title: cesp.NOTIFICATION_CONSENT_LINK}
+        ],
+        isClickable: true
       };
       chrome.notifications.create(
           cesp.NOTIFICATION_TAG,
