@@ -244,42 +244,31 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
       return;
     }
 
-    var surveyLocations = {
-      SSL_OVERRIDABLE_PROCEED: 'ssl-overridable-proceed.html',
-      SSL_OVERRIDABLE_NOPROCEED: 'ssl-overridable-noproceed.html',
-      SSL_NONOVERRIDABLE: 'ssl-nonoverridable.html',
-      MALWARE_PROCEED: 'malware-proceed.html',
-      MALWARE_NOPROCEED: 'malware-noproceed.html',
-      PHISHING_PROCEED: 'phishing-proceed.html',
-      PHISHING_NOPROCEED: 'phishing-noproceed.html',
-      EXTENSION_PROCEED: 'extension-proceed.html',
-      EXTENSION_NOPROCEED: 'extension-noproceed.html'
-    };
     var surveyURL;
     var eventType = constants.FindEventType(element['name']);
     switch (eventType) {
       case constants.EventType.SSL_OVERRIDABLE:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
-            surveyLocations.SSL_OVERRIDABLE_PROCEED :
-            surveyLocations.SSL_OVERRIDABLE_NOPROCEED;
+            constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED :
+            constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED;
         break;
       case constants.EventType.SSL_NONOVERRIDABLE:
-        surveyURL = surveyLocations.SSL_NONOVERRIDABLE;
+        surveyURL = constants.SurveyLocation.SSL_NONOVERRIDABLE;
         break;
       case constants.EventType.MALWARE:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
-            surveyLocations.MALWARE_PROCEED :
-            surveyLocations.MALWARE_NOPROCEED;
+            constants.SurveyLocation.MALWARE_PROCEED :
+            constants.SurveyLocation.MALWARE_NOPROCEED;
         break;
       case constants.EventType.PHISHING:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
-            surveyLocations.PHISHING_PROCEED :
-            surveyLocations.PHISHING_NOPROCEED;
+            constants.SurveyLocation.PHISHING_PROCEED :
+            constants.SurveyLocation.PHISHING_NOPROCEED;
         break;
       case constants.EventType.EXTENSION_INSTALL:
         surveyURL = userDecision === constants.DecisionType.PROCEED ?
-            surveyLocations.EXTENSION_PROCEED :
-            surveyLocations.EXTENSION_NOPROCEED;
+            constants.SurveyLocation.EXTENSION_PROCEED :
+            constants.SurveyLocation.EXTENSION_NOPROCEED;
         break;
       case constants.EventType.HARMFUL:
       case constants.EventType.SB_OTHER:
@@ -293,7 +282,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         break;
     }
     chrome.tabs.create(
-        {'url': chrome.extension.getURL('surveys/' + surveyURL)},
+        {'url': chrome.extension.getURL('surveys/survey.html?js=' + surveyURL)},
         function() { console.log('Opened survey.'); });
   });
 }
