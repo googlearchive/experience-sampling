@@ -29,7 +29,7 @@ Question.prototype.setUserResponse = function(response) {
 /**
  * Creates the DOM representation of a question. This should be implemented
  * by any subclasses!
- * @return {Object} The DOM node that contains the question.
+ * @return {object} The DOM node that contains the question.
  */
 Question.prototype.makeDOMTree = function() {
   return document.createElement('div');
@@ -59,7 +59,7 @@ FixedQuestion.prototype.constructor = FixedQuestion;
 
 /**
  * Creates the DOM representation of a FixedQuestion question.
- * @return {Object} The DOM node that contains the question.
+ * @return {object} The DOM node that contains the question.
  */
 FixedQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
@@ -227,7 +227,7 @@ ScaleQuestion.prototype.makeSingleRow =
 
 /**
  * Creates the DOM representation of a ScaleQuestion.
- * @return {Object} The DOM node that contains the question.
+ * @return {object} The DOM node that contains the question.
  */
 ScaleQuestion.prototype.makeDOMTree = function() {
   var horizontal =
@@ -285,7 +285,7 @@ EssayQuestion.prototype.constructor = EssayQuestion;
 
 /**
  * Creates the DOM representation of an EssayQuestion.
- * @return {Object} The DOM node that contains the question.
+ * @return {object} The DOM node that contains the question.
  */
 EssayQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
@@ -384,7 +384,7 @@ function flipArray(arr, anchorLast) {
 
 /**
  * Creates a submit button for a form.
- * @returns {Object} The DOM node with the submit button.
+ * @returns {object} The DOM node with the submit button.
  */
 function makeSubmitButtonDOM() {
   var button = document.createElement('input');

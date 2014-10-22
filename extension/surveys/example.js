@@ -4,7 +4,7 @@
 
 /**
  * Adds the questions for the example survey.
- * @param {Object} parentNode The DOM node to attach the surveys to.
+ * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
   var age = new FixedQuestion(
