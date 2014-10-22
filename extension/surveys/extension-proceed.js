@@ -7,12 +7,8 @@
  * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  var howChoose = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'You chose "Add" instead of "Cancel."' +
-          ' How did you choose between the two options?',
-      true);
-  parentNode.appendChild(howChoose.makeDOMTree());
+  parentNode.appendChild(commonQuestions.createChoiceQuestion(
+      'Add', 'Cancel'));
 
   var meaning = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
@@ -60,10 +56,5 @@ function addQuestions(parentNode) {
       constants.Randomize.NONE);
   parentNode.appendChild(extensionName.makeDOMTree());
 
-  var extra = new EssayQuestion(
-      constants.QuestionType.SHORT_ESSAY,
-      'Please use this space to clarify any of your responses from above or ' +
-          'let us know how we can improve this survey.',
-      false);
-  parentNode.appendChild(extra.makeDOMTree());
+  parentNode.appendChild(commonQuestions.createClarificationQuestion());
 }
