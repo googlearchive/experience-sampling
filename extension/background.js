@@ -27,6 +27,8 @@ cesp.SURVEY_COUNT_RESET_ALARM_NAME = 'surveyCountReset';
 cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
+cesp.PENDING_RESPONSES_DB_NAME = 'pendingResponsesDB';
+cesp.DB_VERSION = 1;
 
 // SETUP
 
@@ -294,6 +296,64 @@ function Survey(type, participantId, dateTaken, responses) {
   this.dateTaken = dateTaken;
   this.responses = responses;
 }
+
+/**
+ * Saves a survey into the database of pending completed surveys.
+ * Applies an exponential backoff based on the number of attempts made to
+ * submit the survey so far (a delay of pow(BACKOFF, tries) in minutes).
+ * @param {Survey} survey The survey to add to the queue.
+ * @param {int=} tries The number of tries so far (optional, defaults to 0).
+ */
+function saveSurvey(survey, tries) {
+  if (!tries)
+    var tries = 0;
+  var db = indexedDB.open('pendingResponses', cesp.DB_VERSION);
+  var objectStore = db.transaction(['responses'], 'readwrite').objectStore('responses');
+  var timeToSend = Date.now() + Math.pow(cesp.BACKOFF, tries) * constants.MS_IN_MIN;
+  //var pendingSurvey = PendingSurvey(survey, timeToSend, tries);
+  var request = objectStore.add({survey: survey, timeToSend: timeToSend});
+  // Handle success and error
+}
+
+function setupPendingResponsesDatabase(event) {
+  var db = event.target.result;
+  // Create the object store for this database.
+  var objectStore = db.createObjectStore('responses', {autoIncrement: true});
+  objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
+}
+
+function processQueue(alarm) {
+  // Retrieves the array of pending responses
+  // Tries to send all 
+  if (alarm.name != cesp.QUEUE_ALARM_NAME) return;
+
+  var db = indexedDB.open('pendingResponses', cesp.DB_VERSION);
+  var objectStore = db.transaction(['responses'], 'readwrite').objectStore('responses');
+  var index = objectStore.index('timeToSend');
+  var now = Date.now();
+  var keyRange = IDBKeyRange.upperBound(now);
+  index.openCursor(keyRange).onsuccess = function(event) {
+    var cursor = event.target.result;
+    if (cursor) {
+      // cursor.key is timeToSend
+      // cursor.value is the object, we can get at:
+      //  - cursor.value.survey
+      //  - cursor.value.tries
+      // So we want to pass it to the sendSurvey function.
+      sendSurvey(cursor.value.survey,
+          function(response) {},
+          function(status) {
+            // On error, add the survey back to the queue.
+            saveSurvey(cursor.value.survey, cursor.value.tries + 1);
+          });
+      // Then delete the item at the cursor.
+      var request = cursor.delete();
+      request.oncomplete = function(event) { cursor.continue(); };
+    }
+  }
+}
+
+
 
 /**
  * Sends a survey to the CESP backend via XHR.
