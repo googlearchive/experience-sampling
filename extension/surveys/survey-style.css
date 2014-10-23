@@ -58,6 +58,10 @@ h2.scroll-heading {
   margin-top: 0;
 }
 
+.heavy {
+  font-weight: bold;
+}
+
 .hidden {
   display: none;
 }
@@ -91,6 +95,10 @@ html, body {
   text-align: center;
 }
 
+#instructions {
+  padding: 10px 0;
+}
+
 label {
   padding-left: 5px;
   padding-right: 5px;
@@ -99,6 +107,11 @@ label {
 legend {
   font-weight: bold;
   padding-bottom: .3em;
+}
+
+p {
+  margin: 0;
+  padding: 0;
 }
 
 .scroll-constant {

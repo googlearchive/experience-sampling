@@ -61,6 +61,19 @@ constants.EventType = {
   UNKNOWN: 'unknown',
 };
 
+// The JavaScript files that load each survey.
+constants.SurveyLocation = {
+  SSL_OVERRIDABLE_PROCEED: 'ssl-overridable-proceed.js',
+  SSL_OVERRIDABLE_NOPROCEED: 'ssl-overridable-noproceed.js',
+  SSL_NONOVERRIDABLE: 'ssl-nonoverridable.js',
+  MALWARE_PROCEED: 'malware-proceed.js',
+  MALWARE_NOPROCEED: 'malware-noproceed.js',
+  PHISHING_PROCEED: 'phishing-proceed.js',
+  PHISHING_NOPROCEED: 'phishing-noproceed.js',
+  EXTENSION_PROCEED: 'extension-proceed.js',
+  EXTENSION_NOPROCEED: 'extension-noproceed.js'
+};
+
 // The different types of user decisions.
 constants.DecisionType = {
   PROCEED: 'proceed',
