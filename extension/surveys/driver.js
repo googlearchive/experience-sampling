@@ -4,15 +4,15 @@
  */
 function loadSurveyScript() {
   // Grab the JS file location from the url and check it's a valid location.
-  var handleError = function() {
+  function handleError() {
     console.log('Unexpected query: ' + window.location);
     window.location = '../consent.html';
-  };
+  }
   var query = window.location.search.substring(1);
   if (!query) handleError();
   var splitArr = query.split('=');
   if (!splitArr || splitArr.length != 2) handleError();
-  var jsUrl = (query.split('='))[1];
+  var jsUrl = splitArr[1];
   switch (jsUrl) {
     case constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED:
     case constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED:
@@ -30,7 +30,7 @@ function loadSurveyScript() {
   }
 
   // Load the JS file and start the survey setup.
-  var head = document.getElementsByTagName('head')[0];
+  var head = document.head;
   var script = document.createElement('script');
   script.addEventListener('load', setupSurvey);
   script.setAttribute('src', jsUrl);
