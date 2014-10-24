@@ -338,55 +338,26 @@ function sendingDelay(tries) {
  *
  */
 function processQueue(alarm) {
-  // Retrieves the array of pending responses
-  // Tries to send all 
   if (alarm.name != cesp.QUEUE_ALARM_NAME) return;
 
-  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
-  request.onsuccess = function(event) {
-    var db = event.target.result;
-    var transaction = db.transaction(['responses'], 'read');
-    var objectStore = transaction.objectStore('responses');
-    var index = objectStore.index('timeToSend');
-    var now = Date.now();
-    var keyRange = IDBKeyRange.upperBound(now);
+  withDBStore('pendingResponses', 'responses', 'read', function(store) {
+    var index = store.index('timeToSend');
+    var keyRange = IDBKeyRange.upperBound(Date.now());
     index.openCursor(keyRange).onsuccess = function(event) {
       var cursor = event.target.result;
       if (cursor) {
         console.log('current: ' + cursor.value);
-        // Send the survey. If it succeeds, remove it from the DB.
-        // If it fails, increment it's timeToSend.
         sendSurvey(cursor.value.survey,
-          function(response) {
-            deleteSurvey(cursor.value.key);
-          },
-          function(status) {
-            updateTimeToSend(cursor.value.key);
-          });
-        // Delete the survey at the cursor and continue.
-        var req = cursor.delete();
-        req.onsuccess = function(event) { console.log('deleted'); };
-        req.onerror = function(event) { console.log('error deleting'); };
-        req.oncomplete = function(event) { cursor.continue(); };
+            function(response) { deleteSurvey(cursor.value.key); },
+            function(status) { updateTimeToSend(cursor.value.key); });
+        cursor.continue();
       }
-    }
-  }
-  request.onupgradeneeded = setupPendingResponsesDatabase;
+    };
+  });
 }
 
-function deleteSurvey(key) {
-  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
-  request.onsuccess = function(event) {
-    var db = event.target.result;
-    var transaction = db.transaction(['responses'], 'readwrite');
-    var objectStore = transaction.objectStore('responses');
-    var request = objectStore.delete(key);
-    request.onsuccess = function(event) {};
-    request.onerror = function(event) {};
-    request.oncomplete = function(event) {};
-  }
-  request.onupgradeneeded = setupPendingResponsesDatabase;
 
+function deleteSurvey(key) {
   withDBStore('pendingResponses', 'responses', 'readwrite', function(store) {
     var request = objectStore.delete(key);
     request.onsuccess = function(event) {};
@@ -396,22 +367,6 @@ function deleteSurvey(key) {
 }
 
 function updateTimeToSend(key) {
-  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
-  request.onsuccess = function(event) {
-    var db = event.target.result;
-    var transaction = db.transaction(['responses'], 'readwrite');
-    var objectStore = transaction.objectStore('responses');
-    var request = objectStore.get(key);
-    request.onsuccess = function(event) {
-      var record = event.target.result;
-      record.tries = record.tries + 1;
-      record.timeToSend = Date.now() + sendingDelay(record.tries);
-      var request = store.put(record);
-      request.onsuccess = function(event) {};
-      request.onerror = function(event) {};
-    }
-  }
-
   withDBStore('pendingResponses', 'responses', 'readwrite', function(store) {
     var request = store.get(key);
     request.onsuccess =  function(event) {
@@ -458,17 +413,17 @@ function setupPendingResponsesDatabase(event) {
  */
 function sendSurvey(survey, successCallback, errorCallback) {
   var url = cesp.SERVER_URL + cesp.SUBMIT_SURVEY_ACTION;
-  var method = "POST";
+  var method = 'POST';
   var dateTaken = survey.dateTaken.toISOString();
-  // Get rid of timezone "Z" on end of ISO String for AppEngine compatibility.
-  if (dateTaken.slice(-1) === "Z") {
+  // Get rid of timezone 'Z' on end of ISO String for AppEngine compatibility.
+  if (dateTaken.slice(-1) === 'Z') {
     dateTaken = dateTaken.slice(0, -1);
   }
   var data = {
-    "date_taken": dateTaken,
-    "participant_id": survey.participantId,
-    "responses": [],
-    "survey_type": survey.type
+    'date_taken': dateTaken,
+    'participant_id': survey.participantId,
+    'responses': [],
+    'survey_type': survey.type
   };
   for (var i = 0; i < survey.responses.length; i++) {
     data.responses.push(survey.responses[i]);
