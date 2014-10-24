@@ -19,7 +19,7 @@ cesp.XHR_TIMEOUT = 4000;
 cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
-cesp.MAX_SURVEYS_PER_DAY = 2;
+cesp.MAX_SURVEYS_PER_DAY = 10;
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
@@ -62,7 +62,6 @@ function setupState(details) {
   // reasons (extension or browser update).
   if (details.reason === 'install') {
     setReadyForSurveysStorageValue(false);
-    chrome.storage.local.set({'pending_responses': []});
     chrome.runtime.getPlatformInfo(function(platformInfo) {
       cesp.operatingSystem = platformInfo.os;
     });
@@ -297,63 +296,153 @@ function Survey(type, participantId, dateTaken, responses) {
   this.responses = responses;
 }
 
+function PendingSurvey(survey, timeToSend, tries) {
+  this.survey = survey;
+  this.timeToSend = timeToSend;
+  this.tries = tries;
+}
+
 /**
  * Saves a survey into the database of pending completed surveys.
  * Applies an exponential backoff based on the number of attempts made to
- * submit the survey so far (a delay of pow(BACKOFF, tries) in minutes).
+ * submit the survey so far.
  * @param {Survey} survey The survey to add to the queue.
  * @param {int=} tries The number of tries so far (optional, defaults to 0).
  */
 function saveSurvey(survey, tries) {
   if (!tries)
     var tries = 0;
-  var db = indexedDB.open('pendingResponses', cesp.DB_VERSION);
-  var objectStore = db.transaction(['responses'], 'readwrite').objectStore('responses');
-  var timeToSend = Date.now() + Math.pow(cesp.BACKOFF, tries) * constants.MS_IN_MIN;
-  //var pendingSurvey = PendingSurvey(survey, timeToSend, tries);
-  var request = objectStore.add({survey: survey, timeToSend: timeToSend});
-  // Handle success and error
+  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
+  request.onsuccess = function(event) {
+    var db = event.target.result;
+    var transaction = db.transaction(['responses'], 'readwrite');
+    var objectStore = transaction.objectStore('responses');
+    var timeToSend = Date.now() + sendingDelay(tries);
+    var pendingSurvey = new PendingSurvey(survey, timeToSend, tries);
+    var request = objectStore.add(pendingSurvey);
+    // Handle success and error
+    request.onsuccess = function(event) { console.log("success"); };
+    request.onerror = function(event) { console.log("error"); };
+  }
+  request.onerror = function(event) {
+    console.log("Failed to open database.");
+  }
+  request.onupgradeneeded = setupPendingResponsesDatabase;
 }
 
-function setupPendingResponsesDatabase(event) {
-  var db = event.target.result;
-  // Create the object store for this database.
-  var objectStore = db.createObjectStore('responses', {autoIncrement: true});
-  objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
+function sendingDelay(tries) {
+  return (Math.pow(2, tries) - 1) * 60000;
 }
 
+/**
+ *
+ */
 function processQueue(alarm) {
   // Retrieves the array of pending responses
   // Tries to send all 
   if (alarm.name != cesp.QUEUE_ALARM_NAME) return;
 
-  var db = indexedDB.open('pendingResponses', cesp.DB_VERSION);
-  var objectStore = db.transaction(['responses'], 'readwrite').objectStore('responses');
-  var index = objectStore.index('timeToSend');
-  var now = Date.now();
-  var keyRange = IDBKeyRange.upperBound(now);
-  index.openCursor(keyRange).onsuccess = function(event) {
-    var cursor = event.target.result;
-    if (cursor) {
-      // cursor.key is timeToSend
-      // cursor.value is the object, we can get at:
-      //  - cursor.value.survey
-      //  - cursor.value.tries
-      // So we want to pass it to the sendSurvey function.
-      sendSurvey(cursor.value.survey,
-          function(response) {},
+  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
+  request.onsuccess = function(event) {
+    var db = event.target.result;
+    var transaction = db.transaction(['responses'], 'read');
+    var objectStore = transaction.objectStore('responses');
+    var index = objectStore.index('timeToSend');
+    var now = Date.now();
+    var keyRange = IDBKeyRange.upperBound(now);
+    index.openCursor(keyRange).onsuccess = function(event) {
+      var cursor = event.target.result;
+      if (cursor) {
+        console.log('current: ' + cursor.value);
+        // Send the survey. If it succeeds, remove it from the DB.
+        // If it fails, increment it's timeToSend.
+        sendSurvey(cursor.value.survey,
+          function(response) {
+            deleteSurvey(cursor.value.key);
+          },
           function(status) {
-            // On error, add the survey back to the queue.
-            saveSurvey(cursor.value.survey, cursor.value.tries + 1);
+            updateTimeToSend(cursor.value.key);
           });
-      // Then delete the item at the cursor.
-      var request = cursor.delete();
-      request.oncomplete = function(event) { cursor.continue(); };
+        // Delete the survey at the cursor and continue.
+        var req = cursor.delete();
+        req.onsuccess = function(event) { console.log('deleted'); };
+        req.onerror = function(event) { console.log('error deleting'); };
+        req.oncomplete = function(event) { cursor.continue(); };
+      }
     }
   }
+  request.onupgradeneeded = setupPendingResponsesDatabase;
 }
 
+function deleteSurvey(key) {
+  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
+  request.onsuccess = function(event) {
+    var db = event.target.result;
+    var transaction = db.transaction(['responses'], 'readwrite');
+    var objectStore = transaction.objectStore('responses');
+    var request = objectStore.delete(key);
+    request.onsuccess = function(event) {};
+    request.onerror = function(event) {};
+    request.oncomplete = function(event) {};
+  }
+  request.onupgradeneeded = setupPendingResponsesDatabase;
 
+  withDBStore('pendingResponses', 'responses', 'readwrite', function(store) {
+    var request = objectStore.delete(key);
+    request.onsuccess = function(event) {};
+    request.onerror = function(event) {};
+    request.oncomplete = function(event) {};
+  });
+}
+
+function updateTimeToSend(key) {
+  var request = indexedDB.open('pendingResponses', cesp.DB_VERSION);
+  request.onsuccess = function(event) {
+    var db = event.target.result;
+    var transaction = db.transaction(['responses'], 'readwrite');
+    var objectStore = transaction.objectStore('responses');
+    var request = objectStore.get(key);
+    request.onsuccess = function(event) {
+      var record = event.target.result;
+      record.tries = record.tries + 1;
+      record.timeToSend = Date.now() + sendingDelay(record.tries);
+      var request = store.put(record);
+      request.onsuccess = function(event) {};
+      request.onerror = function(event) {};
+    }
+  }
+
+  withDBStore('pendingResponses', 'responses', 'readwrite', function(store) {
+    var request = store.get(key);
+    request.onsuccess =  function(event) {
+      var record = event.target.result;
+      record.tries = record.tries + 1;
+      record.timeToSend = Date.now() + sendingDelay(record.tries);
+      var request = store.put(record);
+      request.onsuccess = function(event) {};
+      request.onerror = function(event) {};
+    }
+  });
+}
+
+function withDatabaseStore(database, store, mode, action) {
+  var request = indexedDB.open(database, cesp.DB_VERSION);
+  request.onsuccess = function(event) {
+    var db = event.target.result;
+    var transaction = db.transaction([store], mode);
+    var objectStore = transaction.objectStore(store);
+    action(objectStore);
+  };
+  request.onupgradeneeded = setupPendingResponsesDatabase;
+}
+
+function setupPendingResponsesDatabase(event) {
+  var db = event.target.result;
+  // Create the object store for this database.
+  var objectStore = db.createObjectStore(
+      'responses', { keyPath: 'id', autoIncrement: true});
+  objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
+}
 
 /**
  * Sends a survey to the CESP backend via XHR.
@@ -408,3 +497,10 @@ function sendSurvey(survey, successCallback, errorCallback) {
   xhr.ontimeout = onTimeoutHandler;
   xhr.send(JSON.stringify(data));
 }
+
+var testResponse = new Response('q1', 'a1');
+var testSurvey = new Survey('test', 0, new Date(), [testResponse]);
+var testAlarm = {name: 'test'};
+cesp.QUEUE_ALARM_NAME = 'test';
+cesp.SERVER_URL = 'https://tensile-impulse-729.appspot.com';
+
