@@ -351,47 +351,43 @@ function sendingDelay(tries) {
 function processQueue(alarm) {
   if (alarm.name != cesp.QUEUE_ALARM_NAME) return;
 
-  var surveysToSubmit = [];
+  function makeSuccessCallback(id) {
+    return function(response) {
+      deleteSurvey(id);
+    };
+  }
+
+  function makeErrorCallback(id) {
+    return function(status) {
+      updateTimeToSend(id);
+    };
+  }
 
   withObjectStore('surveys', 'readonly', function(store) {
+    var surveysToSubmit = [];
+
     var index = store.index('timeToSend');
     var keyRange = IDBKeyRange.upperBound(Date.now());
     index.openCursor(keyRange).onsuccess = function(event) {
       var cursor = event.target.result;
       if (cursor) {
         console.log(cursor.value);
-        surveysToSubmit.push({
-          id: cursor.value.id,
-          survey: cursor.value.survey
-        });
+        surveysToSubmit.push({id: cursor.value.id, survey: cursor.value.survey});
         cursor.continue();
+      } else {
+        // After collecting all the surveys over the cursor, make async calls
+        // to sendSurvey.
+        console.log(surveysToSubmit);
+        for (var i = 0; i < surveysToSubmit.length; i++) {
+          var id = surveysToSubmit[i].id;
+          var survey = surveysToSubmit[i].survey;
+          sendSurvey(survey,
+            makeSuccessCallback(id),
+            makeErrorCallback(id));
+        }
       }
     };
   });
-
-  // TODO: These closures aren't defined correctly, accidentally using the last
-  // instance of id always.
-  function makeSuccessCallback(id) {
-    var keyID = id;
-    return function(response) {
-      deleteSurvey(keyID);
-    };
-  }
-
-  function makeErrorCallback(id) {
-    var keyID = id;
-    return function(status) {
-      updateTimeToSend(keyID);
-    };
-  }
-
-  for (var i = 0; i < surveysToSubmit.length; i++) {
-    var id = surveysToSubmit[i].id;
-    var survey = surveysToSubmit[i].survey;
-    console.log("sending");
-    console.log(survey);
-    sendSurvey(survey, makeSuccessCallback(id), makeErrorCallback(id));
-  }
 }
 
 /**
