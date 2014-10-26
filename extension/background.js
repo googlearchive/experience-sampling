@@ -392,6 +392,7 @@ function processQueue(alarm) {
     };
   });
 }
+chrome.alarms.onAlarm.addListener(processQueue);
 
 /**
  * Delete the survey with the specified key from the database.
