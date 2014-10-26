@@ -351,11 +351,7 @@ function saveSurvey(survey, tries) {
   withObjectStore('surveys', 'readwrite', function(store) {
     var timeToSend = Date.now() + sendingDelay(tries);
     var pendingSurvey = new PendingSurvey(survey, timeToSend, tries);
-    console.log(pendingSurvey);
     var request = store.add(pendingSurvey);
-    // Handle success and error
-    request.onsuccess = function(event) { console.log("success"); };
-    request.onerror = function(event) { console.log("error"); };
   });
 }
 
@@ -397,13 +393,11 @@ function processQueue(alarm) {
     index.openCursor(keyRange).onsuccess = function(event) {
       var cursor = event.target.result;
       if (cursor) {
-        console.log(cursor.value);
         surveysToSubmit.push({id: cursor.value.id, survey: cursor.value.survey});
         cursor.continue();
       } else {
         // After collecting all the surveys over the cursor, make async calls
         // to sendSurvey.
-        console.log(surveysToSubmit);
         for (var i = 0; i < surveysToSubmit.length; i++) {
           var id = surveysToSubmit[i].id;
           var survey = surveysToSubmit[i].survey;
@@ -424,7 +418,6 @@ chrome.alarms.onAlarm.addListener(processQueue);
 function deleteSurvey(id) {
   withObjectStore('surveys', 'readwrite', function(store) {
     var request = store.delete(id);
-    request.onsuccess = function(event) {console.log("deleted"); };
   });
 }
 
@@ -438,11 +431,9 @@ function updateTimeToSend(id) {
     var request = store.get(id);
     request.onsuccess =  function(event) {
       var record = event.target.result;
-      console.log(record);
       record.tries = record.tries + 1;
       record.timeToSend = Date.now() + sendingDelay(record.tries);
       var request = store.put(record);
-      request.onsuccess = function(event) {console.log("updated"); };
     }
   });
 }
@@ -513,20 +504,16 @@ function sendSurvey(survey, successCallback, errorCallback) {
   function onLoadHandler(event) {
     if (xhr.readyState === 4) {
       if (xhr.status === 204) {
-        console.log("successfully sent");
         successCallback(xhr.response);
       } else {
-        console.log("error sending");
         errorCallback(xhr.status);
       }
     }
   }
   function onErrorHandler(event) {
-    console.log("error sending");
     errorCallback(xhr.status);
   }
   function onTimeoutHandler(event) {
-    console.log("timeout sending");
     errorCallback();
   }
   xhr.open(method, url, true);
