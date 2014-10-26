@@ -45,7 +45,8 @@ constants.OTHER = 'Other: ';
 
 // The different types of events that trigger survey notifications.
 constants.EventType = {
-  SSL: 'ssl_interstitial',
+  SSL_OVERRIDABLE: 'ssl_interstitial_overridable',
+  SSL_NONOVERRIDABLE: 'ssl_interstitial_notoverridable',
   MALWARE: 'safebrowsing_interstitial',
   PHISHING: 'phishing_interstitial',
   HARMFUL: 'harmful_interstitial',
@@ -58,6 +59,28 @@ constants.EventType = {
   EXTENSION_INSTALL: 'extension_install_dialog',
 
   UNKNOWN: 'unknown',
+};
+
+// The JavaScript files that load each survey.
+constants.SurveyLocation = {
+  SSL_OVERRIDABLE_PROCEED: 'ssl-overridable-proceed.js',
+  SSL_OVERRIDABLE_NOPROCEED: 'ssl-overridable-noproceed.js',
+  SSL_NONOVERRIDABLE: 'ssl-nonoverridable.js',
+  MALWARE_PROCEED: 'malware-proceed.js',
+  MALWARE_NOPROCEED: 'malware-noproceed.js',
+  PHISHING_PROCEED: 'phishing-proceed.js',
+  PHISHING_NOPROCEED: 'phishing-noproceed.js',
+  EXTENSION_PROCEED: 'extension-proceed.js',
+  EXTENSION_NOPROCEED: 'extension-noproceed.js'
+};
+
+// The different types of user decisions.
+constants.DecisionType = {
+  PROCEED: 'proceed',
+  DENY: 'deny',
+  IGNORE: 'ignore',
+  CANCEL: 'cancel',
+  RELOAD: 'reload'
 };
 
 /**

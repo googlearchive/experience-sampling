@@ -19,7 +19,8 @@ cesp.XHR_TIMEOUT = 4000;
 cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
-cesp.MAX_SURVEYS_PER_DAY = 10;
+cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
+cesp.MAX_SURVEYS_PER_DAY = 2;
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
@@ -71,7 +72,7 @@ function setupState(details) {
     setSurveysShownStorageValue(0);
     var midnight = new Date();
     midnight.setHours(0, 0, 0, 0);
-    // midnight is the last midnight, so we set the alarm for one day from it.
+    // Midnight is the last midnight, so we set the alarm for one day from it.
     chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
         {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
     // Process the pending survey submission queue every 20 minutes.
@@ -194,19 +195,26 @@ function showSurveyNotification(element, decision) {
       clearNotifications();
 
       var timePromptShown = new Date();
-      var clickHandler = function(unused) {
-        var timePromptClicked = new Date();
-        loadSurvey(element, decision, timePromptShown, timePromptClicked);
-        clearNotifications();
+      var clickHandler = function(notificationId, buttonIndex) {
+        if (buttonIndex === 1) {
+          chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
+        } else {
+          var timePromptClicked = new Date();
+          loadSurvey(element, decision, timePromptShown, timePromptClicked);
+          clearNotifications();
+        }
       };
-
       var opt = {
         type: 'basic',
         iconUrl: cesp.ICON_FILE,
         title: cesp.NOTIFICATION_TITLE,
         message: cesp.NOTIFICATION_BODY,
         eventTime: Date.now(),
-        buttons: [{title: cesp.NOTIFICATION_BUTTON}]
+        buttons: [
+          {title: cesp.NOTIFICATION_BUTTON},
+          {title: cesp.NOTIFICATION_CONSENT_LINK}
+        ],
+        isClickable: true
       };
       chrome.notifications.create(
           cesp.NOTIFICATION_TAG,
@@ -235,26 +243,41 @@ function showSurveyNotification(element, decision) {
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
+    var userDecision = decision['name'];
+    if (userDecision !== constants.DecisionType.PROCEED &&
+        userDecision !== constants.DecisionType.DENY) {
+      return;
+    }
 
-    var surveyLocations = {
-      SSL: 'ssl.html',
-      EXAMPLE: 'survey-example.html'
-    };
     var surveyURL;
     var eventType = constants.FindEventType(element['name']);
     switch (eventType) {
-      case constants.EventType.SSL:
-        surveyURL = surveyLocations.SSL;
+      case constants.EventType.SSL_OVERRIDABLE:
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED :
+            constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED;
+        break;
+      case constants.EventType.SSL_NONOVERRIDABLE:
+        surveyURL = constants.SurveyLocation.SSL_NONOVERRIDABLE;
         break;
       case constants.EventType.MALWARE:
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            constants.SurveyLocation.MALWARE_PROCEED :
+            constants.SurveyLocation.MALWARE_NOPROCEED;
+        break;
       case constants.EventType.PHISHING:
-      case constants.EventType.DOWNLOAD_MALICIOUS:
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            constants.SurveyLocation.PHISHING_PROCEED :
+            constants.SurveyLocation.PHISHING_NOPROCEED;
+        break;
       case constants.EventType.EXTENSION_INSTALL:
-        // TODO: Make surveys for each of these.
-        surveyURL = surveyLocations.EXAMPLE;
+        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+            constants.SurveyLocation.EXTENSION_PROCEED :
+            constants.SurveyLocation.EXTENSION_NOPROCEED;
         break;
       case constants.EventType.HARMFUL:
       case constants.EventType.SB_OTHER:
+      case constants.EventType.DOWNLOAD_MALICIOUS:
       case constants.EventType.DOWNLOAD_DANGEROUS:
       case constants.EventType.DOWNLOAD_DANGER_PROMPT:
         // Don't survey about these.
@@ -264,7 +287,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         break;
     }
     chrome.tabs.create(
-        {'url': chrome.extension.getURL('surveys/' + surveyURL)},
+        {'url': chrome.extension.getURL('surveys/survey.html?js=' + surveyURL)},
         function() { console.log('Opened survey.'); });
   });
 }

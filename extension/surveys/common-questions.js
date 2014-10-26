@@ -1,44 +1,71 @@
 /**
- * SSL survey.
+ * Defines common questions that are repeated across surveys.
  */
+
+var commonQuestions = {};
 
 /**
- * Adds the questions for the SSL survey.
- * @param {Object} parentNode The DOM node to attach the surveys to.
+ * How did you choose between the two options?
+ * @param {string} The option that the user chose.
+ * @param {string} The option that the user didn't choose.
+ * @returns {object} The DOM subtree with the question.
  */
-function addQuestions(parentNode) {
-
-  // TODO: FILL IN CORRECT WEBSITE NAME!
+commonQuestions.createChoiceQuestion = function(chosen, alternative) {
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'You chose "Proceed to www.example.com" instead of "Back to safety."' +
+      'You chose "' + chosen + '" instead of "' + alternative + '."' +
           ' How did you choose between the two options?',
       true);
-  parentNode.appendChild(howChoose.makeDOMTree());
+  return howChoose.makeDOMTree();
+};
 
+/**
+ * What was the page trying to tell you?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createPageMeaningQuestion = function() {
   var meaning = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'What was the page trying to tell you, in your own words?',
       true);
-  parentNode.appendChild(meaning.makeDOMTree());
+  return meaning.makeDOMTree();
+};
 
+/**
+ * Who was the page from?
+ * @returns {object} The DOM subtree with the question.
+ */
+// TODO: FILL IN CORRECT WEBSITE NAME!
+commonQuestions.createPageSourceQuestion = function() {
   var source = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'Who do you think the page was from?',
       true);
-  parentNode.appendChild(source.makeDOMTree());
+  return source.makeDOMTree();
+};
 
-  // TODO: FILL IN CORRECT WEBSITE NAME!
+/**
+ * Have you visited example.com before?
+ * @returns {object} The DOM subtree with the question.
+ */
+// TODO: FILL IN CORRECT WEBSITE NAME!
+commonQuestions.createPreviousVisitQuestion = function() {
   var hist = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you visited www.example.com before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(hist.makeDOMTree());
+  return hist.makeDOMTree();
+};
 
-  // TODO: Make conditional on previous question.
-  // TODO: Fill in correct website name!
+/**
+ * Have you seen a page like this before?
+ * @returns {object} The DOM subtree with the question.
+ */
+// TODO: Make conditional on createPreviousVisitQuestion.
+// TODO: Fill in correct website name!
+commonQuestions.createPreviousExposureQuestion = function() {
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you seen a page like the one pictured above when trying to visit' +
@@ -46,8 +73,14 @@ function addQuestions(parentNode) {
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(errorBefore.makeDOMTree());
+  return errorBefore.makeDOMTree();
+};
 
+/**
+ * What led you to the site you were trying to visit?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createReferrerQuestion = function() {
   var referrer = new FixedQuestion(
       constants.QuestionType.RADIO,
       'What led you to the site you were trying to visit?',
@@ -61,8 +94,14 @@ function addQuestions(parentNode) {
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(referrer.makeDOMTree());
+  return referrer.makeDOMTree();
+};
 
+/**
+ * Rank how much the attributes describe the page.
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createAttributesQuestion = function() {
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
       'To what degree do each of the following attributes describe this page?',
@@ -84,9 +123,15 @@ function addQuestions(parentNode) {
         'confusing',
         'informative'
       ]);
-  parentNode.appendChild(attributes.makeDOMTree());
+  return attributes.makeDOMTree();
+};
 
-  // TODO: Fill in real URL!
+/**
+ * Record the URL?
+ * @returns {object} The DOM subtree with the question.
+ */
+// TODO: Fill in real URL!
+commonQuestions.createRecordUrlQuestion = function() {
   var url = new FixedQuestion(
       constants.QuestionType.RADIO,
       'May we record the URL of the website you were trying to visit, ' +
@@ -94,40 +139,18 @@ function addQuestions(parentNode) {
       true,
       ['Yes', 'No'],
       constants.Randomize.NONE);
-  parentNode.appendChild(url.makeDOMTree());
+  return url.makeDOMTree();
+};
 
+/**
+ * Anything else?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createClarificationQuestion = function() {
   var extra = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
       'Please use this space to clarify any of your responses from above or ' +
           'let us know how we can improve this survey.',
       false);
-  parentNode.appendChild(extra.makeDOMTree());
-}
-
-/**
- * Sets up the survey form.
- */
-function setupSurvey() {
-  console.log('Setting up a survey');
-  $('explanation').classList.remove('hidden');
-  $('survey-container').classList.remove('hidden');
-  addQuestions($('survey-form'));
-  $('survey-form').appendChild(makeSubmitButtonDOM());
-  document.forms['survey-form'].addEventListener(
-      'submit', setupFormSubmitted);
-}
-
-/**
- * Handles the submission of the setup survey.
- * @param {object} The submission button click event.
- */
-function setupFormSubmitted(event) {
-  console.log('Survey submitted');
-  event.preventDefault();
-  $('explanation').classList.add('hidden');
-  $('survey-container').classList.add('hidden');
-  $('thank-you').classList.remove('hidden');
-  setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
-}
-
-document.addEventListener('DOMContentLoaded', setupSurvey);
+  return extra.makeDOMTree();
+};
