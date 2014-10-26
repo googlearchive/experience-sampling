@@ -29,9 +29,9 @@ cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.DB_NAME = 'pendingResponsesDB';
 cesp.DB_VERSION = 1;
+cesp.QUEUE_ALARM_NAME = 'surveySubmissionAlarm';
 
 // SETUP
-
 
 /**
  * A helper method for updating the value in local storage.
@@ -74,6 +74,9 @@ function setupState(details) {
     // midnight is the last midnight, so we set the alarm for one day from it.
     chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
         {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
+    // Process the pending survey submission queue every 20 minutes.
+    chrome.alarms.create(cesp.QUEUE_ALARM_NAME,
+        {delayInMinutes: 0, periodInMinutes: 20});
   }
 }
 
@@ -510,10 +513,3 @@ function sendSurvey(survey, successCallback, errorCallback) {
   xhr.ontimeout = onTimeoutHandler;
   xhr.send(JSON.stringify(data));
 }
-
-var testResponse = new Response('q1', 'a1');
-var testSurvey = new Survey('test', 0, new Date(), [testResponse]);
-var testAlarm = {name: 'test'};
-cesp.QUEUE_ALARM_NAME = 'test';
-cesp.SERVER_URL = 'https://tensile-impulse-729.appspot.com';
-
