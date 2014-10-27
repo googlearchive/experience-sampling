@@ -12,16 +12,22 @@ function loadSurveyScript() {
     console.log('Unexpected query: ' + window.location);
     window.location = '../consent.html';
   }
+  function parseKeyValuePair(keyName, pairStr) {
+    var paramArr = pairStr.split('=');
+    if (!paramArr || paramArr.length != 2 || paramArr[0] !== keyName) {
+      handleError();
+      return '';  // Won't be reached because handleError will navigate.
+    }
+    return paramArr[1];
+  }
   var query = window.location.search.substring(1);
   if (!query) handleError();
-  var splitIntoParams = query.split('&');
-  if (!splitIntoParams || splitIntoParams.length < 2) handleError();
+  var splitIntoPairs = query.split('&');
+  if (!splitIntoPairs || splitIntoPairs.length < 2) handleError();
 
   // Determine the type of survey to show.
-  var jsParamArr = splitIntoParams[0].split('=');
+  var jsUrl = parseKeyValuePair('js', splitIntoPairs[0]);
   var extensionSurvey = false;
-  if (jsParamArr.length != 2 || jsParamArr[0] !== 'js') handleError();
-  var jsUrl = jsParamArr[1];
   switch (jsUrl) {
     case constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED:
     case constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED:
@@ -43,9 +49,8 @@ function loadSurveyScript() {
 
   // Get the URL or extension name that the survey is about.
   if (!extensionSurvey) {
-    var urlParamArr = splitIntoParams[1].split('=');
-    if (urlParamArr.length != 2 || urlParamArr[0] != 'url') handleError();
-    var questionUrl = decodeURIComponent(urlParamArr[1]);
+    var questionUrl = decodeURIComponent(
+        parseKeyValuePair('url', splitIntoPairs[1]));
     if (!questionUrl) handleError();
     surveySetup.QuestionUrl = questionUrl;
   }
