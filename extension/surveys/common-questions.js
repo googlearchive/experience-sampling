@@ -47,22 +47,13 @@ commonQuestions.createPageSourceQuestion = function() {
  * Have you visited example.com before?
  * @returns {object} The DOM subtree with the question.
  */
-commonQuestions.createPreviousVisitQuestion = function() {
+commonQuestions.createHistoryQuestions = function() {
   var hist = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you visited ' + surveySetup.QuestionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
-  return hist.makeDOMTree();
-};
-
-/**
- * Have you seen a page like this before?
- * @returns {object} The DOM subtree with the question.
- */
-// TODO: Make conditional on createPreviousVisitQuestion.
-commonQuestions.createPreviousExposureQuestion = function() {
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you seen a page like the one pictured above when trying to visit ' +
@@ -70,7 +61,8 @@ commonQuestions.createPreviousExposureQuestion = function() {
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
-  return errorBefore.makeDOMTree();
+  hist.addDependentQuestion(errorBefore, 'Yes');
+  return hist.makeDOMTree();
 };
 
 /**

@@ -75,6 +75,10 @@ function setupSurvey() {
   $('survey-form').appendChild(makeSubmitButtonDOM());
   document.forms['survey-form'].addEventListener(
       'submit', setupFormSubmitted);
+  var selectElements = document.getElementsByTagName('select');
+  for (var i = 0; i < selectElements.length; i++) {
+    selectElements[i].selectedIndex = -1;
+  }
 }
 
 /**
