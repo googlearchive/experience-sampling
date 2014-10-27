@@ -57,13 +57,6 @@ function FixedQuestion(
 FixedQuestion.prototype = Object.create(Question.prototype);
 FixedQuestion.prototype.constructor = FixedQuestion;
 
-function checkRequiredForm(questionName) {
-  var elems = document.getElementsByName(questionName);
-  for (var i = 0; i < elems.length; i++) {
-    elems[i].removeAttribute('required');
-  }
-}
-
 /**
  * Creates the DOM representation of a FixedQuestion question.
  * @return {object} The DOM node that contains the question.
