@@ -35,6 +35,12 @@
   clear: both;
 }
 
+.dependent {
+  border-top: dotted #A3A3A3 1px;
+  margin-top: 10px;
+  padding-top: 10px;
+}
+
 .example {
   padding-top: 20px;
 }

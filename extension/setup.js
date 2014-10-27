@@ -90,10 +90,6 @@ function addQuestions(parentNode) {
         'Georgia'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(country.makeDOMTree());
-
-  // TODO: Make this question appear only if the U.S. is the answer to the
-  // previous question.
   var state = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
       'Which state?',
@@ -157,7 +153,8 @@ function addQuestions(parentNode) {
         'Northern Mariana Islands'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(state.makeDOMTree());
+  country.addDependentQuestion(state, 'Delaware');
+  parentNode.appendChild(country.makeDOMTree());
 
   var source = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -236,6 +233,10 @@ function setupSurveyForm(savedState) {
     $('survey-form').appendChild(makeSubmitButtonDOM());
     document.forms['survey-form'].addEventListener(
         'submit', setupFormSubmitted);
+    var selectElements = document.getElementsByTagName('select');
+    for (var i = 0; i < selectElements.length; i++) {
+      selectElements[i].selectedIndex = -1;
+    }
   } else if (setupSurvey.status == constants.SETUP_COMPLETED) {
     // Show a notice that the survey was already completed.
     $('already-completed').classList.remove('hidden');
