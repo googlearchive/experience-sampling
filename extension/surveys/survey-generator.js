@@ -14,7 +14,7 @@ function Question(questionType, question, required) {
   this.question = question;
   this.required = required;
   this.userResponse = "";
-  this.isDependent = false;
+  this.isDependentChild = false;
 }
 
 /**
@@ -59,14 +59,14 @@ FixedQuestion.prototype.constructor = FixedQuestion;
 
 /**
  * Attaches a dependent question to this one. The dependent question will only
- * be shown when the user selects a specific fixed answer.
- * @param {object} dependent The question conditional on this one.
+ * be shown when the user selects a specific fixed answer. |this| is the parent.
+ * @param {object} child The question conditional on this one.
  * @param {string} answer Show the conditional when this answer is selected.
  */
-FixedQuestion.prototype.addDependentQuestion = function(dependent, answer) {
-  this.dependent = dependent;
-  this.dependentAnswer = answer;
-  dependent.isDependent = true;
+FixedQuestion.prototype.addDependentQuestion = function(child, answer) {
+  this.depChild = child;
+  this.depChildAnswer = answer;
+  child.isDependentChild = true;
 };
 
 /**
@@ -75,7 +75,7 @@ FixedQuestion.prototype.addDependentQuestion = function(dependent, answer) {
  */
 FixedQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
-  if (this.isDependent) {
+  if (this.isDependentChild) {
     container.classList.add('hidden');
     container.classList.add('dependent');
   } else {
@@ -129,13 +129,13 @@ FixedQuestion.prototype.makeDOMTree = function() {
           answer.appendChild(textInput);
         }
 
-        if (this.dependent && this.dependentAnswer === this.answers[i]) {
-          var dependentQuestion = getDomNameFromValue(this.dependent.question);
+        if (this.depChild && this.depChildAnswer === this.answers[i]) {
+          var dependentQuestion = getDomNameFromValue(this.depChild.question);
           input.addEventListener('change', function(unused) {
             $(dependentQuestion).classList.remove('hidden');
           });
-        } else if (this.dependent) {
-          var dependentQuestion = getDomNameFromValue(this.dependent.question);
+        } else if (this.depChild) {
+          var dependentQuestion = getDomNameFromValue(this.depChild.question);
           input.addEventListener('change', function(unused) {
             $(dependentQuestion).classList.add('hidden');
           });
@@ -156,7 +156,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
         option.value = i + '-' + getDomNameFromValue(this.answers[i]);
         option.textContent = this.answers[i];
         answerChoices.push(option);
-        if (this.answers[i] === this.dependentAnswer)
+        if (this.answers[i] === this.depChildAnswer)
           depAnswer = option.value;
       }
       if (this.randomize != constants.Randomize.NONE)
@@ -170,8 +170,8 @@ FixedQuestion.prototype.makeDOMTree = function() {
       for (var i = 0; i < answerChoices.length; i++)
         select.appendChild(answerChoices[i]);
 
-      if (this.dependent && depAnswer) {
-        var depQuest = getDomNameFromValue(this.dependent.question);
+      if (this.depChild && depAnswer) {
+        var depQuest = getDomNameFromValue(this.depChild.question);
         select.addEventListener('change', function(unused) {
           if (select.value === depAnswer)
             $(depQuest).classList.toggle('hidden');
@@ -186,9 +186,9 @@ FixedQuestion.prototype.makeDOMTree = function() {
         'question type: ' + this.questionType);
   }
 
-  if (this.dependent) {
-    var child = this.dependent.makeDOMTree();
-    child.setAttribute('id', getDomNameFromValue(this.dependent.question));
+  if (this.depChild) {
+    var child = this.depChild.makeDOMTree();
+    child.setAttribute('id', getDomNameFromValue(this.depChild.question));
     container.appendChild(child);
   }
 
@@ -303,7 +303,7 @@ ScaleQuestion.prototype.makeDOMTree = function() {
       this.attributes.length > 0;
 
   var container = document.createElement('div');
-  if (this.isDependent) {
+  if (this.isDependentChild) {
     container.classList.add('hidden');
     container.classList.add('dependent');
   } else {
@@ -360,7 +360,7 @@ EssayQuestion.prototype.constructor = EssayQuestion;
  */
 EssayQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
-  if (this.isDependent) {
+  if (this.isDependentChild) {
     container.classList.add('hidden');
     container.classList.add('dependent');
   } else {
