@@ -61,24 +61,24 @@ function setSurveysShownStorageValue(newCount) {
 function setupState(details) {
   // We check the event reason because onInstalled can trigger for other
   // reasons (extension or browser update).
-  if (details.reason === 'install') {
-    setReadyForSurveysStorageValue(false);
-    chrome.runtime.getPlatformInfo(function(platformInfo) {
-      cesp.operatingSystem = platformInfo.os;
-    });
-    // Automatically uninstall the extension after 120 days.
-    chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
-    // Set the count of surveys shown to 0, and reset it each day at midnight.
-    setSurveysShownStorageValue(0);
-    var midnight = new Date();
-    midnight.setHours(0, 0, 0, 0);
-    // Midnight is the last midnight, so we set the alarm for one day from it.
-    chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
-        {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
-    // Process the pending survey submission queue every 20 minutes.
-    chrome.alarms.create(cesp.QUEUE_ALARM_NAME,
-        {delayInMinutes: 0, periodInMinutes: 20});
-  }
+  if (details.reason !== 'install') return;
+
+  setReadyForSurveysStorageValue(false);
+  chrome.runtime.getPlatformInfo(function(platformInfo) {
+    cesp.operatingSystem = platformInfo.os;
+  });
+  // Automatically uninstall the extension after 120 days.
+  chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
+  // Set the count of surveys shown to 0, and reset it each day at midnight.
+  setSurveysShownStorageValue(0);
+  var midnight = new Date();
+  midnight.setHours(0, 0, 0, 0);
+  // Midnight is the last midnight, so we set the alarm for one day from it.
+  chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
+      {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
+  // Process the pending survey submission queue every 20 minutes.
+  chrome.alarms.create(cesp.QUEUE_ALARM_NAME,
+      {delayInMinutes: 0, periodInMinutes: 20});
 }
 
 /**
@@ -297,7 +297,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
 
 /**
- * A survey response (question and answer).
+ * A question and response.
  * @constructor
  * @param {string} question The question being answered.
  * @param {string} answer The answer to that question.
@@ -315,7 +315,7 @@ function Response(question, answer) {
  * @param {Date} dateTaken The date and time when the survey was taken.
  * @param {Array.Response} responses An array of Response objects.
 */
-function Survey(type, participantId, dateTaken, responses) {
+function SurveyRecord(type, participantId, dateTaken, responses) {
   this.type = type;
   this.participantId = participantId;
   this.dateTaken = dateTaken;
@@ -325,33 +325,35 @@ function Survey(type, participantId, dateTaken, responses) {
 /**
  * A completed survey pending submission to the backend.
  * @constructor
- * @param {Survey} survey The survey that is pending.
+ * @param {SurveyRecord} surveyRecord The completed survey that is pending.
  * @param {int} timeToSend The time when we want the survey to be sent, in ms
  *     since epoch. The survey will not be sent before this time, but may be 
  *     delayed arbitrarily.
  * @param {int} tries The number of attempts made to send this survey so far.
  */
-function PendingSurvey(survey, timeToSend, tries) {
-  this.survey = survey;
+function PendingSurveyRecord(surveyRecord, timeToSend, tries) {
+  this.surveyRecord = surveyRecord;
   this.timeToSend = timeToSend;
   this.tries = tries;
 }
 
 /**
- * Saves a survey into the database of pending completed surveys.
+ * Saves a completed survey into the database of pending completed surveys.
  * Applies an exponential backoff based on the number of attempts made to
  * submit the survey so far.
- * @param {Survey} survey The survey to add to the queue.
+ * @param {SurveyRecord} surveyRecord The completed survey to add to the
+ *     queue.
  * @param {int=} tries The number of tries so far (optional, defaults to 0).
  */
-function saveSurvey(survey, tries) {
+function saveSurveyRecord(surveyRecord, tries) {
   if (!tries)
     var tries = 0;
 
-  withObjectStore('surveys', 'readwrite', function(store) {
+  withObjectStore('PendingSurveyRecords', 'readwrite', function(store) {
     var timeToSend = Date.now() + sendingDelay(tries);
-    var pendingSurvey = new PendingSurvey(survey, timeToSend, tries);
-    var request = store.add(pendingSurvey);
+    var pendingSurveyRecord = new PendingSurveyRecord(surveyRecord,
+        timeToSend, tries);
+    var request = store.add(pendingSurveyRecord);
   });
 }
 
@@ -365,9 +367,9 @@ function sendingDelay(tries) {
 }
 
 /**
- * Get all pending surveys with timeToSend less than the current time, and try
- * to send them. If sending succeeds, delete them from the database. If sending
- * fails, update the timeToSend so we try again later.
+ * Get all pending surveyRecords with timeToSend less than the current time,
+ * and try to send them. If sending succeeds, delete them from the database. If
+ * sending fails, update the timeToSend so we try again later.
  * @params {Alarm} alarm The alarm that triggered.
  */
 function processQueue(alarm) {
@@ -385,7 +387,7 @@ function processQueue(alarm) {
     };
   }
 
-  withObjectStore('surveys', 'readonly', function(store) {
+  withObjectStore('PendingSurveyRecords', 'readonly', function(store) {
     var surveysToSubmit = [];
 
     var index = store.index('timeToSend');
@@ -393,15 +395,16 @@ function processQueue(alarm) {
     index.openCursor(keyRange).onsuccess = function(event) {
       var cursor = event.target.result;
       if (cursor) {
-        surveysToSubmit.push({id: cursor.value.id, survey: cursor.value.survey});
+        surveysToSubmit.push({id: cursor.value.id,
+            surveyRecord: cursor.value.surveyRecord});
         cursor.continue();
       } else {
         // After collecting all the surveys over the cursor, make async calls
         // to sendSurvey.
         for (var i = 0; i < surveysToSubmit.length; i++) {
           var id = surveysToSubmit[i].id;
-          var survey = surveysToSubmit[i].survey;
-          sendSurvey(survey,
+          var surveyRecord = surveysToSubmit[i].survey;
+          sendSurvey(surveyRecord,
             makeSuccessCallback(id),
             makeErrorCallback(id));
         }
@@ -415,8 +418,8 @@ chrome.alarms.onAlarm.addListener(processQueue);
  * Delete the survey with the specified key from the database.
  * @param {int} id The ID primary key of survey to delete.
  */
-function deleteSurvey(id) {
-  withObjectStore('surveys', 'readwrite', function(store) {
+function deleteSurveyRecord(id) {
+  withObjectStore('PendingSurveyRecords', 'readwrite', function(store) {
     var request = store.delete(id);
   });
 }
@@ -427,7 +430,7 @@ function deleteSurvey(id) {
  * @param {int} id The ID primary key of the survey to update.
  */
 function updateTimeToSend(id) {
-  withObjectStore('surveys', 'readwrite', function(store) {
+  withObjectStore('PendingSurveyRecords', 'readwrite', function(store) {
     var request = store.get(id);
     request.onsuccess =  function(event) {
       var record = event.target.result;
@@ -467,13 +470,14 @@ function withObjectStore(storeName, mode, action) {
 function setupPendingResponsesDatabase(event) {
   var db = event.target.result;
   var objectStore = db.createObjectStore(
-      'surveys', { keyPath: 'id', autoIncrement: true});
+      'PendingSurveyRecords', { keyPath: 'id', autoIncrement: true});
   objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
 }
 
 /**
- * Sends a survey to the CESP backend via XHR.
- * @param {Survey} survey The completed survey to send to the backend.
+ * Sends a completed survey to the CESP backend via XHR.
+ * @param {SurveyRecord} surveyRecord The completed survey to send to the
+ *     backend.
  * @param {function(string)} successCallback A function to call on receiving a
  *     successful response (HTTP 204). It should look like
  *     "function(response) {...};" where "response" is the text of the response
@@ -483,22 +487,22 @@ function setupPendingResponsesDatabase(event) {
  *     "function(status) {...};" where "status" is an HTTP status code integer,
  *     if there is one. For a timeout, there is no status.
  */
-function sendSurvey(survey, successCallback, errorCallback) {
+function sendSurveyRecord(surveyRecord, successCallback, errorCallback) {
   var url = cesp.SERVER_URL + cesp.SUBMIT_SURVEY_ACTION;
   var method = 'POST';
-  var dateTaken = survey.dateTaken.toISOString();
+  var dateTaken = surveyRecord.dateTaken.toISOString();
   // Get rid of timezone 'Z' on end of ISO String for AppEngine compatibility.
   if (dateTaken.slice(-1) === 'Z') {
     dateTaken = dateTaken.slice(0, -1);
   }
   var data = {
     'date_taken': dateTaken,
-    'participant_id': survey.participantId,
+    'participant_id': surveyRecord.participantId,
     'responses': [],
-    'survey_type': survey.type
+    'survey_type': surveyRecord.type
   };
-  for (var i = 0; i < survey.responses.length; i++) {
-    data.responses.push(survey.responses[i]);
+  for (var i = 0; i < surveyRecord.responses.length; i++) {
+    data.responses.push(surveyRecord.responses[i]);
   }
   var xhr = new XMLHttpRequest();
   function onLoadHandler(event) {
