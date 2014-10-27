@@ -1,5 +1,5 @@
 var surveySetup = {};
-surveySetup.QuestionUrl = '';  // Holds the URL or extension name.
+surveySetup.QuestionUrl = '';  // Holds the URL for putting into questions.
 
 /**
  * Finds and loads the appropriate JS file, which has the questions for this
