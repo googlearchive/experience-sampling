@@ -11,8 +11,7 @@ function addQuestions(parentNode) {
       'Back to safety', 'visit this infected site'));
   parentNode.appendChild(commonQuestions.createPageMeaningQuestion());
   parentNode.appendChild(commonQuestions.createPageSourceQuestion());
-  parentNode.appendChild(commonQuestions.createPreviousVisitQuestion());
-  parentNode.appendChild(commonQuestions.createPreviousExposureQuestion());
+  parentNode.appendChild(commonQuestions.createHistoryQuestions());
   parentNode.appendChild(commonQuestions.createReferrerQuestion());
   parentNode.appendChild(commonQuestions.createAttributesQuestion());
   parentNode.appendChild(commonQuestions.createRecordUrlQuestion());

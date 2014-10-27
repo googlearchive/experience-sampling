@@ -14,6 +14,7 @@ function Question(questionType, question, required) {
   this.question = question;
   this.required = required;
   this.userResponse = "";
+  this.isDependentChild = false;
 }
 
 /**
@@ -24,7 +25,6 @@ function Question(questionType, question, required) {
 Question.prototype.setUserResponse = function(response) {
   this.userResponse = response;
 };
-
 
 /**
  * Creates the DOM representation of a question. This should be implemented
@@ -58,12 +58,29 @@ FixedQuestion.prototype = Object.create(Question.prototype);
 FixedQuestion.prototype.constructor = FixedQuestion;
 
 /**
+ * Attaches a dependent question to this one. The dependent question will only
+ * be shown when the user selects a specific fixed answer. |this| is the parent.
+ * @param {object} child The question conditional on this one.
+ * @param {string} answer Show the conditional when this answer is selected.
+ */
+FixedQuestion.prototype.addDependentQuestion = function(child, answer) {
+  this.depChild = child;
+  this.depChildAnswer = answer;
+  child.isDependentChild = true;
+};
+
+/**
  * Creates the DOM representation of a FixedQuestion question.
  * @return {object} The DOM node that contains the question.
  */
 FixedQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
-  container.classList.add('fieldset');
+  if (this.isDependentChild) {
+    container.classList.add('hidden');
+    container.classList.add('dependent');
+  } else {
+    container.classList.add('fieldset');
+  }
 
   var legend = document.createElement('legend');
   legend.textContent = this.question;
@@ -76,13 +93,28 @@ FixedQuestion.prototype.makeDOMTree = function() {
       var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
         var answer = document.createElement('div');
-        var shrunkenAnswer = i + '-' + getDomNameFromValue(this.answers[i]);
+        var shrunkenAnswer = i + '-' + getDomNameFromValue(this.answers[i]) +
+            '-' + shrunkenQuestion;
         var input = document.createElement('input');
         input.setAttribute('id', shrunkenAnswer);
         input.setAttribute('name', shrunkenQuestion);
         input.setAttribute('type', this.questionType);
         input.setAttribute('value', shrunkenAnswer);
-        input.setAttribute('required', this.required);
+        if (this.required) {
+          input.setAttribute('required', this.required);
+          if (this.questionType === constants.QuestionType.CHECKBOX) {
+            // By default, HTML5 requires *all* of the checkboxes to be checked
+            // for submission. Since we only want one of a group to be
+            // submitted, remove the requirement once one is checked.
+            input.addEventListener('change', function removeRequired(unused) {
+              var elems = document.getElementsByName(shrunkenQuestion);
+              for (var i = 0; i < elems.length; i++) {
+                elems[i].removeAttribute('required');
+                elems[i].removeEventListener('click', removeRequired);
+              }
+            });
+          }
+        }
         answer.appendChild(input);
 
         var label = document.createElement('label');
@@ -96,6 +128,18 @@ FixedQuestion.prototype.makeDOMTree = function() {
           textInput.setAttribute('name', shrunkenAnswer);
           answer.appendChild(textInput);
         }
+
+        if (this.depChild && this.depChildAnswer === this.answers[i]) {
+          var dependentQuestion = getDomNameFromValue(this.depChild.question);
+          input.addEventListener('change', function(unused) {
+            $(dependentQuestion).classList.remove('hidden');
+          });
+        } else if (this.depChild) {
+          var dependentQuestion = getDomNameFromValue(this.depChild.question);
+          input.addEventListener('change', function(unused) {
+            $(dependentQuestion).classList.add('hidden');
+          });
+        }
         answerChoices.push(answer);
       }
       if (this.randomize != constants.Randomize.NONE)
@@ -105,12 +149,15 @@ FixedQuestion.prototype.makeDOMTree = function() {
       break;
     case constants.QuestionType.DROPDOWN:
       var select = document.createElement('select');
+      var depAnswer;
       var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
         var option = document.createElement('option');
         option.value = i + '-' + getDomNameFromValue(this.answers[i]);
         option.textContent = this.answers[i];
         answerChoices.push(option);
+        if (this.answers[i] === this.depChildAnswer)
+          depAnswer = option.value;
       }
       if (this.randomize != constants.Randomize.NONE)
         answerChoices = knuthShuffle(answerChoices, this.randomize);
@@ -122,12 +169,29 @@ FixedQuestion.prototype.makeDOMTree = function() {
       }
       for (var i = 0; i < answerChoices.length; i++)
         select.appendChild(answerChoices[i]);
+
+      if (this.depChild && depAnswer) {
+        var depQuest = getDomNameFromValue(this.depChild.question);
+        select.addEventListener('change', function(unused) {
+          if (select.value === depAnswer)
+            $(depQuest).classList.toggle('hidden');
+          else
+            $(depQuest).classList.add('hidden');
+        });
+      }
       container.appendChild(select);
       break;
     default:
       throw new Error('Question "' + this.question + '" has an unexpected ' +
         'question type: ' + this.questionType);
   }
+
+  if (this.depChild) {
+    var child = this.depChild.makeDOMTree();
+    child.setAttribute('id', getDomNameFromValue(this.depChild.question));
+    container.appendChild(child);
+  }
+
   return container;
 }
 
@@ -184,7 +248,8 @@ ScaleQuestion.prototype.makeSingleRow =
     var answer = document.createElement('div');
     if (horizontal)
       answer.classList.add('horizontal-scale');
-    var shrunkenAnswer = i + '-' + getDomNameFromValue(this.scale[i]);
+    var shrunkenAnswer =
+        i + '-' + getDomNameFromValue(this.scale[i]) + '-' + questionName;
 
     var radio = document.createElement('input');
     radio.setAttribute('id', shrunkenAnswer);
@@ -236,8 +301,14 @@ ScaleQuestion.prototype.makeDOMTree = function() {
   var multi =
       (this.questionType == constants.QuestionType.MULT_HORIZ_SCALE) &&
       this.attributes.length > 0;
+
   var container = document.createElement('div');
-  container.classList.add('fieldset');
+  if (this.isDependentChild) {
+    container.classList.add('hidden');
+    container.classList.add('dependent');
+  } else {
+    container.classList.add('fieldset');
+  }
 
   var legend = document.createElement('legend');
   legend.textContent = this.question;
@@ -289,7 +360,12 @@ EssayQuestion.prototype.constructor = EssayQuestion;
  */
 EssayQuestion.prototype.makeDOMTree = function() {
   var container = document.createElement('div');
-  container.classList.add('fieldset');
+  if (this.isDependentChild) {
+    container.classList.add('hidden');
+    container.classList.add('dependent');
+  } else {
+    container.classList.add('fieldset');
+  }
 
   var legend = document.createElement('legend');
   legend.textContent = this.question;

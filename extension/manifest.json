@@ -6,7 +6,7 @@
   "version": "1.0",
 
   "background": {
-    "scripts": ["constants.js", "background.js", "survey-submission.js"],
+    "scripts": ["constants.js", "survey-submission.js", "url-prettify.js", "background.js"],
     "persistent": false
   },
 
@@ -16,7 +16,6 @@
     "notifications",
     "storage",
     "unlimitedStorage",
-    "alarms",
     "https://chrome-experience-sampling.appspot.com/_ah/api/*"
   ],
 
