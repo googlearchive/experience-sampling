@@ -250,23 +250,23 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED :
             constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED;
-        visitUrl = sanitizers.ReplaceUrl(element['destination']);
+        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
         break;
       case constants.EventType.SSL_NONOVERRIDABLE:
         surveyUrl = constants.SurveyLocation.SSL_NONOVERRIDABLE;
-        visitUrl = sanitizers.ReplaceUrl(element['destination']);
+        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
         break;
       case constants.EventType.MALWARE:
         surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.MALWARE_PROCEED :
             constants.SurveyLocation.MALWARE_NOPROCEED;
-        visitUrl = sanitizers.ReplaceUrl(element['destination']);
+        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
         break;
       case constants.EventType.PHISHING:
         surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.PHISHING_PROCEED :
             constants.SurveyLocation.PHISHING_NOPROCEED;
-        visitUrl = sanitizers.ReplaceUrl(element['destination']);
+        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
         break;
       case constants.EventType.EXTENSION_INSTALL:
         surveyUrl = userDecision === constants.DecisionType.PROCEED ?
@@ -288,6 +288,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         !surveyUrl) {
       return;
     }
+    visitUrl = encodeURIComponent(visitUrl);
     var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl;
     chrome.tabs.create(
         {'url': chrome.extension.getURL(openUrl)},

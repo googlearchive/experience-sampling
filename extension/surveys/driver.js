@@ -45,7 +45,7 @@ function loadSurveyScript() {
   if (!extensionSurvey) {
     var urlParamArr = splitIntoParams[1].split('=');
     if (urlParamArr.length != 2 || urlParamArr[0] != 'url') handleError();
-    var questionUrl = sanitizers.ReplaceUrl(urlParamArr[1]);
+    var questionUrl = decodeURIComponent(urlParamArr[1]);
     if (!questionUrl) handleError();
     surveySetup.QuestionUrl = questionUrl;
   }

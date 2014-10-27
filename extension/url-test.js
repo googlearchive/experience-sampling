@@ -9,7 +9,7 @@ function addResult(testInput, testOutput, passed) {
   var newEntry = document.createElement('p');
   var color = passed ? 'green' : 'red';
   newEntry.setAttribute('style', 'color: ' + color);
-  newEntry.textContent = testInput + ' : ' + passed;
+  newEntry.textContent = testInput + ' : ' + testOutput;
   $('test-result-display').appendChild(newEntry);
 }
 
@@ -20,7 +20,7 @@ function addResult(testInput, testOutput, passed) {
  * @returns {boolean} Whether they result matches the output.
  */
 function runTest(testInput, expectedOutput) {
-  var actualOutput = sanitizers.ReplaceUrl(testInput);
+  var actualOutput = urlHandler.GetMinimalUrl(testInput);
   addResult(testInput, actualOutput, actualOutput === expectedOutput);
 }
 
@@ -43,32 +43,25 @@ function runTests() {
   // Origin with a mix of numbers and letters.
   runTest('www.exa123mple.com', 'www.exa123mple.com');
 
-  // Origin with some naughty characters.
-  runTest('www.exa\'\'\'mple.com', 'www.example.com');
-
-  // Origin with some naughty characters.
-  runTest('www.ex<>ample.com', 'www.example.com');
-
-  // Origin with some naughty characters.
-  runTest('www.exa"m"ple.com', 'www.example.com');
-
-  // Origin with some naughty characters.
-  runTest('www.exa??mple.com', 'www.example.com');
-
-  // Origin with some naughty characters.
-  runTest('www.exa&mple.com', 'www.example.com');
-
   // Origin with scheme.
   runTest('https://www.example.com', 'www.example.com');
 
   // Origin with scheme.
   runTest('http://www.example.com', 'www.example.com');
 
-  // Origin with unsupported scheme.
-  runTest('file://www.example.com', '');
+  // Origin with non-standard scheme.
+  runTest('file://www.example.com', 'file://www.example.com');
 
-  // Origin with unsupported scheme.
+  // Origin with missing scheme.
   runTest('://www.example.com', '');
+
+  // Origin with standard port.
+  runTest('http://www.example.com:80', 'www.example.com');
+
+  // Origin with non-standard port.
+  runTest('http://www.example.com:3000', 'www.example.com:3000');
+
+  // Origin with 
 }
 
 document.addEventListener('DOMContentLoaded', runTests);
