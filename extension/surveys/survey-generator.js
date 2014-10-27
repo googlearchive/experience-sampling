@@ -88,7 +88,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
             // By default, HTML5 requires *all* of the checkboxes to be checked
             // for submission. Since we only want one of a group to be submitted
             // submitted, remove the requirement once one is checked.
-            input.addEventListener('click', function removeRequired(unused) {
+            answer.addEventListener('click', function removeRequired(unused) {
               var elems = document.getElementsByName(shrunkenQuestion);
               for (var i = 0; i < elems.length; i++) {
                 elems[i].removeAttribute('required');
