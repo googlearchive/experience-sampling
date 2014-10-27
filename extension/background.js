@@ -11,7 +11,7 @@
 var cesp = {};  // namespace variable
 
 cesp.operatingSystem = '';
-cesp.openTabIds = [];
+cesp.openTabId = -1;
 
 // Settings.
 cesp.SERVER_URL = 'https://chrome-experience-sampling.appspot.com';
@@ -294,10 +294,10 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
     chrome.tabs.create(
         {'url': chrome.extension.getURL(openUrl)},
         function(tab) {
-          for (var i = 0; i < cesp.openTabIds.length; i++) {
-            chrome.tabs.remove(cesp.openTabIds[i]);
-          }
-          cesp.openTabIds = [ tab.id ];
+          try {
+            chrome.tabs.remove(cesp.openTabId);
+          } catch (err) { }
+          cesp.openTabId = tab.id;
         });
   });
 }
