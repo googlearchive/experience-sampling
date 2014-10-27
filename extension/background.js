@@ -20,7 +20,7 @@ cesp.NOTIFICATION_TITLE = 'New Chrome survey available!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
-cesp.MAX_SURVEYS_PER_DAY = 2;
+cesp.MAX_SURVEYS_PER_DAY = 2000;
 cesp.ICON_FILE = 'icon.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
@@ -171,7 +171,6 @@ function clearNotifications(alarm) {
 // Clear the notification state when the survey times out.
 chrome.alarms.onAlarm.addListener(clearNotifications);
 
-
 /**
  * Creates a new notification to prompt the participant to take an experience
  * sampling survey.
@@ -244,29 +243,33 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
       return;
     }
 
-    var surveyURL;
+    var surveyUrl, visitUrl;
     var eventType = constants.FindEventType(element['name']);
     switch (eventType) {
       case constants.EventType.SSL_OVERRIDABLE:
-        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED :
             constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED;
+        visitUrl = sanitizers.ReplaceUrl(element['destination']);
         break;
       case constants.EventType.SSL_NONOVERRIDABLE:
-        surveyURL = constants.SurveyLocation.SSL_NONOVERRIDABLE;
+        surveyUrl = constants.SurveyLocation.SSL_NONOVERRIDABLE;
+        visitUrl = sanitizers.ReplaceUrl(element['destination']);
         break;
       case constants.EventType.MALWARE:
-        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.MALWARE_PROCEED :
             constants.SurveyLocation.MALWARE_NOPROCEED;
+        visitUrl = sanitizers.ReplaceUrl(element['destination']);
         break;
       case constants.EventType.PHISHING:
-        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.PHISHING_PROCEED :
             constants.SurveyLocation.PHISHING_NOPROCEED;
+        visitUrl = sanitizers.ReplaceUrl(element['destination']);
         break;
       case constants.EventType.EXTENSION_INSTALL:
-        surveyURL = userDecision === constants.DecisionType.PROCEED ?
+        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.EXTENSION_PROCEED :
             constants.SurveyLocation.EXTENSION_NOPROCEED;
         break;
@@ -281,8 +284,13 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         throw new Error('Unknown event type: ' + element['name']);
         break;
     }
+    if ((eventType !== constants.EventType.EXTENSION_INSTALL && !visitUrl) ||
+        !surveyUrl) {
+      return;
+    }
+    var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl;
     chrome.tabs.create(
-        {'url': chrome.extension.getURL('surveys/survey.html?js=' + surveyURL)},
+        {'url': chrome.extension.getURL(openUrl)},
         function() { console.log('Opened survey.'); });
   });
 }

@@ -1,18 +1,27 @@
+var surveySetup = {};
+surveySetup.QuestionUrl = '';  // Holds the URL or extension name.
+
 /**
  * Finds and loads the appropriate JS file, which has the questions for this
- * particular survey.
+ * particular survey. Parameters here are not trusted. The JS value should be
+ * discarded unless it matches a known JS file location, and the question URL
+ * value must be sanitized before being used.
  */
 function loadSurveyScript() {
-  // Grab the JS file location from the url and check it's a valid location.
   function handleError() {
     console.log('Unexpected query: ' + window.location);
     window.location = '../consent.html';
   }
   var query = window.location.search.substring(1);
   if (!query) handleError();
-  var splitArr = query.split('=');
-  if (!splitArr || splitArr.length != 2) handleError();
-  var jsUrl = splitArr[1];
+  var splitIntoParams = query.split('&');
+  if (!splitIntoParams || splitIntoParams.length < 2) handleError();
+
+  // Determine the type of survey to show.
+  var jsParamArr = splitIntoParams[0].split('=');
+  var extensionSurvey = false;
+  if (jsParamArr.length != 2 || jsParamArr[0] !== 'js') handleError();
+  var jsUrl = jsParamArr[1];
   switch (jsUrl) {
     case constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED:
     case constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED:
@@ -21,12 +30,24 @@ function loadSurveyScript() {
     case constants.SurveyLocation.MALWARE_NOPROCEED:
     case constants.SurveyLocation.PHISHING_PROCEED:
     case constants.SurveyLocation.PHISHING_NOPROCEED:
+      break;
     case constants.SurveyLocation.EXTENSION_PROCEED:
     case constants.SurveyLocation.EXTENSION_NOPROCEED:
+      extensionSurvey = true;
       break;
     default:
       handleError();
       return;
+  }
+  if (!jsUrl) handleError();
+
+  // Get the URL or extension name that the survey is about.
+  if (!extensionSurvey) {
+    var urlParamArr = splitIntoParams[1].split('=');
+    if (urlParamArr.length != 2 || urlParamArr[0] != 'url') handleError();
+    var questionUrl = sanitizers.ReplaceUrl(urlParamArr[1]);
+    if (!questionUrl) handleError();
+    surveySetup.QuestionUrl = questionUrl;
   }
 
   // Load the JS file and start the survey setup.

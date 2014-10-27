@@ -7,9 +7,8 @@
  * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  // TODO: FILL IN CORRECT WEBSITE NAME!
   parentNode.appendChild(commonQuestions.createChoiceQuestion(
-      'Back to safety', 'Proceed to www.example.com'));
+      'Back to safety', 'Proceed to ' + surveySetup.QuestionUrl));
 
   parentNode.appendChild(commonQuestions.createPageMeaningQuestion());
   parentNode.appendChild(commonQuestions.createPageSourceQuestion());

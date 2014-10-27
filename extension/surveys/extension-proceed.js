@@ -46,16 +46,6 @@ function addQuestions(parentNode) {
       ]);
   parentNode.appendChild(attributes.makeDOMTree());
 
-  // TODO: Fill in real extension name!
-  var extensionName = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'May we record the name of the extension you were trying to install, ' +
-          'Google Translate, with your responses?',
-      true,
-      ['Yes', 'No'],
-      constants.Randomize.NONE);
-  parentNode.appendChild(extensionName.makeDOMTree());
-
   parentNode.appendChild(commonQuestions.createClarificationQuestion());
 }
 

@@ -6,7 +6,7 @@
   "version": "1.0",
 
   "background": {
-    "scripts": ["constants.js", "background.js"],
+    "scripts": ["constants.js", "sanitizers.js", "background.js"],
     "persistent": false
   },
 
@@ -15,7 +15,6 @@
     "experienceSamplingPrivate",
     "notifications",
     "storage",
-    "alarms",
     "https://chrome-experience-sampling.appspot.com/_ah/api/*"
   ],
 

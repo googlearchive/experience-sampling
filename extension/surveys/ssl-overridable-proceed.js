@@ -9,7 +9,7 @@
 function addQuestions(parentNode) {
   // TODO: FILL IN CORRECT WEBSITE NAME!
   parentNode.appendChild(commonQuestions.createChoiceQuestion(
-      'Proceed to www.example.com', 'Back to safety'));
+      'Proceed to ' + surveySetup.QuestionUrl, 'Back to safety'));
 
   parentNode.appendChild(commonQuestions.createPageMeaningQuestion());
   parentNode.appendChild(commonQuestions.createPageSourceQuestion());

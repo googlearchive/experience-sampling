@@ -35,7 +35,6 @@ commonQuestions.createPageMeaningQuestion = function() {
  * Who was the page from?
  * @returns {object} The DOM subtree with the question.
  */
-// TODO: FILL IN CORRECT WEBSITE NAME!
 commonQuestions.createPageSourceQuestion = function() {
   var source = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
@@ -48,11 +47,10 @@ commonQuestions.createPageSourceQuestion = function() {
  * Have you visited example.com before?
  * @returns {object} The DOM subtree with the question.
  */
-// TODO: FILL IN CORRECT WEBSITE NAME!
 commonQuestions.createPreviousVisitQuestion = function() {
   var hist = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you visited www.example.com before?',
+      'Have you visited ' + surveySetup.QuestionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
@@ -64,12 +62,11 @@ commonQuestions.createPreviousVisitQuestion = function() {
  * @returns {object} The DOM subtree with the question.
  */
 // TODO: Make conditional on createPreviousVisitQuestion.
-// TODO: Fill in correct website name!
 commonQuestions.createPreviousExposureQuestion = function() {
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you seen a page like the one pictured above when trying to visit' +
-          ' www.example.com before?',
+      'Have you seen a page like the one pictured above when trying to visit ' +
+          surveySetup.QuestionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
@@ -130,12 +127,11 @@ commonQuestions.createAttributesQuestion = function() {
  * Record the URL?
  * @returns {object} The DOM subtree with the question.
  */
-// TODO: Fill in real URL!
 commonQuestions.createRecordUrlQuestion = function() {
   var url = new FixedQuestion(
       constants.QuestionType.RADIO,
       'May we record the URL of the website you were trying to visit, ' +
-          'www.example.com, with your responses?',
+          surveySetup.QuestionUrl + ', with your responses?',
       true,
       ['Yes', 'No'],
       constants.Randomize.NONE);
