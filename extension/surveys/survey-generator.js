@@ -82,7 +82,21 @@ FixedQuestion.prototype.makeDOMTree = function() {
         input.setAttribute('name', shrunkenQuestion);
         input.setAttribute('type', this.questionType);
         input.setAttribute('value', shrunkenAnswer);
-        input.setAttribute('required', this.required);
+        if (this.required) {
+          input.setAttribute('required', this.required);
+          if (this.questionType === constants.QuestionType.CHECKBOX) {
+            // By default, HTML5 requires *all* of the checkboxes to be checked
+            // for submission. Since we only want one of a group to be
+            // submitted, remove the requirement once one is checked.
+            input.addEventListener('change', function removeRequired(unused) {
+              var elems = document.getElementsByName(shrunkenQuestion);
+              for (var i = 0; i < elems.length; i++) {
+                elems[i].removeAttribute('required');
+                elems[i].removeEventListener('click', removeRequired);
+              }
+            });
+          }
+        }
         answer.appendChild(input);
 
         var label = document.createElement('label');
