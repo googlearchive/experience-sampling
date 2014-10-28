@@ -13,7 +13,7 @@ var SurveySubmission = SurveySubmission || {};
 // Submission settings.
 SurveySubmission.SERVER_URL = 'https://chrome-experience-sampling.appspot.com';
 SurveySubmission.SUBMIT_SURVEY_ACTION = '/_ah/api/cesp/v1/submitsurvey';
-SurveySubmission.XHR_TIMEOUT = 4000;
+SurveySubmission.XHR_TIMEOUT = 4000;  // milliseconds
 SurveySubmission.DB_NAME = 'pendingResponsesDB';
 SurveySubmission.DB_VERSION = 1;
 SurveySubmission.QUEUE_ALARM_NAME = 'surveySubmissionAlarm';
@@ -70,12 +70,11 @@ SurveySubmission.PendingSurveyRecord = function(surveyRecord, timeToSend,
  * @param {int=} tries The number of tries so far (optional, defaults to 0).
  */
 SurveySubmission.saveSurveyRecord = function(surveyRecord, tries) {
-  if (!tries)
-    var tries = 0;
+  tries = tries || 0;
 
   SurveySubmission.withObjectStore('PendingSurveyRecords', 'readwrite',
       function(store) {
-    var timeToSend = Date.now() + SurveySubmission.sendingDelay(tries);
+    var timeToSend = Date.now() + SurveySubmission.calculateSendingDelay(tries);
     var pendingSurveyRecord = new SurveySubmission.PendingSurveyRecord(
         surveyRecord, timeToSend, tries);
     var request = store.add(pendingSurveyRecord);
@@ -87,7 +86,7 @@ SurveySubmission.saveSurveyRecord = function(surveyRecord, tries) {
  * @param {int} tries The number of tries to send so far.
  * @returns {int} The delay in ms.
  */
-SurveySubmission.sendingDelay = function(tries) {
+SurveySubmission.calculateSendingDelay = function(tries) {
   return (Math.pow(2, tries) - 1) * 60000;
 }
 
@@ -121,8 +120,10 @@ SurveySubmission.processQueue = function(alarm) {
     index.openCursor(keyRange).onsuccess = function(event) {
       var cursor = event.target.result;
       if (cursor) {
-        surveysToSubmit.push({id: cursor.value.id,
-            surveyRecord: cursor.value.surveyRecord});
+        surveysToSubmit.push({
+          id: cursor.value.id,
+          surveyRecord: cursor.value.surveyRecord
+        });
         cursor.continue();
       } else {
         // After collecting all the surveys over the cursor, make async calls
@@ -164,7 +165,7 @@ SurveySubmission.updateTimeToSend = function(id) {
       var record = event.target.result;
       record.tries = record.tries + 1;
       record.timeToSend = Date.now() +
-          SurveySubmission.sendingDelay(record.tries);
+          SurveySubmission.calculateSendingDelay(record.tries);
       var request = store.put(record);
     }
   });
@@ -200,7 +201,7 @@ SurveySubmission.withObjectStore = function(storeName, mode, action) {
 SurveySubmission.setupPendingResponsesDatabase = function(event) {
   var db = event.target.result;
   var objectStore = db.createObjectStore(
-      'PendingSurveyRecords', { keyPath: 'id', autoIncrement: true});
+      'PendingSurveyRecords', {keyPath: 'id', autoIncrement: true});
   objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
 }
 
