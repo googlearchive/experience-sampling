@@ -131,9 +131,8 @@ SurveySubmission.processQueue = function(alarm) {
         for (var i = 0; i < surveysToSubmit.length; i++) {
           var id = surveysToSubmit[i].id;
           var surveyRecord = surveysToSubmit[i].survey;
-          SurveySubmission.sendSurvey(surveyRecord,
-            makeSuccessCallback(id),
-            makeErrorCallback(id));
+          SurveySubmission.sendSurvey(surveyRecord, makeSuccessCallback(id),
+              makeErrorCallback(id));
         }
       }
     };
