@@ -1,0 +1,11 @@
+URL: https://github.com/pivotal/jasmine/blob/master/dist/jasmine-standalone-2.0.3.zip
+Version: 2.0.3
+License: MIT
+License File: LICENSE
+
+Description:
+Jasmine is a testing framework that we're using to test our extension
+JavaScript.
+
+Local Modifications:
+MIT.LICENSE file copied as LICENSE file.
