@@ -25,3 +25,6 @@ Backend: Setup and deployment
 - To deploy the backend to App Engine:
 
   `appcfg.py update backend/app.yaml`
+
+Extension: Setup and deployment
+-----------------------------
