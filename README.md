@@ -26,5 +26,3 @@ Backend: Setup and deployment
 
   `appcfg.py update backend/app.yaml`
 
-Extension: Setup and deployment
------------------------------
