@@ -78,6 +78,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
   if (this.isDependentChild) {
     container.classList.add('hidden');
     container.classList.add('dependent');
+    this.required = false;  // Children might be hidden.
   } else {
     container.classList.add('fieldset');
   }
