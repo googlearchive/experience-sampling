@@ -42,6 +42,7 @@ function setupConsentForm(savedState) {
     $('top-blurb').classList.remove('hidden');
     $('retract-consent').classList.remove('hidden');
   } else if (consentForm.status == constants.CONSENT_REJECTED) {
+    alert("CUES will uninstall itself now. Thanks anyway!");
     // This state shouldn't be possible here because the extension should
     // already have been uninstalled. Adding this as an extra safety.
     chrome.management.uninstallSelf();
@@ -67,6 +68,7 @@ function userRejectConsent(event) {
   console.log('Consent rejected');
   setConsentStorageValue(constants.CONSENT_REJECTED);
   $('consent-form-holder').classList.add('hidden');
+  alert("CUES will uninstall itself now. Thanks anyway!");
   chrome.management.uninstallSelf();
 }
 
