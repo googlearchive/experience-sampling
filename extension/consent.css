@@ -1,5 +1,5 @@
-#consent-form-holder {
-  padding: 10px 0 10px 0;
+.bottom-text {
+  padding: 30px 0 10px 0;
 }
 
 #give-consent {
@@ -10,11 +10,35 @@
 
 html, body {
   height: auto;
-  margin: 1em;
+  margin: 0.5em 1em 1em 1em;
 }
 
 #no-consent {
   color: #656565;
+}
+
+.scroll-constant {
+  bottom: 0;
+  height: 80px;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.scroll-holder {
+  height: 100%;
+  position: relative;
+}
+
+.scroll-scroll {
+  bottom: 80px;
+  border-bottom: 1px solid #F2F2F2;
+  left: 30;
+  overflow-x: hidden;
+  overflow-y: scroll;
+  position: absolute;
+  right: 30;
+  top: 0;
 }
 
 #uninstall {
