@@ -56,10 +56,11 @@ constants.EventType = {
   DOWNLOAD_DANGEROUS: 'download_warning_dangerous',
   DOWNLOAD_DANGER_PROMPT: 'download_danger_prompt',
 
+  // The postfixes need to match ExtensionInstallPrompt::PromptTypeToString.
   EXTENSION_INSTALL: 'extension_install_dialog_INSTALL_PROMPT',
   EXTENSION_INLINE_INSTALL: 'extension_install_dialog_INLINE_INSTALL_PROMPT',
   EXTENSION_BUNDLE: 'extension_install_dialog_BUNDLE_INSTALL_PROMPT',
-  EXTENSION_OTHER: 'extension_install_dialog',
+  EXTENSION_OTHER: 'extension_install_dialog',  // Catch-all
 
   UNKNOWN: 'unknown',
 };
