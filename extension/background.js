@@ -22,7 +22,7 @@ cesp.NOTIFICATION_TITLE = 'Take a Chrome user experience survey!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
-cesp.MAX_SURVEYS_PER_DAY = 2;
+cesp.MAX_SURVEYS_PER_DAY = 20;
 cesp.ICON_FILE = 'icons/cues_85.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
@@ -182,6 +182,28 @@ chrome.alarms.onAlarm.addListener(clearNotifications);
  * @param {object} decision The decision the participant made.
  */
 function showSurveyNotification(element, decision) {
+  var eventType = constants.FindEventType(element['name']);
+  switch (eventType) {
+    case constants.EventType.SSL_OVERRIDABLE:
+    case constants.EventType.SSL_NONOVERRIDABLE:
+    case constants.EventType.MALWARE:
+    case constants.EventType.PHISHING:
+    case constants.EventType.EXTENSION_INSTALL:
+    case constants.EventType.EXTENSION_INLINE_INSTALL:
+    case constants.EventType.EXTENSION_BUNDLE:
+      // Supported events.
+      break;
+    case constants.EventType.HARMFUL:
+    case constants.EventType.SB_OTHER:
+    case constants.EventType.DOWNLOAD_MALICIOUS:
+    case constants.EventType.DOWNLOAD_DANGEROUS:
+    case constants.EventType.DOWNLOAD_DANGER_PROMPT:
+    case constants.EventType.EXTENSION_OTHER:
+    case constants.EventType.UNKNOWN:
+    default:
+      // Unsupported events.
+      return;
+  }
   chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
 
@@ -273,6 +295,8 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         visitUrl = urlHandler.GetMinimalUrl(element['destination']);
         break;
       case constants.EventType.EXTENSION_INSTALL:
+      case constants.EventType.EXTENSION_INLINE_INSTALL:
+      case constants.EventType.EXTENSION_BUNDLE:
         surveyUrl = userDecision === constants.DecisionType.PROCEED ?
             constants.SurveyLocation.EXTENSION_PROCEED :
             constants.SurveyLocation.EXTENSION_NOPROCEED;
@@ -282,6 +306,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
       case constants.EventType.DOWNLOAD_MALICIOUS:
       case constants.EventType.DOWNLOAD_DANGEROUS:
       case constants.EventType.DOWNLOAD_DANGER_PROMPT:
+      case constants.EventType.EXTENSION_OTHER:
         // Don't survey about these.
         return;
       case constants.EventType.UNKNOWN:
