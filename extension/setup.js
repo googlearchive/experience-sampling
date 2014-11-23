@@ -4,6 +4,7 @@
 
 var setupSurvey = {};  // Namespace variable
 setupSurvey.status = constants.SETUP_PENDING;
+setupSurvey.questions = [];
 
 /**
  * A helper method for updating the value in local storage.
@@ -13,6 +14,14 @@ function setSetupStorageValue(newState) {
   var items = {};
   items[constants.SETUP_KEY] = newState;
   chrome.storage.local.set(items);
+}
+
+/**
+ * 
+ */
+function addQuestion(parentNode, question) {
+  setupSurvey.questions.push(question);
+  parentNode.appendChild(question.makeDOMTree());
 }
 
 /**
@@ -34,7 +43,7 @@ function addQuestions(parentNode) {
         '65 or older'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(age.makeDOMTree());
+  addQuestion(parentNode, age);
 
   var gender = new FixedQuestion(
       constants.QuestionType.CHECKBOX,
@@ -47,7 +56,7 @@ function addQuestions(parentNode) {
         'I prefer not to answer'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(gender.makeDOMTree());
+  addQuestion(parentNode, gender);
 
   var education = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -64,13 +73,13 @@ function addQuestions(parentNode) {
         constants.OTHER
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(education.makeDOMTree());
+  addQuestion(parentNode, education);
 
   var occupation = new EssayQuestion(
       constants.QuestionType.SHORT_STRING,
       'What is your occupation?',
       true);
-  parentNode.appendChild(occupation.makeDOMTree());
+  addQuestion(parentNode, occupation);
 
   var country = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
@@ -382,7 +391,7 @@ function addQuestions(parentNode) {
       ],
       constants.Randomize.NONE);
   country.addDependentQuestion(state, 'United States of America');
-  parentNode.appendChild(country.makeDOMTree());
+  addQuestion(parentNode, country);
 
   var source = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -396,7 +405,7 @@ function addQuestions(parentNode) {
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(source.makeDOMTree());
+  addQuestion(parentNode, source);
 
   var computer = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -411,7 +420,7 @@ function addQuestions(parentNode) {
         constants.OTHER
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(computer.makeDOMTree());
+  addQuestion(parentNode, computer);
 
   var computerOwner = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -425,7 +434,7 @@ function addQuestions(parentNode) {
         constants.OTHER
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(computerOwner.makeDOMTree());
+  addQuestion(parentNode, computerOwner);
 
   var antivirus = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -437,7 +446,7 @@ function addQuestions(parentNode) {
         'I don\'t know'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(antivirus.makeDOMTree());
+  addQuestion(parentNode, antivirus);
 }
 
 /**
@@ -485,6 +494,13 @@ function setupFormSubmitted(event) {
     chrome.management.uninstallSelf();
     return;
   }
+
+  chrome.runtime.sendMessage(
+    {
+      'survey_type': constants.SurveyLocation.SETUP,
+      'responses': getFormValues(document['survey-form'])
+    }
+  );
 
   setSetupStorageValue(constants.SETUP_COMPLETED);
   $('explanation').classList.add('hidden');

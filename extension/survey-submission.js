@@ -235,6 +235,7 @@ SurveySubmission.sendSurveyRecord = function(surveyRecord, successCallback,
   for (var i = 0; i < surveyRecord.responses.length; i++) {
     data.responses.push(surveyRecord.responses[i]);
   }
+  console.log(JSON.stringify(data));
   var xhr = new XMLHttpRequest();
   function onLoadHandler(event) {
     if (xhr.readyState === 4) {
