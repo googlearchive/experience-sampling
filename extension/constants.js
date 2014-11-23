@@ -44,19 +44,25 @@ constants.Randomize = {
 constants.OTHER = 'Other: ';
 
 // The different types of events that trigger survey notifications.
+// The strings need to match the definitions in Chrome.
 constants.EventType = {
+  // Defined in ssl_blocking_page.cc.
   SSL_OVERRIDABLE: 'ssl_interstitial_overridable',
   SSL_NONOVERRIDABLE: 'ssl_interstitial_notoverridable',
+
+  // Defined in safe_browsing_blocking_page.cc.
   MALWARE: 'safebrowsing_interstitial',
   PHISHING: 'phishing_interstitial',
   HARMFUL: 'harmful_interstitial',
   SB_OTHER: 'safebrowsing_other',
 
+  // Defined in experience_sampling_private/experience_sampling.cc.
   DOWNLOAD_MALICIOUS: 'download_warning_malicious',
   DOWNLOAD_DANGEROUS: 'download_warning_dangerous',
   DOWNLOAD_DANGER_PROMPT: 'download_danger_prompt',
 
-  // The postfixes need to match ExtensionInstallPrompt::PromptTypeToString.
+  // Prefix defined in experience_sampling_private/experience_sampling.cc.
+  // Postfixes are from ExtensionInstallPrompt::PromptTypeToString.
   EXTENSION_INSTALL: 'extension_install_dialog_INSTALL_PROMPT',
   EXTENSION_INLINE_INSTALL: 'extension_install_dialog_INLINE_INSTALL_PROMPT',
   EXTENSION_BUNDLE: 'extension_install_dialog_BUNDLE_INSTALL_PROMPT',
