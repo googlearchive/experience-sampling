@@ -53,5 +53,5 @@ function addQuestions(parentNode) {
  * Adds the screenshot for the survey.
  */
 function setScreenshot() {
-  $('example-img').src = 'screenshots/extension.png';
+  $('example-img').src = 'screenshots/extensionWin.png';
 }
