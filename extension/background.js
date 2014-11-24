@@ -14,8 +14,6 @@
  */
 var cesp = cesp || {};
 
-cesp.operatingSystem = '';
-cesp.participantId = null;
 cesp.openTabId = -1;
 
 // Settings.
@@ -32,6 +30,7 @@ cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
+cesp.QUEUE_ALARM_NAME = 'pendingSubmissionQueue';
 
 // SETUP
 
@@ -56,55 +55,19 @@ function setSurveysShownStorageValue(newCount) {
 }
 
 /**
- * A helper method for generating and setting a new participant ID.
- */
-function setNewParticipantId() {
-  // If the participant ID already has a value, this is redundant.
-  if (cesp.participantId) return;
-
-  var charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-  var participantId = '';
-  for (var i = 0; i < 100; i++) {
-    var rand = Math.floor(Math.random() * charset.length);
-    participantId += charset.charAt(rand);
-  }
-
-  cesp.participantId = participantId;
-  var items = {};
-  items[cesp.PARTICIPANT_ID_LOOKUP] = participantId;
-  chrome.storage.local.set(items);
-}
-
-/**
- * A helper method for ensuring the participant ID is always set.
- */
-function getParticipantIdFromStorage() {
-  // If the participant ID already has a value, this is redundant.
-  if (cesp.participantId) return;
-
-  chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
-    if (!lookup || !lookup[cesp.PARTICIPANT_ID_LOOKUP]) {
-      setNewParticipantId();
-    } else {
-      cesp.participantId = lookup[cesp.PARTICIPANT_ID_LOOKUP];
-    }
-  });
-}
-
-/**
- * Sets up basic state for the extension. Called when extension is installed.
+ * Sets up basic state for the extension. Called when extension is installed
+ * or reloaded after the extension or Chrome updates.
  * @param {object} details The details of the chrome.runtime.onInstalled event.
  */
 function setupState(details) {
+  initStateAfterRestart();
+
   // We check the event reason because onInstalled can trigger for other
-  // reasons (extension or browser update).
+  // reasons (extension or browser update). Anything that is specific to
+  // installation should happen after this check.
   if (details.reason !== 'install') return;
 
-  setNewParticipantId();
   setReadyForSurveysStorageValue(false);
-  chrome.runtime.getPlatformInfo(function(platformInfo) {
-    cesp.operatingSystem = platformInfo.os;
-  });
   // Automatically uninstall the extension after 120 days.
   chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
   // Set the count of surveys shown to 0, and reset it each day at midnight.
@@ -198,7 +161,46 @@ function storageUpdated(changes, areaName) {
 chrome.runtime.onInstalled.addListener(getConsentStatus);
 chrome.runtime.onStartup.addListener(getConsentStatus);
 chrome.runtime.onInstalled.addListener(setupState);
-chrome.runtime.onStartup.addListener(getParticipantIdFromStorage);
+chrome.runtime.onStartup.addListener(initStateAfterRestart);
+
+// GETTERS
+
+/**
+ * A helper method for getting (or, if necessary, setting) the participant ID.
+ * @returns {Promise} A promise that resolves with the participant ID.
+ */
+function getParticipantId() {
+  return new Promise(function(resolve, reject) {
+    chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
+      if (lookup && lookup[cesp.PARTICIPANT_ID_LOOKUP])
+        resolve(lookup[cesp.PARTICIPANT_ID_LOOKUP]);
+
+      var charset = 
+          "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+      var participantId = '';
+      for (var i = 0; i < 100; i++) {
+        var rand = Math.floor(Math.random() * charset.length);
+        participantId += charset.charAt(rand);
+      }
+      var items = {};
+      items[cesp.PARTICIPANT_ID_LOOKUP] = participantId;
+      chrome.storage.local.set(items);
+      resolve(participantId);
+    });
+  });
+}
+
+/**
+ * A helper method for getting the operating system.
+ * @returns {Promise} A promise that resolves with the operating system.
+ */
+function getOperatingSytem() {
+  return new Promise(function(resolve, reject)) {
+    chrome.runtime.getPlatformInfo(function(platformInfo) {
+      resolve(platformInfo.os);
+    });
+  });
+}
 
 // SURVEY HANDLING
 
@@ -378,18 +380,19 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
  * Handle the submission of a completed survey.
  */
 function handleCompletedSurvey(message) {
-  var record = new SurveySubmission.SurveyRecord(
-      message['survey_type'],
-      cesp.participantId,
-      (new Date),
-      message['responses']);
-  var successCallback = function() {
-    console.log('Survey submitted successfully');
-  };
-  var errorCallback = function(responseCode) {
-    console.log(responseCode);
-    console.log('Survey submission error: ' + responseCode);
-  };
-  SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);
+  getParticipantId().then(function(participantId) {
+    var record = new SurveySubmission.SurveyRecord(
+        message['survey_type'],
+        participantId,
+        (new Date),
+        message['responses']);
+    var successCallback = function() {
+      console.log('Survey submitted successfully');
+    };
+    var errorCallback = function(responseCode) {
+      console.log('Survey submission error: ' + responseCode);
+    };
+    SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);
+  });
 }
 chrome.runtime.onMessage.addListener(handleCompletedSurvey);
