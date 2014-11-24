@@ -83,7 +83,7 @@ function getParticipantIdFromStorage() {
   if (cesp.participantId) return;
 
   chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
-    if (!lookup || !lookup[cesp.PARTICIPANT_ID_LOOKUP) {
+    if (!lookup || !lookup[cesp.PARTICIPANT_ID_LOOKUP]) {
       setNewParticipantId();
     } else {
       cesp.participantId = lookup[cesp.PARTICIPANT_ID_LOOKUP];
@@ -387,6 +387,7 @@ function handleCompletedSurvey(message) {
     console.log('Survey submitted successfully');
   };
   var errorCallback = function(responseCode) {
+    console.log(responseCode);
     console.log('Survey submission error: ' + responseCode);
   };
   SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);

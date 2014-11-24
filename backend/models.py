@@ -22,7 +22,7 @@ class SurveyModel(ndb.Model):
   survey_type = ndb.StringProperty(indexed=True, required=True)
   participant_id = ndb.StringProperty(indexed=True, required=True)
   date_taken = ndb.DateTimeProperty(required=True)
-  date_received = ndb.DateTimeProperty(auto_now_add=True, required=True)
+  date_received = ndb.DateTimeProperty(auto_now_add=True)
   responses = ndb.StructuredProperty(ResponseModel, repeated=True)
 
   @staticmethod
