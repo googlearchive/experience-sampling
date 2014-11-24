@@ -21,7 +21,7 @@ cesp.NOTIFICATION_TITLE = 'Take a Chrome user experience survey!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
-cesp.MAX_SURVEYS_PER_DAY = 20;
+cesp.MAX_SURVEYS_PER_DAY = 2;
 cesp.ICON_FILE = 'icons/cues_85.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
@@ -55,16 +55,12 @@ function setSurveysShownStorageValue(newCount) {
 }
 
 /**
- * Sets up basic state for the extension. Called when extension is installed
- * or reloaded after the extension or Chrome updates.
+ * Sets up basic state for the extension. Called when extension is installed.
  * @param {object} details The details of the chrome.runtime.onInstalled event.
  */
 function setupState(details) {
-  initStateAfterRestart();
-
   // We check the event reason because onInstalled can trigger for other
-  // reasons (extension or browser update). Anything that is specific to
-  // installation should happen after this check.
+  // reasons (extension or browser update).
   if (details.reason !== 'install') return;
 
   setReadyForSurveysStorageValue(false);
@@ -161,7 +157,6 @@ function storageUpdated(changes, areaName) {
 chrome.runtime.onInstalled.addListener(getConsentStatus);
 chrome.runtime.onStartup.addListener(getConsentStatus);
 chrome.runtime.onInstalled.addListener(setupState);
-chrome.runtime.onStartup.addListener(initStateAfterRestart);
 
 // GETTERS
 
