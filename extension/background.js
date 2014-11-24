@@ -15,7 +15,7 @@
 var cesp = cesp || {};
 
 cesp.operatingSystem = '';
-cesp.participantId = '';
+cesp.participantId = null;
 cesp.openTabId = -1;
 
 // Settings.
@@ -60,13 +60,13 @@ function setSurveysShownStorageValue(newCount) {
  */
 function setNewParticipantId() {
   // If the participant ID already has a value, this is redundant.
-  if (cesp.participantId !== '') return;
+  if (cesp.participantId) return;
 
   var charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
   var participantId = '';
   for (var i = 0; i < 100; i++) {
     var rand = Math.floor(Math.random() * charset.length);
-    participantId += charset.substring(rand, rand + 1);
+    participantId += charset.charAt(rand);
   }
 
   cesp.participantId = participantId;
@@ -80,10 +80,10 @@ function setNewParticipantId() {
  */
 function getParticipantIdFromStorage() {
   // If the participant ID already has a value, this is redundant.
-  if (cesp.participantId !== '') return;
+  if (cesp.participantId) return;
 
   chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
-    if (!lookup || lookup[cesp.PARTICIPANT_ID_LOOKUP] == null) {
+    if (!lookup || !lookup[cesp.PARTICIPANT_ID_LOOKUP) {
       setNewParticipantId();
     } else {
       cesp.participantId = lookup[cesp.PARTICIPANT_ID_LOOKUP];
