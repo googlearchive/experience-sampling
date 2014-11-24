@@ -7,20 +7,20 @@
  * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  parentNode.appendChild(commonQuestions.createChoiceQuestion(
+  addQuestion(parentNode, commonQuestions.createChoiceQuestion(
       'Add', 'Cancel'));
 
   var meaning = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'What was the dialog trying to tell you, in your own words?',
       true);
-  parentNode.appendChild(meaning.makeDOMTree());
+  addQuestion(parentNode, meaning);
 
   var source = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'Who do you think the dialog was from?',
       true);
-  parentNode.appendChild(source.makeDOMTree());
+  addQuestion(parentNode, source);
 
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
@@ -44,9 +44,9 @@ function addQuestions(parentNode) {
         'confusing',
         'informative'
       ]);
-  parentNode.appendChild(attributes.makeDOMTree());
+  addQuestion(parentNode, attributes);
 
-  parentNode.appendChild(commonQuestions.createClarificationQuestion());
+  addQuestion(parentNode, commonQuestions.createClarificationQuestion());
 }
 
 /**

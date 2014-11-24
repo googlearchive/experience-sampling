@@ -7,16 +7,15 @@
  * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  parentNode.appendChild(commonQuestions.createChoiceQuestion(
-      'Back to safety', 'Proceed to ' + surveySetup.QuestionUrl));
-
-  parentNode.appendChild(commonQuestions.createPageMeaningQuestion());
-  parentNode.appendChild(commonQuestions.createPageSourceQuestion());
-  parentNode.appendChild(commonQuestions.createHistoryQuestions());
-  parentNode.appendChild(commonQuestions.createReferrerQuestion());
-  parentNode.appendChild(commonQuestions.createAttributesQuestion());
-  parentNode.appendChild(commonQuestions.createRecordUrlQuestion());
-  parentNode.appendChild(commonQuestions.createClarificationQuestion());
+  addQuestion(parentNode, commonQuestions.createChoiceQuestion(
+      'Back to safety', 'Proceed to ' + surveyDriver.QuestionUrl));
+  addQuestion(parentNode, commonQuestions.createPageMeaningQuestion());
+  addQuestion(parentNode, commonQuestions.createPageSourceQuestion());
+  addQuestion(parentNode, commonQuestions.createHistoryQuestions());
+  addQuestion(parentNode, commonQuestions.createReferrerQuestion());
+  addQuestion(parentNode, commonQuestions.createAttributesQuestion());
+  addQuestion(parentNode, commonQuestions.createRecordUrlQuestion());
+  addQuestion(parentNode, commonQuestions.createClarificationQuestion());
 }
 
 /**
