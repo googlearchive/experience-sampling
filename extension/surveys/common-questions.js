@@ -62,7 +62,7 @@ commonQuestions.createPageSourceQuestion = function() {
         surveySetup.QuestionUrl,
         constants.OTHER
       ],
-      constants.Randomize.ANCHOR_LAST););
+      constants.Randomize.ANCHOR_LAST);
   return source.makeDOMTree();
 };
 
