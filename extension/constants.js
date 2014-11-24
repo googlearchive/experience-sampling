@@ -73,6 +73,7 @@ constants.EventType = {
 
 // The JavaScript files that load each survey.
 constants.SurveyLocation = {
+  SETUP: 'setup.js',
   SSL_OVERRIDABLE_PROCEED: 'ssl-overridable-proceed.js',
   SSL_OVERRIDABLE_NOPROCEED: 'ssl-overridable-noproceed.js',
   SSL_NONOVERRIDABLE: 'ssl-nonoverridable.js',

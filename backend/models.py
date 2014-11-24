@@ -19,9 +19,9 @@ class ResponseModel(ndb.Model):
 
 
 class SurveyModel(ndb.Model):
-  survey_type = ndb.StringProperty(indexed=True)
-  participant_id = ndb.IntegerProperty(indexed=True)
-  date_taken = ndb.DateTimeProperty()
+  survey_type = ndb.StringProperty(indexed=True, required=True)
+  participant_id = ndb.StringProperty(indexed=True, required=True)
+  date_taken = ndb.DateTimeProperty(required=True)
   date_received = ndb.DateTimeProperty(auto_now_add=True)
   responses = ndb.StructuredProperty(ResponseModel, repeated=True)
 

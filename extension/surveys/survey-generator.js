@@ -150,6 +150,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
       break;
     case constants.QuestionType.DROPDOWN:
       var select = document.createElement('select');
+      select.setAttribute('name', shrunkenQuestion);
       var depAnswer;
       var answerChoices = [];
       for (var i = 0; i < this.answers.length; i++) {
@@ -473,4 +474,33 @@ function makeSubmitButtonDOM() {
   fieldset.classList.add('submit');
   fieldset.appendChild(button);
   return fieldset;
+}
+
+/**
+ * Extracts the question and answer values from a completed survey form.
+ * @param {Object} form The containing <form> DOM node.
+ * @returns {SurveySubmission.Response} The question and associated answer.
+ */
+function getFormValues(form) {
+  var responses = [];
+  for (var i = 0; i < setupSurvey.questions.length; i++) {
+    var question = setupSurvey.questions[i];  // The Question object
+    var questionStr = setupSurvey.questions[i].question;  // The question text
+    var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
+    if (question.questionType === constants.QuestionType.CHECKBOX) {
+      // Checkboxes may have multiple answers.
+      var answerList = document.querySelectorAll(
+          'input[name="' + questionLookup + '"]:checked');
+      for (var j = 0; j < answerList.length; j++) {
+        var response = new SurveySubmission.Response(
+            questionStr, answerList[j].value);
+        responses.push(response);
+      }
+    } else {
+      var answer = form[questionLookup].value || 'NOANSWER';
+      var response = new SurveySubmission.Response(questionStr, answer);
+      responses.push(response);
+    }
+  }
+  return responses;
 }

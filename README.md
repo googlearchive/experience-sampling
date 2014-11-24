@@ -14,9 +14,12 @@ Backend: Setup and deployment
 
 - Install the
   [App Engine GCS Client Libary](https://developers.google.com/appengine/docs/python/googlecloudstorageclient/download)
-  into the backend (*this may not work on old versions of pip*):
-
+  into the backend
+  
+  If you use pip:
   `pip install -t backend/lib GoogleAppEngineCloudStorageClient`
+
+  You should end up with a folder named "cloudstorage" under backend/.
 
 - To run the development server:
 
