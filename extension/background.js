@@ -353,7 +353,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
               chrome.tabs.remove(cesp.openTabId);
             } catch (err) { }
             cesp.openTabId = tab.id;
-          });
+      });
     });
   });
 }
