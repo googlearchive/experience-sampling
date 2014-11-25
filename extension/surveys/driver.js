@@ -2,6 +2,7 @@ var surveyDriver = {};
 surveyDriver.surveyType = '';  // Holds the type of survey.
 surveyDriver.questionUrl = '';  // Holds the URL for putting into questions.
 surveyDriver.questions = [];  // Holds the questions for a given survey.
+surveyDriver.operatingSystem = ''; // mac, win, cros, or linux
 
 /**
  * Convenience method for adding questions.
@@ -66,6 +67,29 @@ function loadSurveyScript() {
         parseKeyValuePair('url', splitIntoPairs[1]));
     if (!questionUrl) handleError();
     surveyDriver.questionUrl = questionUrl;
+  }
+
+  var os = decodeURIComponent(parseKeyValuePair('os', splitIntoPairs[2]));
+  if (!os) handleError();
+  // This switch statement needs to match PlatformInfo.
+  // https://developer.chrome.com/extensions/runtime#type-PlatformInfo
+  switch (os) {
+    case constants.OS.MAC:
+    case constants.OS.WIN:
+    case constants.OS.CROS:
+    case constants.OS.LINUX:
+      surveyDriver.operatingSystem = os;
+      break;
+    case 'openbsd':
+      // Coerce openbsd into Linux.
+      surveyDriver.operatingSystem = constants.OS.LINUX;
+      break;
+    case 'android':
+      // You can't install extensions into Android, so this shouldn't happen.
+      handleError();
+      break;
+    default:
+      surveyDriver.operatingSystem = constants.OS.OTHER;
   }
 
   // Load the JS file and start the survey setup.
