@@ -75,7 +75,7 @@ SurveySubmission.saveSurveyRecord = function(surveyRecord, tries) {
     var timeToSend = Date.now() + SurveySubmission.calculateSendingDelay(tries);
     var pendingSurveyRecord = new SurveySubmission.PendingSurveyRecord(
         surveyRecord, timeToSend, tries);
-    var request = store.add(pendingSurveyRecord);
+    store.add(pendingSurveyRecord);
     console.log('Survey added to queue');
   }
   SurveySubmission.withObjectStore(
@@ -133,7 +133,9 @@ SurveySubmission.processQueue = function(alarm) {
           var id = surveysToSubmit[i].id;
           var surveyRecord = surveysToSubmit[i].surveyRecord;
           SurveySubmission.sendSurveyRecord(
-              surveyRecord, makeSuccessCallback(id), makeErrorCallback(id));
+              surveysToSubmit[i].surveyRecord,
+              makeSuccessCallback(id),
+              makeErrorCallback(id));
         }
       }
     };
@@ -152,8 +154,8 @@ SurveySubmission.deleteSurveyRecord = function(id) {
       'PendingSurveyRecords',
       'readwrite',
       function(store) {
-        var request = store.delete(id);
-      });
+        store.delete(id);
+  });
 }
 
 /**
@@ -169,7 +171,7 @@ SurveySubmission.updateTimeToSend = function(id) {
       record.tries = record.tries + 1;
       record.timeToSend = Date.now() +
           SurveySubmission.calculateSendingDelay(record.tries);
-      var request = store.put(record);
+      store.put(record);
     }
   }
   SurveySubmission.withObjectStore('PendingSurveyRecords', 'readwrite', update);
@@ -188,11 +190,13 @@ SurveySubmission.withObjectStore = function(storeName, mode, action) {
   request.onsuccess = function(event) {
     var db = event.target.result;
     var transaction = db.transaction([storeName], mode);
-    var objectStore = transaction.objectStore(storeName);
-    action(objectStore);
+    transaction.onerror = function(event) {
+      console.error("Transaction error: " + event.target.errorCode);
+    };
+    action(transaction.objectStore(storeName));
   };
   request.onerror = function(event) {
-    console.log("Database Error: " + event.target.errorCode);
+    console.error("Database Error: " + event.target.errorCode);
   };
   request.onupgradeneeded = function(event) {
     var db = event.target.result;
