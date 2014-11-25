@@ -30,7 +30,6 @@ cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
-cesp.QUEUE_ALARM_NAME = 'pendingSubmissionQueue';
 
 // SETUP
 
@@ -74,8 +73,8 @@ function setupState(details) {
   chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
       {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
   // Process the pending survey submission queue every 20 minutes.
-  chrome.alarms.create(cesp.QUEUE_ALARM_NAME,
-      {delayInMinutes: 0, periodInMinutes: 20});
+  chrome.alarms.create(SurveySubmission.QUEUE_ALARM_NAME,
+      {delayInMinutes: 1, periodInMinutes: 20});
 }
 
 /**
@@ -372,13 +371,7 @@ function handleCompletedSurvey(message) {
         participantId,
         (new Date),
         message['responses']);
-    var successCallback = function() {
-      console.log('Survey submitted successfully');
-    };
-    var errorCallback = function(responseCode) {
-      console.log('Survey submission error: ' + responseCode);
-    };
-    SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);
+    SurveySubmission.saveSurveyRecord(record);
   });
 }
 chrome.runtime.onMessage.addListener(handleCompletedSurvey);
