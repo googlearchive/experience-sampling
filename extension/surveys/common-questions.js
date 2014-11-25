@@ -50,14 +50,14 @@ commonQuestions.createPageSourceQuestion = function() {
 commonQuestions.createHistoryQuestions = function() {
   var hist = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you visited ' + surveyDriver.QuestionUrl + ' before?',
+      'Have you visited ' + surveyDriver.questionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you seen a page like the one pictured above when trying to visit ' +
-          surveyDriver.QuestionUrl + ' before?',
+          surveyDriver.questionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
@@ -123,7 +123,7 @@ commonQuestions.createRecordUrlQuestion = function() {
   var url = new FixedQuestion(
       constants.QuestionType.RADIO,
       'May we record the URL of the website you were trying to visit, ' +
-          surveyDriver.QuestionUrl + ', with your responses?',
+          surveyDriver.questionUrl + ', with your responses?',
       true,
       ['Yes', 'No'],
       constants.Randomize.NONE);

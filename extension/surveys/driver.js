@@ -1,7 +1,7 @@
 var surveyDriver = {};
-surveyDriver.SurveyType = '';  // Holds the type of survey.
-surveyDriver.QuestionUrl = '';  // Holds the URL for putting into questions.
-surveyDriver.Questions = [];  // Holds the questions for a given survey.
+surveyDriver.surveyType = '';  // Holds the type of survey.
+surveyDriver.questionUrl = '';  // Holds the URL for putting into questions.
+surveyDriver.questions = [];  // Holds the questions for a given survey.
 
 /**
  * Convenience method for adding questions.
@@ -9,7 +9,7 @@ surveyDriver.Questions = [];  // Holds the questions for a given survey.
  * @param {Question} question The Question you want to add.
  */
 function addQuestion(parentNode, question) {
-  surveyDriver.Questions.push(question);
+  surveyDriver.questions.push(question);
   parentNode.appendChild(question.makeDOMTree());
 }
 
@@ -58,14 +58,14 @@ function loadSurveyScript() {
       return;
   }
   if (!jsUrl) handleError();
-  surveyDriver.SurveyType = jsUrl;
+  surveyDriver.surveyType = jsUrl;
 
   // Get the URL or extension name that the survey is about.
   if (!extensionSurvey) {
     var questionUrl = decodeURIComponent(
         parseKeyValuePair('url', splitIntoPairs[1]));
     if (!questionUrl) handleError();
-    surveyDriver.QuestionUrl = questionUrl;
+    surveyDriver.questionUrl = questionUrl;
   }
 
   // Load the JS file and start the survey setup.
@@ -102,9 +102,9 @@ function setupFormSubmitted(event) {
   event.preventDefault();
   chrome.runtime.sendMessage(
     {
-      'survey_type': surveyDriver.SurveyType,
+      'survey_type': surveyDriver.surveyType,
       'responses': getFormValues(
-                       surveyDriver.Questions, document['survey-form'])
+                       surveyDriver.questions, document['survey-form'])
     }
   );
   $('explanation').classList.add('hidden');

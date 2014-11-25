@@ -8,7 +8,7 @@
  */
 function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createChoiceQuestion(
-      'Proceed to ' + surveyDriver.QuestionUrl, 'Back to safety'));
+      'Proceed to ' + surveyDriver.questionUrl, 'Back to safety'));
   addQuestion(parentNode, commonQuestions.createPageMeaningQuestion());
   addQuestion(parentNode, commonQuestions.createPageSourceQuestion());
   addQuestion(parentNode, commonQuestions.createHistoryQuestions());

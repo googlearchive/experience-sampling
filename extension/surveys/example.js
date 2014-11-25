@@ -13,7 +13,7 @@ function addQuestions(parentNode) {
       true,
       ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
       constants.Randomize.NONE);
-  parentNode.appendChild(age.makeDOMTree());
+  addQuestion(parentNode, age);
 
   var realAge = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -21,7 +21,7 @@ function addQuestions(parentNode) {
       true,
       ['18-24', '25-34', '35-44', '45-54', '55-64', '65 or older'],
       constants.Randomize.ALL);
-  parentNode.appendChild(realAge.makeDOMTree());
+  addQuestion(parentNode, realAge);
 
   var gender = new FixedQuestion(
       constants.QuestionType.CHECKBOX,
@@ -29,7 +29,7 @@ function addQuestions(parentNode) {
       true,
       ['Female', 'Male', constants.OTHER],
       constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(gender.makeDOMTree());
+  addQuestion(parentNode, gender);
 
   var source = new FixedQuestion(
       constants.QuestionType.RADIO,
@@ -42,7 +42,7 @@ function addQuestions(parentNode) {
         'Word of mouth'
       ],
       constants.Randomize.ALL);
-  parentNode.appendChild(source.makeDOMTree());
+  addQuestion(parentNode, source);
 
   var source = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
@@ -107,7 +107,7 @@ function addQuestions(parentNode) {
         'Northern Mariana Islands'
       ],
       constants.Randomize.NONE);
-  parentNode.appendChild(source.makeDOMTree());
+  addQuestion(parentNode, source);
 
   var source = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
@@ -126,25 +126,25 @@ function addQuestions(parentNode) {
         'Georgia'
       ],
       constants.Randomize.ALL);
-  parentNode.appendChild(source.makeDOMTree());
+  addQuestion(parentNode, source);
 
   var pinaColadas = new EssayQuestion(
       constants.QuestionType.SHORT_STRING,
       'How much do you like pina coladas?',
       true);
-  parentNode.appendChild(pinaColadas.makeDOMTree());
+  addQuestion(parentNode, pinaColadas);
 
   var pinaColadasDetails = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
       'What is your favorite thing about pina coladas?',
       true);
-  parentNode.appendChild(pinaColadasDetails.makeDOMTree());
+  addQuestion(parentNode, pinaColadasDetails);
 
   var pinaColadasEssay = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'Please compare and contrast pina coladas and mimosas.',
       false);
-  parentNode.appendChild(pinaColadasEssay.makeDOMTree());
+  addQuestion(parentNode, pinaColadasEssay);
 
   var hungry = new ScaleQuestion(
       constants.QuestionType.VERTICAL_SCALE,
@@ -152,7 +152,7 @@ function addQuestions(parentNode) {
       false,
       ['I want to eat my hands', '', 'Medium', '', 'I hate food'],
       constants.Randomize.ALL);
-  parentNode.appendChild(hungry.makeDOMTree());
+  addQuestion(parentNode, hungry);
 
   var pizza = new ScaleQuestion(
       constants.QuestionType.VERTICAL_SCALE,
@@ -160,7 +160,7 @@ function addQuestions(parentNode) {
       false,
       ['The best', '', 'Medium', '', 'Still pretty good', 'Mmm'],
       constants.Randomize.ANCHOR_LAST);
-  parentNode.appendChild(pizza.makeDOMTree());
+  addQuestion(parentNode, pizza);
 
   var adrienne = new ScaleQuestion(
       constants.QuestionType.HORIZ_SCALE,
@@ -168,7 +168,7 @@ function addQuestions(parentNode) {
       true,
       ['Super duper', '', 'Blazing', '', 'Fantastical'],
       constants.Randomize.ALL);
-  parentNode.appendChild(adrienne.makeDOMTree());
+  addQuestion(parentNode, adrienne);
 
   var kittens = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
@@ -177,7 +177,7 @@ function addQuestions(parentNode) {
       ['Agree', '', '', '', 'Disagree'],
       constants.Randomize.ALL);
   kittens.setAttributes(['Red wine', 'White wine', 'Champagne']);
-  parentNode.appendChild(kittens.makeDOMTree());
+  addQuestion(parentNode, kittens);
 }
 
 /**
