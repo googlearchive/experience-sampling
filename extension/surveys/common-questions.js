@@ -5,6 +5,18 @@
 var commonQuestions = {};
 
 /**
+ * What website were you trying to visit when the page was displayed?
+ * @returns {object} The DOM subtree with the question.
+*/
+commonQuestions.createWhatWebsiteQuestion = function() {
+  var whatWebsite = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'What website were you trying to visit when the page was displayed?',
+      true);
+  return whatWebsite;
+};
+
+/**
  * How did you choose between the two options? Note that the options should be
  * flipped for the proceed & no-proceed scenarios.
  * @param {string} The option that the user chose.
