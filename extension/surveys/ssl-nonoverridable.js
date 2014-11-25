@@ -14,6 +14,7 @@ function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createAttributesQuestion());
   addQuestion(parentNode, commonQuestions.createRecordUrlQuestion());
   addQuestion(parentNode, commonQuestions.createClarificationQuestion());
+  addQuestion(parentNode, commonQuestions.createTrustQuestion());
 }
 
 /**
