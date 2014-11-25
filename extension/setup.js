@@ -17,7 +17,9 @@ function setSetupStorageValue(newState) {
 }
 
 /**
- * 
+ * Convenience method for adding questions.
+ * @param {Object} parentNode The DOM node to add the question to.
+ * @param {Question} question The Question you want to add.
  */
 function addQuestion(parentNode, question) {
   setupSurvey.questions.push(question);
@@ -498,7 +500,7 @@ function setupFormSubmitted(event) {
   chrome.runtime.sendMessage(
     {
       'survey_type': constants.SurveyLocation.SETUP,
-      'responses': getFormValues(document['survey-form'])
+      'responses': getFormValues(setupSurvey.questions, document['survey-form'])
     }
   );
 

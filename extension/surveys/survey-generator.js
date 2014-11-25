@@ -478,14 +478,15 @@ function makeSubmitButtonDOM() {
 
 /**
  * Extracts the question and answer values from a completed survey form.
+ * @param {Array.Question} questionArr The set of questions.
  * @param {Object} form The containing <form> DOM node.
  * @returns {SurveySubmission.Response} The question and associated answer.
  */
-function getFormValues(form) {
+function getFormValues(questionArr, form) {
   var responses = [];
-  for (var i = 0; i < setupSurvey.questions.length; i++) {
-    var question = setupSurvey.questions[i];  // The Question object
-    var questionStr = setupSurvey.questions[i].question;  // The question text
+  for (var i = 0; i < questionArr.length; i++) {
+    var question = questionArr[i];  // The Question object
+    var questionStr = questionArr[i].question;  // The question text
     var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
@@ -493,7 +494,18 @@ function getFormValues(form) {
           'input[name="' + questionLookup + '"]:checked');
       for (var j = 0; j < answerList.length; j++) {
         var response = new SurveySubmission.Response(
-            questionStr, answerList[j].value);
+            questionStr, answerList[j].value || 'NOANSWER');
+        responses.push(response);
+      }
+    } else if (question.questionType ===
+               constants.QuestionType.MULT_HORIZ_SCALE) {
+      // MULT_HOR_SCALE questions have multiple levels of responses.
+      for (var j = 0; j < question.attributes.length; j++) {
+        var attrQuestion = questionStr + '(' + question.attributes[j] + ')';
+        var attrLookup = getDomNameFromValue(question.attributes[j]) +
+            questionLookup;
+        var answer = form[attrLookup].value || 'NOANSWER';
+        var response = new SurveySubmission.Response(attrQuestion, answer);
         responses.push(response);
       }
     } else {
