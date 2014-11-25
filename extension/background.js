@@ -30,7 +30,6 @@ cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
-cesp.QUEUE_ALARM_NAME = 'pendingSubmissionQueue';
 
 // SETUP
 
@@ -74,8 +73,8 @@ function setupState(details) {
   chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
       {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
   // Process the pending survey submission queue every 20 minutes.
-  chrome.alarms.create(cesp.QUEUE_ALARM_NAME,
-      {delayInMinutes: 0, periodInMinutes: 20});
+  chrome.alarms.create(SurveySubmission.QUEUE_ALARM_NAME,
+      {delayInMinutes: 1, periodInMinutes: 20});
 }
 
 /**
@@ -106,8 +105,10 @@ function maybeShowConsentOrSetupSurvey() {
   var setupCallback = function(lookup) {
     if (!lookup || !lookup[constants.SETUP_KEY] ||
         lookup[constants.SETUP_KEY] === constants.SETUP_PENDING) {
-      chrome.tabs.create(
-          {'url': chrome.extension.getURL('surveys/setup.html')});
+      getOperatingSystem().then(function(os) {
+        chrome.tabs.create(
+            {'url': chrome.extension.getURL('surveys/setup.html?os=' + os)});
+      });
     } else if (lookup[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
       setReadyForSurveysStorageValue(true);
     }
@@ -116,7 +117,10 @@ function maybeShowConsentOrSetupSurvey() {
     if (!lookup || !lookup[constants.CONSENT_KEY] ||
         lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
       chrome.storage.onChanged.addListener(storageUpdated);
-      chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
+      getOperatingSystem().then(function(os) {
+        chrome.tabs.create(
+            {'url': chrome.extension.getURL('consent.html?os=' + os)});
+      });
     } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
       chrome.management.uninstallSelf();
     } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_GRANTED) {
@@ -177,7 +181,7 @@ function getParticipantId() {
  * A helper method for getting the operating system.
  * @returns {Promise} A promise that resolves with the operating system.
  */
-function getOperatingSytem() {
+function getOperatingSystem() {
   return new Promise(function(resolve, reject) {
     chrome.runtime.getPlatformInfo(function(platformInfo) {
       resolve(platformInfo.os);
@@ -342,7 +346,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         !surveyUrl) {
       return;
     }
-    getOperatingSytem().then(function(os) {
+    getOperatingSystem().then(function(os) {
       visitUrl = encodeURIComponent(visitUrl);
       var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl
           + '&os=' + os;
@@ -372,13 +376,7 @@ function handleCompletedSurvey(message) {
         participantId,
         (new Date),
         message['responses']);
-    var successCallback = function() {
-      console.log('Survey submitted successfully');
-    };
-    var errorCallback = function(responseCode) {
-      console.log('Survey submission error: ' + responseCode);
-    };
-    SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);
+    SurveySubmission.saveSurveyRecord(record);
   });
 }
 chrome.runtime.onMessage.addListener(handleCompletedSurvey);

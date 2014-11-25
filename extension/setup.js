@@ -497,10 +497,14 @@ function setupFormSubmitted(event) {
     return;
   }
 
+  var responses = getFormValues(setupSurvey.questions, document['survey-form']);
+  var query = window.location.search.substring(1);
+  var os = new SurveySubmission.Response('OS', query.split('=')[1]);
+  responses.push(os);
   chrome.runtime.sendMessage(
     {
       'survey_type': constants.SurveyLocation.SETUP,
-      'responses': getFormValues(setupSurvey.questions, document['survey-form'])
+      'responses': responses
     }
   );
 

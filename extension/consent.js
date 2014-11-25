@@ -35,6 +35,8 @@ function setupConsentForm(savedState) {
     $('top-blurb').classList.remove('hidden');
     $('consent-form-holder').classList.remove('hidden');
     $('give-consent').addEventListener('click', userGrantConsent);
+    $('give-consent').href = 'surveys/setup.html?' +
+        window.location.search.substring(1);
     $('no-consent').addEventListener('click', userRejectConsent)
   } else if (consentForm.status == constants.CONSENT_GRANTED) {
     // Show the consent form and the user's decision.
