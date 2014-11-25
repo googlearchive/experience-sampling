@@ -18,10 +18,10 @@ describe('ssl-overridable-noproceed', function() {
     parentNode.name = 'testForm';
   });
 
-  it('generates 12 questions', function() {
+  it('generates 11 questions', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend').length)
-        .toEqual(12);
+        .toEqual(11);
   });
 
   it('generates the not-proceed-choice question 1st', function() {
@@ -118,32 +118,12 @@ describe('ssl-overridable-noproceed', function() {
     expect(labelTexts).toContain('I prefer not to answer');
   });
 
-  it('generates the visit question and responses 8th', function() {
+  it('generates the trust question and responses 8th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[7].textContent)
-        .toEqual('Were you trying to visit example.com when you saw the' +
-        ' page instead?');
-
-    fieldsetElement = parentNode.getElementsByClassName('fieldset')[6];
-    var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(4);
-
-    var labelTexts = '';
-    for (var i = 0; i < labels.length; i++) {
-      labelTexts += labels[i].textContent;
-    }
-    expect(labelTexts).toContain('Yes');
-    expect(labelTexts).toContain('No');
-    expect(labelTexts).toContain('I\'m not sure');
-    expect(labelTexts).toContain('I prefer not to answer');
-  });
-
-  it('generates the trust question and responses 9th', function() {
-    addQuestions(parentNode);
-    expect(parentNode.getElementsByTagName('legend')[8].textContent)
         .toEqual('How much do you trust example.com?');
 
-    fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
+    fieldsetElement = parentNode.getElementsByClassName('fieldset')[6];
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(5);
 
@@ -158,12 +138,12 @@ describe('ssl-overridable-noproceed', function() {
     expect(labelTexts).toContain('Strongly trust');
   });
 
-  it('generates the attributes question and responses 10th', function() {
+  it('generates the attributes question and responses 9th', function() {
     addQuestions(parentNode);
-    expect(parentNode.getElementsByTagName('legend')[9].textContent)
+    expect(parentNode.getElementsByTagName('legend')[8].textContent)
         .toEqual('To what degree do each of the following adjectives describe this page?');
 
-    fieldsetElement = parentNode.getElementsByClassName('fieldset')[8];
+    fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(5);
 
@@ -178,13 +158,13 @@ describe('ssl-overridable-noproceed', function() {
     expect(labelTexts).toContain('A great deal');
   });
 
-  it('generates the record-URL question and responses 11th', function() {
+  it('generates the record-URL question and responses 10th', function() {
     addQuestions(parentNode);
-    expect(parentNode.getElementsByTagName('legend')[10].textContent)
+    expect(parentNode.getElementsByTagName('legend')[9].textContent)
         .toEqual('May we record the URL of the website you were trying' +
         ' to visit, example.com, with your responses?');
 
-    fieldsetElement = parentNode.getElementsByClassName('fieldset')[9];
+    fieldsetElement = parentNode.getElementsByClassName('fieldset')[8];
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(2);
 
@@ -196,9 +176,9 @@ describe('ssl-overridable-noproceed', function() {
     expect(labelTexts).toContain('No');
   });
 
-  it('generates the clarification question 12th', function() {
+  it('generates the clarification question 11th', function() {
     addQuestions(parentNode);
-    expect(parentNode.getElementsByTagName('legend')[11].textContent)
+    expect(parentNode.getElementsByTagName('legend')[10].textContent)
         .toEqual('Please use this space to clarify any of your responses' +
         ' from above or let us know how we can improve this survey.');
   });

@@ -14,7 +14,6 @@ function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createHistoryQuestions());
   addQuestion(parentNode, commonQuestions.createReferrerQuestion());
   addQuestion(parentNode, commonQuestions.createAccountQuestion());
-  addQuestion(parentNode, commonQuestions.createVisitQuestion());
   addQuestion(parentNode, commonQuestions.createTrustQuestion());
   addQuestion(parentNode, commonQuestions.createAttributesQuestion());
   addQuestion(parentNode, commonQuestions.createRecordUrlQuestion());
