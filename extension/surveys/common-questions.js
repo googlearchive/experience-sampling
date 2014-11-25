@@ -5,7 +5,8 @@
 var commonQuestions = {};
 
 /**
- * How did you choose between the two options?
+ * How did you choose between the two options? Note that the options should be
+ * flipped for the proceed & no-proceed scenarios.
  * @param {string} The option that the user chose.
  * @param {string} The option that the user didn't choose.
  * @returns {object} The DOM subtree with the question.
@@ -16,7 +17,7 @@ commonQuestions.createChoiceQuestion = function(chosen, alternative) {
       'You chose "' + chosen + '" instead of "' + alternative + '."' +
           ' How did you choose between the two options?',
       true);
-  return howChoose.makeDOMTree();
+  return howChoose;
 };
 
 /**
@@ -31,7 +32,7 @@ commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
       'You chose the "' + chosen + '" option, or you closed the page.' +
       ' Why did you choose not to proceed to ' + surveySetup.QuestionUrl +
       '?', true);
-  return howChoose.makeDOMTree();
+  return howChoose;
 };
 
 /**
@@ -43,7 +44,7 @@ commonQuestions.createPageMeaningQuestion = function() {
       constants.QuestionType.LONG_ESSAY,
       'What was the page trying to tell you, in your own words?',
       true);
-  return meaning.makeDOMTree();
+  return meaning;
 };
 
 /**
@@ -63,7 +64,7 @@ commonQuestions.createPageSourceQuestion = function() {
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
-  return source.makeDOMTree();
+  return source;
 };
 
 /**
@@ -73,19 +74,19 @@ commonQuestions.createPageSourceQuestion = function() {
 commonQuestions.createHistoryQuestions = function() {
   var hist = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you visited ' + surveySetup.QuestionUrl + ' before?',
+      'Have you visited ' + surveyDriver.questionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you seen a page like the one pictured above when trying to visit ' +
-          surveySetup.QuestionUrl + ' before?',
+          surveyDriver.questionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
   hist.addDependentQuestion(errorBefore, 'Yes');
-  return hist.makeDOMTree();
+  return hist;
 };
 
 /**
@@ -106,7 +107,7 @@ commonQuestions.createReferrerQuestion = function() {
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
-  return referrer.makeDOMTree();
+  return referrer;
 };
 
 /**
@@ -120,7 +121,7 @@ commonQuestions.createAccountQuestion = function() {
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
       constants.Randomize.ANCHOR_LAST);
-  return account.makeDOMTree();
+  return account;
 };
 
 /**
@@ -135,7 +136,7 @@ commonQuestions.createVisitQuestion = function() {
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
       constants.Randomize.ANCHOR_LAST);
-  return visit.makeDOMTree();
+  return visit;
 };
 
 /**
@@ -155,7 +156,7 @@ commonQuestions.createTrustQuestion = function() {
         'Strongly trust'
       ],
       constants.Randomize.ALL);
-  return trust.makeDOMTree();
+  return trust;
 };
 
 /**
@@ -184,7 +185,7 @@ commonQuestions.createAttributesQuestion = function() {
         'confusing',
         'informative'
       ]);
-  return attributes.makeDOMTree();
+  return attributes;
 };
 
 /**
@@ -195,11 +196,11 @@ commonQuestions.createRecordUrlQuestion = function() {
   var url = new FixedQuestion(
       constants.QuestionType.RADIO,
       'May we record the URL of the website you were trying to visit, ' +
-          surveySetup.QuestionUrl + ', with your responses?',
+          surveyDriver.questionUrl + ', with your responses?',
       true,
       ['Yes', 'No'],
       constants.Randomize.NONE);
-  return url.makeDOMTree();
+  return url;
 };
 
 /**
@@ -212,5 +213,5 @@ commonQuestions.createClarificationQuestion = function() {
       'Please use this space to clarify any of your responses from above or ' +
           'let us know how we can improve this survey.',
       false);
-  return extra.makeDOMTree();
+  return extra;
 };

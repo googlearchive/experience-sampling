@@ -14,8 +14,6 @@
  */
 var cesp = cesp || {};
 
-cesp.operatingSystem = '';
-cesp.participantId = null;
 cesp.openTabId = -1;
 
 // Settings.
@@ -32,6 +30,7 @@ cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
+cesp.QUEUE_ALARM_NAME = 'pendingSubmissionQueue';
 
 // SETUP
 
@@ -56,42 +55,6 @@ function setSurveysShownStorageValue(newCount) {
 }
 
 /**
- * A helper method for generating and setting a new participant ID.
- */
-function setNewParticipantId() {
-  // If the participant ID already has a value, this is redundant.
-  if (cesp.participantId) return;
-
-  var charset = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
-  var participantId = '';
-  for (var i = 0; i < 100; i++) {
-    var rand = Math.floor(Math.random() * charset.length);
-    participantId += charset.charAt(rand);
-  }
-
-  cesp.participantId = participantId;
-  var items = {};
-  items[cesp.PARTICIPANT_ID_LOOKUP] = participantId;
-  chrome.storage.local.set(items);
-}
-
-/**
- * A helper method for ensuring the participant ID is always set.
- */
-function getParticipantIdFromStorage() {
-  // If the participant ID already has a value, this is redundant.
-  if (cesp.participantId) return;
-
-  chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
-    if (!lookup || !lookup[cesp.PARTICIPANT_ID_LOOKUP]) {
-      setNewParticipantId();
-    } else {
-      cesp.participantId = lookup[cesp.PARTICIPANT_ID_LOOKUP];
-    }
-  });
-}
-
-/**
  * Sets up basic state for the extension. Called when extension is installed.
  * @param {object} details The details of the chrome.runtime.onInstalled event.
  */
@@ -100,11 +63,7 @@ function setupState(details) {
   // reasons (extension or browser update).
   if (details.reason !== 'install') return;
 
-  setNewParticipantId();
   setReadyForSurveysStorageValue(false);
-  chrome.runtime.getPlatformInfo(function(platformInfo) {
-    cesp.operatingSystem = platformInfo.os;
-  });
   // Automatically uninstall the extension after 120 days.
   chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
   // Set the count of surveys shown to 0, and reset it each day at midnight.
@@ -140,45 +99,33 @@ function resetSurveyCount(alarm) {
 chrome.alarms.onAlarm.addListener(resetSurveyCount);
 
 /**
- * Retrieves the registration status from Local Storage.
+ * Checks whether participant has granted consent and/or completed the
+ * demographic survey. If not, get the participant started.
  */
-function getConsentStatus() {
-  chrome.storage.local.get(constants.CONSENT_KEY, maybeShowConsentForm);
-}
-
-/**
- * Checks whether consent has been granted yet; if not, opens the consent form.
- * @param {object} consentLookup Object containing consent status (or empty).
- */
-function maybeShowConsentForm(consentLookup) {
-  if (!consentLookup || consentLookup[constants.CONSENT_KEY] == null ||
-      consentLookup[constants.CONSENT_KEY] == constants.CONSENT_PENDING) {
-    chrome.storage.onChanged.addListener(storageUpdated);
-    chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
-  } else if (consentLookup[constants.CONSENT_KEY] ==
-             constants.CONSENT_REJECTED) {
-    chrome.management.uninstallSelf();
-  } else if (consentLookup[constants.CONSENT_KEY] ==
-             constants.CONSENT_GRANTED) {
-    // Someone might have filled out the consent form previously but not
-    // filled out the setup survey. Check to see if that's the case.
-    chrome.storage.local.get(constants.SETUP_KEY, maybeShowSetupSurvey);
-  }
-}
-
-/**
- * Checks whether the setup survey has been completed yet. If it has been, we
- * are now ready to start showing surveys. If not, we need to listen for
- * when it's completed.
- * @param {object} setupLookup Object containing setup survey status (or empty).
- */
-function maybeShowSetupSurvey(setupLookup) {
-  if (!setupLookup || setupLookup[constants.SETUP_KEY] == null ||
-      setupLookup[constants.SETUP_KEY] == constants.SETUP_PENDING) {
-    chrome.tabs.create({'url': chrome.extension.getURL('surveys/setup.html')});
-  } else if (setupLookup[constants.SETUP_KEY] == constants.SETUP_COMPLETED) {
-    setReadyForSurveysStorageValue(true);
-  }
+function maybeShowConsentOrSetupSurvey() {
+  var setupCallback = function(lookup) {
+    if (!lookup || !lookup[constants.SETUP_KEY] ||
+        lookup[constants.SETUP_KEY] === constants.SETUP_PENDING) {
+      chrome.tabs.create(
+          {'url': chrome.extension.getURL('surveys/setup.html')});
+    } else if (lookup[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
+      setReadyForSurveysStorageValue(true);
+    }
+  };
+  var consentCallback = function(lookup) {
+    if (!lookup || !lookup[constants.CONSENT_KEY] ||
+        lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
+      chrome.storage.onChanged.addListener(storageUpdated);
+      chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
+    } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
+      chrome.management.uninstallSelf();
+    } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_GRANTED) {
+      // Someone might have filled out the consent form previously but not
+      // filled out the setup survey. Check to see if that's the case.
+      chrome.storage.local.get(constants.SETUP_KEY, setupCallback);
+    }
+  };
+  chrome.storage.local.get(constants.CONSENT_KEY, consentCallback);
 }
 
 /**
@@ -195,10 +142,48 @@ function storageUpdated(changes, areaName) {
 }
 
 // Performs consent and registration checks on startup and install.
-chrome.runtime.onInstalled.addListener(getConsentStatus);
-chrome.runtime.onStartup.addListener(getConsentStatus);
+chrome.runtime.onInstalled.addListener(maybeShowConsentOrSetupSurvey);
+chrome.runtime.onStartup.addListener(maybeShowConsentOrSetupSurvey);
 chrome.runtime.onInstalled.addListener(setupState);
-chrome.runtime.onStartup.addListener(getParticipantIdFromStorage);
+
+// GETTERS
+
+/**
+ * A helper method for getting (or, if necessary, setting) the participant ID.
+ * @returns {Promise} A promise that resolves with the participant ID.
+ */
+function getParticipantId() {
+  return new Promise(function(resolve, reject) {
+    chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
+      if (lookup && lookup[cesp.PARTICIPANT_ID_LOOKUP])
+        resolve(lookup[cesp.PARTICIPANT_ID_LOOKUP]);
+
+      var charset = 
+          "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+      var participantId = '';
+      for (var i = 0; i < 100; i++) {
+        var rand = Math.floor(Math.random() * charset.length);
+        participantId += charset.charAt(rand);
+      }
+      var items = {};
+      items[cesp.PARTICIPANT_ID_LOOKUP] = participantId;
+      chrome.storage.local.set(items);
+      resolve(participantId);
+    });
+  });
+}
+
+/**
+ * A helper method for getting the operating system.
+ * @returns {Promise} A promise that resolves with the operating system.
+ */
+function getOperatingSytem() {
+  return new Promise(function(resolve, reject) {
+    chrome.runtime.getPlatformInfo(function(platformInfo) {
+      resolve(platformInfo.os);
+    });
+  });
+}
 
 // SURVEY HANDLING
 
@@ -378,18 +363,19 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
  * Handle the submission of a completed survey.
  */
 function handleCompletedSurvey(message) {
-  var record = new SurveySubmission.SurveyRecord(
-      message['survey_type'],
-      cesp.participantId,
-      (new Date),
-      message['responses']);
-  var successCallback = function() {
-    console.log('Survey submitted successfully');
-  };
-  var errorCallback = function(responseCode) {
-    console.log(responseCode);
-    console.log('Survey submission error: ' + responseCode);
-  };
-  SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);
+  getParticipantId().then(function(participantId) {
+    var record = new SurveySubmission.SurveyRecord(
+        message['survey_type'],
+        participantId,
+        (new Date),
+        message['responses']);
+    var successCallback = function() {
+      console.log('Survey submitted successfully');
+    };
+    var errorCallback = function(responseCode) {
+      console.log('Survey submission error: ' + responseCode);
+    };
+    SurveySubmission.sendSurveyRecord(record, successCallback, errorCallback);
+  });
 }
 chrome.runtime.onMessage.addListener(handleCompletedSurvey);
