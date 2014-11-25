@@ -94,6 +94,14 @@ constants.DecisionType = {
   RELOAD: 'reload'
 };
 
+constants.OS = {
+  MAC: 'mac',
+  WIN: 'win',
+  CROS: 'cros',
+  LINUX: 'linux',
+  OTHER: 'other'
+};
+
 /**
  * The chrome.experienceSamplingPrivate event types are often post-fixed, e.g.,
  * ssl_interstitial_overridable_net::ERR_CERT_COMMON_NAME_INVALID. This
