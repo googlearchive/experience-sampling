@@ -21,7 +21,7 @@ commonQuestions.createChoiceQuestion = function(chosen, alternative) {
 
 /**
  * Why did you choose not to proceed to <website>?
- * @param {string} The option that the user may have chosen, 
+ * @param {string} The option that the user may have chosen,
  *     without enclosing quotes.
  * @returns {object} The DOM subtree with the question.
 */
@@ -56,9 +56,9 @@ commonQuestions.createPageSourceQuestion = function() {
       'Who do you think the page was from?',
       true,
       [
-        'Chrome (my browser)', 
-        'A hacker', 
-        'Windows', 
+        'Chrome (my browser)',
+        'A hacker',
+        'Windows',
         surveySetup.QuestionUrl,
         constants.OTHER
       ],
