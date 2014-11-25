@@ -3,7 +3,7 @@
 
   "name": "Chrome User Experience Surveys",
   "description": "Want to help make Chrome better? This extension occasionally shows surveys to get your feedback.",
-  "version": "1.0",
+  "version": "1.1.1",
 
   "background": {
     "scripts": ["constants.js", "survey-submission.js", "url-prettify.js", "background.js"],
@@ -13,10 +13,12 @@
   "permissions": [
     "alarms",
     "experienceSamplingPrivate",
+    "identity",
     "notifications",
     "storage",
     "unlimitedStorage",
     "https://chrome-experience-sampling.appspot.com/_ah/api/*"
+    "https://wwww.google.com"
   ],
 
   "icons": {
