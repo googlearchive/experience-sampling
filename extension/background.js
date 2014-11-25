@@ -21,7 +21,7 @@ cesp.NOTIFICATION_TITLE = 'Take a Chrome user experience survey!';
 cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
-cesp.MAX_SURVEYS_PER_DAY = 200;
+cesp.MAX_SURVEYS_PER_DAY = 2;
 cesp.ICON_FILE = 'icons/cues_85.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
@@ -74,7 +74,7 @@ function setupState(details) {
       {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
   // Process the pending survey submission queue every 20 minutes.
   chrome.alarms.create(SurveySubmission.QUEUE_ALARM_NAME,
-      {delayInMinutes: 1, periodInMinutes: 2});
+      {delayInMinutes: 1, periodInMinutes: 20});
 }
 
 /**

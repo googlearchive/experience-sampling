@@ -109,7 +109,7 @@ SurveySubmission.processQueue = function(alarm) {
 
   function makeErrorCallback(id) {
     return function(status) {
-      console.log('Survey error ' + status);
+      console.log('Survey cannot be uploaded: ' + status);
       SurveySubmission.updateTimeToSend(id);
     };
   }
