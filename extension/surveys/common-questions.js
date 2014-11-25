@@ -10,7 +10,7 @@ var commonQuestions = {};
  * @param {string} The option that the user didn't choose.
  * @returns {object} The DOM subtree with the question.
  */
-commonQuestions.createProceedChoiceQuestion = function(chosen, alternative) {
+commonQuestions.createChoiceQuestion = function(chosen, alternative) {
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'You chose "' + chosen + '" instead of "' + alternative + '."' +
@@ -28,7 +28,7 @@ commonQuestions.createProceedChoiceQuestion = function(chosen, alternative) {
 commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'You chose the "' + chosen + '"option, or you closed the page.' +
+      'You chose the "' + chosen + '" option, or you closed the page.' +
       ' Why did you choose not to proceed to ' + surveySetup.QuestionUrl +
       '?', true);
   return howChoose.makeDOMTree();
@@ -131,7 +131,7 @@ commonQuestions.createVisitQuestion = function() {
   var visit = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Were you trying to visit ' + surveySetup.QuestionUrl +
-           'when you saw the page instead?',
+           ' when you saw the page instead?',
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
       constants.Randomize.ANCHOR_LAST);
@@ -143,7 +143,7 @@ commonQuestions.createVisitQuestion = function() {
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createTrustQuestion = function() {
-  var trust = new FixedQuestion(
+  var trust = new ScaleQuestion(
       constants.QuestionType.VERTICAL_SCALE,
       'How much do you trust ' + surveySetup.QuestionUrl + '?',
       true,
