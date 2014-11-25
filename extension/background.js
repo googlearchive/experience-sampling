@@ -145,16 +145,16 @@ chrome.alarms.onAlarm.addListener(resetSurveyCount);
  */
 function maybeShowConsentOrSetupSurvey() {
   var setupCallback = function(lookup) {
-    if (!setupLookup || setupLookup[constants.SETUP_KEY] == null ||
-        setupLookup[constants.SETUP_KEY] == constants.SETUP_PENDING) {
+    if (!lookup || !lookup[constants.SETUP_KEY] ||
+        lookup[constants.SETUP_KEY] === constants.SETUP_PENDING) {
       chrome.tabs.create(
           {'url': chrome.extension.getURL('surveys/setup.html')});
-    } else if (setupLookup[constants.SETUP_KEY] == constants.SETUP_COMPLETED) {
+    } else if (lookup[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
       setReadyForSurveysStorageValue(true);
     }
   };
   var consentCallback = function(lookup) {
-    if (!lookup || lookup[constants.CONSENT_KEY] == null ||
+    if (!lookup || !lookup[constants.CONSENT_KEY] ||
         lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
       chrome.storage.onChanged.addListener(storageUpdated);
       chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
