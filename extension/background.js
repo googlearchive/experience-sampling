@@ -33,8 +33,6 @@ cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 
-function err(err) { console.error(err); }
-
 // SETUP
 
 /**
