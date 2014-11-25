@@ -21,6 +21,21 @@ commonQuestions.createChoiceQuestion = function(chosen, alternative) {
 };
 
 /**
+ * Why did you choose not to proceed to <website>?
+ * @param {string} The option that the user may have chosen,
+ *     without enclosing quotes.
+ * @returns {object} The DOM subtree with the question.
+*/
+commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
+  var howChoose = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'You chose the "' + chosen + '" option, or you closed the page.' +
+      ' Why did you choose not to proceed to ' + surveyDriver.questionUrl +
+      '?', true);
+  return howChoose;
+};
+
+/**
  * What was the page trying to tell you?
  * @returns {object} The DOM subtree with the question.
  */
@@ -33,14 +48,22 @@ commonQuestions.createPageMeaningQuestion = function() {
 };
 
 /**
- * Who was the page from?
+ * Who do you think the page was from?
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createPageSourceQuestion = function() {
-  var source = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'Who do you think the page was from?',
-      true);
+  var source = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Who was the page from?',
+      true,
+      [
+        'Chrome (my browser)',
+        'A hacker',
+        'Windows',
+        surveyDriver.questionUrl,
+        constants.OTHER
+      ],
+      constants.Randomize.ANCHOR_LAST);
   return source;
 };
 
@@ -67,24 +90,73 @@ commonQuestions.createHistoryQuestions = function() {
 };
 
 /**
- * What led you to the site you were trying to visit?
+ * What led you to the page?
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createReferrerQuestion = function() {
   var referrer = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'What led you to the site you were trying to visit?',
+      'What led you to the page?',
       true,
       [
-        'A link on another site',
-        'A link in email or a chat window',
-        'A Web search',
-        'I entered the address directly in the address bar',
-        'One of my bookmarks',
+        'Entered or typed a URL',
+        'Used a search engine',
+        'Clicked link from an email message',
+        'Clicked link in a chat window',
+        'Clicked link on a web page',
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
   return referrer;
+};
+
+/**
+ * Do you have an account on example.com?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createAccountQuestion = function() {
+  var account = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Do you have an account on ' + surveyDriver.questionUrl + '?',
+      true,
+      ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
+      constants.Randomize.ANCHOR_LAST);
+  return account;
+};
+
+/**
+ * Were you trying to visit example.com when you saw the page instead?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createVisitQuestion = function() {
+  var visit = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Were you trying to visit ' + surveyDriver.questionUrl +
+           ' when you saw the page instead?',
+      true,
+      ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
+      constants.Randomize.ANCHOR_LAST);
+  return visit;
+};
+
+/**
+ * How much do you trust example.com?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createTrustQuestion = function() {
+  var trust = new ScaleQuestion(
+      constants.QuestionType.VERTICAL_SCALE,
+      'How much do you trust ' + surveyDriver.questionUrl + '?',
+      true,
+      [
+        'Strongly distrust',
+        'Somewhat distrust',
+        'Neither trust nor distrust',
+        'Somewhat trust',
+        'Strongly trust'
+      ],
+      constants.Randomize.ALL);
+  return trust;
 };
 
 /**
@@ -94,7 +166,7 @@ commonQuestions.createReferrerQuestion = function() {
 commonQuestions.createAttributesQuestion = function() {
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following attributes describe this page?',
+      'To what degree do each of the following adjectives describe this page?',
       true,
       [
         'Not at all',
