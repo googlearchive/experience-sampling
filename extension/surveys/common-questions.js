@@ -5,7 +5,8 @@
 var commonQuestions = {};
 
 /**
- * How did you choose between the two options?
+ * How did you choose between the two options? Note that the options should be
+ * flipped for the proceed & no-proceed scenarios.
  * @param {string} The option that the user chose.
  * @param {string} The option that the user didn't choose.
  * @returns {object} The DOM subtree with the question.

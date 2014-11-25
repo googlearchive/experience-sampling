@@ -190,7 +190,7 @@ function getParticipantId() {
  * @returns {Promise} A promise that resolves with the operating system.
  */
 function getOperatingSytem() {
-  return new Promise(function(resolve, reject)) {
+  return new Promise(function(resolve, reject) {
     chrome.runtime.getPlatformInfo(function(platformInfo) {
       resolve(platformInfo.os);
     });
