@@ -15,7 +15,7 @@ SurveySubmission.SERVER_URL = 'https://chrome-experience-sampling.appspot.com';
 SurveySubmission.SUBMIT_SURVEY_ACTION = '/_ah/api/cesp/v1/submitsurvey';
 SurveySubmission.XHR_TIMEOUT = 4000;  // milliseconds
 SurveySubmission.DB_NAME = 'pendingResponsesDB';
-SurveySubmission.DB_VERSION = 1;
+SurveySubmission.DB_VERSION = 2;
 SurveySubmission.QUEUE_ALARM_NAME = 'surveySubmissionAlarm';
 
 /**
@@ -71,14 +71,15 @@ SurveySubmission.PendingSurveyRecord = function(surveyRecord, timeToSend,
  */
 SurveySubmission.saveSurveyRecord = function(surveyRecord, tries) {
   tries = tries || 0;
-
-  SurveySubmission.withObjectStore('PendingSurveyRecords', 'readwrite',
-      function(store) {
+  function makePendingRecord(store) {
     var timeToSend = Date.now() + SurveySubmission.calculateSendingDelay(tries);
     var pendingSurveyRecord = new SurveySubmission.PendingSurveyRecord(
         surveyRecord, timeToSend, tries);
     var request = store.add(pendingSurveyRecord);
-  });
+    console.log('Survey added to queue');
+  }
+  SurveySubmission.withObjectStore(
+      'PendingSurveyRecords', 'readwrite', makePendingRecord);
 }
 
 /**
@@ -101,20 +102,20 @@ SurveySubmission.processQueue = function(alarm) {
 
   function makeSuccessCallback(id) {
     return function(response) {
-      SurveySubmission.deleteSurvey(id);
+      console.log('Survey successfully submitted');
+      SurveySubmission.deleteSurveyRecord(id);
     };
   }
 
   function makeErrorCallback(id) {
     return function(status) {
+      console.log('Survey error ' + status);
       SurveySubmission.updateTimeToSend(id);
     };
   }
 
-  SurveySubmission.withObjectStore('PendingSurveyRecords', 'readonly',
-      function(store) {
+  function maybeSendSurvey(store) {
     var surveysToSubmit = [];
-
     var index = store.index('timeToSend');
     var keyRange = IDBKeyRange.upperBound(Date.now());
     index.openCursor(keyRange).onsuccess = function(event) {
@@ -130,13 +131,15 @@ SurveySubmission.processQueue = function(alarm) {
         // to sendSurvey.
         for (var i = 0; i < surveysToSubmit.length; i++) {
           var id = surveysToSubmit[i].id;
-          var surveyRecord = surveysToSubmit[i].survey;
-          SurveySubmission.sendSurvey(surveyRecord, makeSuccessCallback(id),
-              makeErrorCallback(id));
+          var surveyRecord = surveysToSubmit[i].surveyRecord;
+          SurveySubmission.sendSurveyRecord(
+              surveyRecord, makeSuccessCallback(id), makeErrorCallback(id));
         }
       }
     };
-  });
+  }
+  SurveySubmission.withObjectStore(
+      'PendingSurveyRecords', 'readonly', maybeSendSurvey);
 }
 chrome.alarms.onAlarm.addListener(SurveySubmission.processQueue);
 
@@ -145,10 +148,12 @@ chrome.alarms.onAlarm.addListener(SurveySubmission.processQueue);
  * @param {int} id The ID primary key of survey to delete.
  */
 SurveySubmission.deleteSurveyRecord = function(id) {
-  SurveySubmission.withObjectStore('PendingSurveyRecords', 'readwrite',
+  SurveySubmission.withObjectStore(
+      'PendingSurveyRecords',
+      'readwrite',
       function(store) {
-    var request = store.delete(id);
-  });
+        var request = store.delete(id);
+      });
 }
 
 /**
@@ -157,8 +162,7 @@ SurveySubmission.deleteSurveyRecord = function(id) {
  * @param {int} id The ID primary key of the survey to update.
  */
 SurveySubmission.updateTimeToSend = function(id) {
-  SurveySubmission.withObjectStore('PendingSurveyRecords', 'readwrite',
-      function(store) {
+  function update(store) {
     var request = store.get(id);
     request.onsuccess =  function(event) {
       var record = event.target.result;
@@ -167,7 +171,8 @@ SurveySubmission.updateTimeToSend = function(id) {
           SurveySubmission.calculateSendingDelay(record.tries);
       var request = store.put(record);
     }
-  });
+  }
+  SurveySubmission.withObjectStore('PendingSurveyRecords', 'readwrite', update);
 }
 
 /**
@@ -178,8 +183,8 @@ SurveySubmission.updateTimeToSend = function(id) {
  * @param {function(IDBObjectStore)} action 
  */
 SurveySubmission.withObjectStore = function(storeName, mode, action) {
-  var request = indexedDB.open(SurveySubmission.DB_NAME,
-      SurveySubmission.DB_VERSION);
+  var request = indexedDB.open(
+      SurveySubmission.DB_NAME, SurveySubmission.DB_VERSION);
   request.onsuccess = function(event) {
     var db = event.target.result;
     var transaction = db.transaction([storeName], mode);
@@ -188,20 +193,13 @@ SurveySubmission.withObjectStore = function(storeName, mode, action) {
   };
   request.onerror = function(event) {
     console.log("Database Error: " + event.target.errorCode);
-  }
-  request.onupgradeneeded = SurveySubmission.setupPendingResponsesDatabase;
-}
-
-/**
- * Sets up our object store and index for our database.
- * Used for the 'onupgradeneeded' event listener.
- * @param {event} event The event this listener is receiving.
- */
-SurveySubmission.setupPendingResponsesDatabase = function(event) {
-  var db = event.target.result;
-  var objectStore = db.createObjectStore(
-      'PendingSurveyRecords', {keyPath: 'id', autoIncrement: true});
-  objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
+  };
+  request.onupgradeneeded = function(event) {
+    var db = event.target.result;
+    var objectStore = db.createObjectStore(
+        'PendingSurveyRecords', {keyPath: 'id', autoIncrement: true});
+    objectStore.createIndex('timeToSend', 'timeToSend', {unique: false});
+  };
 }
 
 /**
