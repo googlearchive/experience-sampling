@@ -145,17 +145,17 @@ commonQuestions.createClarificationQuestion = function() {
 };
 
 commonQuestions.createTrustQuestion = function() {
-var trust = new ScaleQuestion(
-constants.QuestionType.VERTICAL_SCALE,
-'How much do you trust ' + surveyDriver.questionUrl + '?',
-true,
-[
-'Strongly distrust',
-'Somewhat distrust',
-'Neither trust nor distrust',
-'Somewhat trust',
-'Strongly trust'
-],
-constants.Randomize.ALL);
-return trust;
+  var trust = new ScaleQuestion(
+      constants.QuestionType.VERTICAL_SCALE,
+      'How much do you trust ' + surveyDriver.questionUrl + '?',
+      true,
+      [
+        'Strongly distrust',
+        'Somewhat distrust',
+        'Neither trust nor distrust',
+        'Somewhat trust',
+        'Strongly trust'
+      ],
+      constants.Randomize.ALL);
+  return trust;
 };
