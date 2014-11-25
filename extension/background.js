@@ -105,8 +105,10 @@ function maybeShowConsentOrSetupSurvey() {
   var setupCallback = function(lookup) {
     if (!lookup || !lookup[constants.SETUP_KEY] ||
         lookup[constants.SETUP_KEY] === constants.SETUP_PENDING) {
-      chrome.tabs.create(
-          {'url': chrome.extension.getURL('surveys/setup.html')});
+      getOperatingSystem().then(function(os) {
+        chrome.tabs.create(
+            {'url': chrome.extension.getURL('surveys/setup.html?os=' + os)});
+      });
     } else if (lookup[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
       setReadyForSurveysStorageValue(true);
     }
@@ -115,7 +117,10 @@ function maybeShowConsentOrSetupSurvey() {
     if (!lookup || !lookup[constants.CONSENT_KEY] ||
         lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
       chrome.storage.onChanged.addListener(storageUpdated);
-      chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
+      getOperatingSystem().then(function(os) {
+        chrome.tabs.create(
+            {'url': chrome.extension.getURL('consent.html?os=' + os)});
+      });
     } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
       chrome.management.uninstallSelf();
     } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_GRANTED) {
@@ -176,7 +181,7 @@ function getParticipantId() {
  * A helper method for getting the operating system.
  * @returns {Promise} A promise that resolves with the operating system.
  */
-function getOperatingSytem() {
+function getOperatingSystem() {
   return new Promise(function(resolve, reject) {
     chrome.runtime.getPlatformInfo(function(platformInfo) {
       resolve(platformInfo.os);
@@ -341,7 +346,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         !surveyUrl) {
       return;
     }
-    getOperatingSytem().then(function(os) {
+    getOperatingSystem().then(function(os) {
       visitUrl = encodeURIComponent(visitUrl);
       var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl
           + '&os=' + os;

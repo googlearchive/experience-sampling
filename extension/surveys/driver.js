@@ -36,7 +36,7 @@ function loadSurveyScript() {
   var query = window.location.search.substring(1);
   if (!query) handleError();
   var splitIntoPairs = query.split('&');
-  if (!splitIntoPairs || splitIntoPairs.length < 2) handleError();
+  if (!splitIntoPairs || splitIntoPairs.length < 3) handleError();
 
   // Determine the type of survey to show.
   var jsUrl = parseKeyValuePair('js', splitIntoPairs[0]);
