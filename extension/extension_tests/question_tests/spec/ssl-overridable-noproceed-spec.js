@@ -1,7 +1,16 @@
-var surveySetup = {};
-surveySetup.QuestionUrl = 'example.com';
+var surveyDriver = {};
+surveyDriver.questionUrl = 'example.com';
 
-describe('ssl-overridable-noproceed questions', function() {
+/**
+ * Adapted from driver.js. This function is needed for testing, but 
+ * including the whole driver.js file in SpecRunner.html causes a redirect
+ * to consent.html, so testing is prevented.
+ */
+function addQuestion(parentNode, question) {
+  parentNode.appendChild(question.makeDOMTree());
+}
+
+describe('ssl-overridable-noproceed', function() {
   var parentNode;
 
   beforeEach(function() {

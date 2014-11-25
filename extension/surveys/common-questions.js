@@ -30,7 +30,7 @@ commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'You chose the "' + chosen + '" option, or you closed the page.' +
-      ' Why did you choose not to proceed to ' + surveySetup.QuestionUrl +
+      ' Why did you choose not to proceed to ' + surveyDriver.questionUrl +
       '?', true);
   return howChoose;
 };
@@ -60,7 +60,7 @@ commonQuestions.createPageSourceQuestion = function() {
         'Chrome (my browser)',
         'A hacker',
         'Windows',
-        surveySetup.QuestionUrl,
+        surveyDriver.questionUrl,
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
@@ -117,7 +117,7 @@ commonQuestions.createReferrerQuestion = function() {
 commonQuestions.createAccountQuestion = function() {
   var account = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Do you have an account on ' + surveySetup.QuestionUrl + '?',
+      'Do you have an account on ' + surveyDriver.questionUrl + '?',
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
       constants.Randomize.ANCHOR_LAST);
@@ -131,7 +131,7 @@ commonQuestions.createAccountQuestion = function() {
 commonQuestions.createVisitQuestion = function() {
   var visit = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Were you trying to visit ' + surveySetup.QuestionUrl +
+      'Were you trying to visit ' + surveyDriver.questionUrl +
            ' when you saw the page instead?',
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
@@ -146,7 +146,7 @@ commonQuestions.createVisitQuestion = function() {
 commonQuestions.createTrustQuestion = function() {
   var trust = new ScaleQuestion(
       constants.QuestionType.VERTICAL_SCALE,
-      'How much do you trust ' + surveySetup.QuestionUrl + '?',
+      'How much do you trust ' + surveyDriver.questionUrl + '?',
       true,
       [
         'Strongly distrust',
