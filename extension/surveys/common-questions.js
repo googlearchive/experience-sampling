@@ -54,7 +54,7 @@ commonQuestions.createPageMeaningQuestion = function() {
 commonQuestions.createPageSourceQuestion = function() {
   var source = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Who do you think the page was from?',
+      'Who was the page from?',
       true,
       [
         'Chrome (my browser)',

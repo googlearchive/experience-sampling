@@ -41,7 +41,7 @@ describe('ssl-overridable-noproceed', function() {
   it('generates the page-source question and responses 3rd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
-        .toEqual('Who do you think the page was from?');
+        .toEqual('Who was the page from?');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[2];
     var labels = fieldsetElement.getElementsByTagName('label');
