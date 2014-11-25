@@ -342,16 +342,19 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         !surveyUrl) {
       return;
     }
-    visitUrl = encodeURIComponent(visitUrl);
-    var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl;
-    chrome.tabs.create(
-        {'url': chrome.extension.getURL(openUrl)},
-        function(tab) {
-          try {
-            chrome.tabs.remove(cesp.openTabId);
-          } catch (err) { }
-          cesp.openTabId = tab.id;
-        });
+    getOperatingSytem().then(function(os) {
+      visitUrl = encodeURIComponent(visitUrl);
+      var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl
+          + '&os=' + os;
+      chrome.tabs.create(
+          {'url': chrome.extension.getURL(openUrl)},
+          function(tab) {
+            try {
+              chrome.tabs.remove(cesp.openTabId);
+            } catch (err) { }
+            cesp.openTabId = tab.id;
+      });
+    });
   });
 }
 
