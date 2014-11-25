@@ -525,6 +525,5 @@ function getFormValues(questionArr, form) {
   for (var i = 0; i < questionArr.length; i++) {
     grabQuestion(questionArr[i]);
   }
-  console.log(JSON.stringify(responses));
   return responses;
 }
