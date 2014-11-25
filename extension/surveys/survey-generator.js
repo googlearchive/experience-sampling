@@ -484,9 +484,8 @@ function makeSubmitButtonDOM() {
  */
 function getFormValues(questionArr, form) {
   var responses = [];
-  for (var i = 0; i < questionArr.length; i++) {
-    var question = questionArr[i];  // The Question object
-    var questionStr = questionArr[i].question;  // The question text
+  function grabQuestion(question) {
+    var questionStr = question.question;  // The question text
     var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
@@ -513,6 +512,11 @@ function getFormValues(questionArr, form) {
       var response = new SurveySubmission.Response(questionStr, answer);
       responses.push(response);
     }
+    if (question.depChild)
+      grabQuestion(question.depChild);
+  }
+  for (var i = 0; i < questionArr.length; i++) {
+    grabQuestion(questionArr[i]);
   }
   return responses;
 }
