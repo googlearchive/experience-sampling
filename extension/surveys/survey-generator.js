@@ -511,13 +511,6 @@ function getFormValues(questionArr, form) {
       var answer = form[questionLookup].value || 'NOANSWER';
       var response = new SurveySubmission.Response(questionStr, answer);
       responses.push(response);
-      var urlConsentQ = commonQuestions.createRecordUrlQuestion();
-      if (questionStr === urlConsentQ.question
-          && answer === '0-Yes-' + questionLookup) {
-        var urlResponse = new SurveySubmission.Response(
-            'URL', surveyDriver.questionUrl);
-        responses.push(urlResponse);
-      }
     }
     if (question.depChild)
       grabQuestion(question.depChild);

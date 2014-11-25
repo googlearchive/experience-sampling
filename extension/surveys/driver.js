@@ -124,11 +124,20 @@ function setupSurvey() {
  */
 function setupFormSubmitted(event) {
   event.preventDefault();
+
+  var responses = getFormValues(
+      surveyDriver.questions, document['survey-form']);
+  var urlConsentQ = commonQuestions.createRecordUrlQuestion();
+  var lookup = getDomNameFromValue(urlConsentQ.question);
+  if (document['survey-form'][lookup].value === '0-Yes-' + lookup) {
+    var urlResponse = new SurveySubmission.Response(
+        'URL', surveyDriver.questionUrl);
+    responses.push(urlResponse);
+  }
   chrome.runtime.sendMessage(
     {
       'survey_type': surveyDriver.surveyType,
-      'responses': getFormValues(
-                       surveyDriver.questions, document['survey-form'])
+      'responses': responses
     }
   );
   $('explanation').classList.add('hidden');
