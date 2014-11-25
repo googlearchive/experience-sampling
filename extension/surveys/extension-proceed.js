@@ -16,11 +16,25 @@ function addQuestions(parentNode) {
       true);
   addQuestion(parentNode, meaning);
 
-  var source = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'Who do you think the dialog was from?',
-      true);
+  var source = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Who was the dialog from?',
+      true,
+      [
+        'Chrome (my browser)',
+        'A hacker',
+        'Windows',
+        surveyDriver.questionUrl,
+        constants.OTHER
+      ],
+      constants.Randomize.ANCHOR_LAST);
   addQuestion(parentNode, source);
+
+  var referrer = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'What led you to install the extension or app mentioned in the dialog?',
+      true);
+  addQuestion(parentNode, referrer);
 
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
@@ -45,6 +59,12 @@ function addQuestions(parentNode) {
         'informative'
       ]);
   addQuestion(parentNode, attributes);
+
+  var extensionName = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'What is the name of the extension or app you were trying to install?',
+      true);
+  addQuestion(parentNode, extensionName);
 
   addQuestion(parentNode, commonQuestions.createClarificationQuestion());
 }
