@@ -22,7 +22,7 @@ function addQuestion(parentNode, question) {
  */
 function loadSurveyScript() {
   function handleError() {
-    console.log('Unexpected query: ' + window.location);
+    console.error('Unexpected query: ' + window.location);
     window.location = '../consent.html';
   }
   function parseKeyValuePair(keyName, pairStr) {
@@ -129,7 +129,8 @@ function setupFormSubmitted(event) {
       surveyDriver.questions, document['survey-form']);
   var urlConsentQ = commonQuestions.createRecordUrlQuestion();
   var lookup = getDomNameFromValue(urlConsentQ.question);
-  if (document['survey-form'][lookup].value === '0-Yes-' + lookup) {
+  if (document['survey-form'][lookup] &&
+      document['survey-form'][lookup].value === ('0-Yes-' + lookup)) {
     var urlResponse = new SurveySubmission.Response(
         'URL', surveyDriver.questionUrl);
     responses.push(urlResponse);
