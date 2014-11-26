@@ -340,11 +340,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         return;
       case constants.EventType.UNKNOWN:
         throw new Error('Unknown event type: ' + element['name']);
-        break;
-    }
-    if ((eventType !== constants.EventType.EXTENSION_INSTALL && !visitUrl) ||
-        !surveyUrl) {
-      return;
+        return;
     }
     getOperatingSystem().then(function(os) {
       visitUrl = encodeURIComponent(visitUrl);
