@@ -61,7 +61,7 @@ describe('extension-proceed', function() {
   it('generates the referrer question 4th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[3].textContent)
-        .toEqual('What led you to install the extension or app' +
+        .toEqual('What led you to try to install the extension or app' +
         ' mentioned in the dialog?');
   });
 

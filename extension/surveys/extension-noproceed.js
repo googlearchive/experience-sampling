@@ -9,64 +9,11 @@
 function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createChoiceQuestion(
       'Cancel', 'Add'));
-
-  var meaning = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'What was the dialog trying to tell you, in your own words?',
-      true);
-  addQuestion(parentNode, meaning);
-
-  var source = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'Who was the dialog from?',
-      true,
-      [
-        'Chrome (my browser)',
-        'A hacker',
-        'Windows',
-        surveyDriver.questionUrl,
-        constants.OTHER
-      ],
-      constants.Randomize.ANCHOR_LAST);
-  addQuestion(parentNode, source);
-
-  var referrer = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'What led you to try to install the extension or app mentioned' +
-      ' in the dialog?',
-      true);
-  addQuestion(parentNode, referrer);
-
-  var attributes = new ScaleQuestion(
-      constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following adjectives describe' +
-          ' the dialog?',
-      true,
-      [
-        'Not at all',
-        'A little bit',
-        'A moderate amount',
-        'Very much',
-        'A great deal'
-      ],
-      constants.Randomize.ALL);
-  attributes.setAttributes(
-      [
-        'annoying',
-        'comforting',
-        'scary',
-        'helpful',
-        'confusing',
-        'informative'
-      ]);
-  addQuestion(parentNode, attributes);
-
-  var extensionName = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'What is the name of the extension or app you were trying to install?',
-      false);
-  addQuestion(parentNode, extensionName);
-
+  addQuestion(parentNode, commonQuestions.createDialogMeaningQuestion());
+  addQuestion(parentNode, commonQuestions.createDialogSourceQuestion());
+  addQuestion(parentNode, commonQuestions.createDialogReferrerQuestion());
+  addQuestion(parentNode, commonQuestions.createDialogAttributesQuestion());
+  addQuestion(parentNode, commonQuestions.createExtensionNameQuestion());
   addQuestion(parentNode, commonQuestions.createClarificationQuestion());
 }
 
