@@ -106,7 +106,6 @@ commonQuestions.createDialogSourceQuestion = function() {
         'Chrome (my browser)',
         'A hacker',
         'Windows',
-        surveyDriver.questionUrl,
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
