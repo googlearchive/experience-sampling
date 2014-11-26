@@ -130,7 +130,7 @@ function setupFormSubmitted(event) {
   var urlConsentQ = commonQuestions.createRecordUrlQuestion();
   var lookup = getDomNameFromValue(urlConsentQ.question);
   if (document['survey-form'][lookup] &&
-      document['survey-form'][lookup].value === '0-Yes-' + lookup) {
+      document['survey-form'][lookup].value === ('0-Yes-' + lookup)) {
     var urlResponse = new SurveySubmission.Response(
         'URL', surveyDriver.questionUrl);
     responses.push(urlResponse);
