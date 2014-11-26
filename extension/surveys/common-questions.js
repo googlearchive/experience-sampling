@@ -298,7 +298,7 @@ commonQuestions.createRecordUrlQuestion = function() {
  */ 
 commonQuestions.createExtensionNameQuestion = function() {
   var extensionName = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
+      constants.QuestionType.SHORT_STRING,
       'What is the name of the extension or app you were trying to install?',
       false);
   return extensionName;
