@@ -63,7 +63,7 @@ function addQuestions(parentNode) {
   var extensionName = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'What is the name of the extension or app you were trying to install?',
-      true);
+      false);
   addQuestion(parentNode, extensionName);
 
   addQuestion(parentNode, commonQuestions.createClarificationQuestion());
