@@ -9,43 +9,11 @@
 function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createChoiceQuestion(
       'Cancel', 'Add'));
-
-  var meaning = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'What was the dialog trying to tell you, in your own words?',
-      true);
-  addQuestion(parentNode, meaning);
-
-  var source = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'Who do you think the dialog was from?',
-      true);
-  addQuestion(parentNode, source);
-
-  var attributes = new ScaleQuestion(
-      constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following attributes describe' +
-          ' this dialog?',
-      true,
-      [
-        'Not at all',
-        'A little bit',
-        'A moderate amount',
-        'Very much',
-        'A great deal'
-      ],
-      constants.Randomize.ALL);
-  attributes.setAttributes(
-      [
-        'annoying',
-        'comforting',
-        'scary',
-        'helpful',
-        'confusing',
-        'informative'
-      ]);
-  addQuestion(parentNode, attributes);
-
+  addQuestion(parentNode, commonQuestions.createDialogMeaningQuestion());
+  addQuestion(parentNode, commonQuestions.createDialogSourceQuestion());
+  addQuestion(parentNode, commonQuestions.createDialogReferrerQuestion());
+  addQuestion(parentNode, commonQuestions.createDialogAttributesQuestion());
+  addQuestion(parentNode, commonQuestions.createExtensionNameQuestion());
   addQuestion(parentNode, commonQuestions.createClarificationQuestion());
 }
 
