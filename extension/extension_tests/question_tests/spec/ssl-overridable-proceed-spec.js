@@ -27,8 +27,8 @@ describe('ssl-overridable-proceed', function() {
   it('generates the choice question 1st', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[0].textContent)
-        .toEqual('You chose the "Proceed to example.com" option,' +
-        ' instead of "Back to safety". How did you choose between' +
+        .toEqual('You chose "Proceed to example.com"' +
+        ' instead of "Back to safety." How did you choose between' +
         ' the two options?');
   });
 

@@ -38,8 +38,8 @@ function addQuestions(parentNode) {
 
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following attributes describe' +
-          ' this dialog?',
+      'To what degree do each of the following adjectives describe' +
+          ' the dialog?',
       true,
       [
         'Not at all',

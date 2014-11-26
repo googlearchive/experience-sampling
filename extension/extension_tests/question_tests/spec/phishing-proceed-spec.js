@@ -35,7 +35,7 @@ describe('phishing-proceed', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
         .toEqual('You chose "visit this unsafe site"' +
-        ' instead of "Back to safety". How did you choose between' +
+        ' instead of "Back to safety." How did you choose between' +
         ' the two options?');
   });
 

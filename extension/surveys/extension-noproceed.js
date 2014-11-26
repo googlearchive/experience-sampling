@@ -32,14 +32,15 @@ function addQuestions(parentNode) {
 
   var referrer = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'What led you to install the extension or app mentioned in the dialog?',
+      'What led you to try to install the extension or app mentioned' +
+      ' in the dialog?',
       true);
   addQuestion(parentNode, referrer);
 
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following attributes describe' +
-          ' this dialog?',
+      'To what degree do each of the following adjectives describe' +
+          ' the dialog?',
       true,
       [
         'Not at all',
