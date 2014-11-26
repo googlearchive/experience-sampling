@@ -235,12 +235,10 @@ function showSurveyNotification(element, decision) {
   }
   chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
-
     chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
       if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
         return;
       }
-
       clearNotifications();
 
       var timePromptShown = new Date();
@@ -340,11 +338,7 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
         return;
       case constants.EventType.UNKNOWN:
         throw new Error('Unknown event type: ' + element['name']);
-        break;
-    }
-    if ((eventType !== constants.EventType.EXTENSION_INSTALL && !visitUrl) ||
-        !surveyUrl) {
-      return;
+        return;
     }
     getOperatingSystem().then(function(os) {
       visitUrl = encodeURIComponent(visitUrl);
