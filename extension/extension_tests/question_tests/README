@@ -1,0 +1,12 @@
+Question tests
+
+These are Jasmine tests for whether the generated survey questions for
+each condition match the expected text.
+
+Each *-SpecRunner.html file should be loaded to complete the test for
+each condition.
+
+It would be nice to only have to load one SpecRunner.html, but since
+each condition (e.g., ssl-overridable-proceed.js, malware-proceed.js,
+etc.) defines an addQuestions function, they could not all be loaded
+into by the same html file without naming collisions.
