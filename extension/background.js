@@ -22,10 +22,12 @@ cesp.NOTIFICATION_BODY = 'Your feedback makes Chrome better.';
 cesp.NOTIFICATION_BUTTON = 'Take survey!';
 cesp.NOTIFICATION_CONSENT_LINK = 'What is this?';
 cesp.MAX_SURVEYS_PER_DAY = 2;
+cesp.MAX_SURVEYS_PER_WEEK = 4;
 cesp.ICON_FILE = 'icons/cues_85.png';
 cesp.NOTIFICATION_DEFAULT_TIMEOUT = 10;  // minutes
 cesp.NOTIFICATION_TAG = 'chromeSurvey';
-cesp.SURVEY_COUNT_RESET_ALARM_NAME = 'surveyCountReset';
+cesp.SURVEY_THROTTLE_DAILY_RESET_ALARM = 'dailySurveyCountReset';
+cesp.SURVEY_THROTTLE_WEEKLY_RESET_ALARM = 'weeklySurveyCountReset';
 cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
@@ -47,9 +49,19 @@ function setReadyForSurveysStorageValue(newState) {
  * A helper method for updating the value in local storage.
  * @param {int} newCount The desired new survey count value.
  */
-function setSurveysShownStorageValue(newCount) {
+function setSurveysShownDaily(newCount) {
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
+  chrome.storage.local.set(items);
+}
+
+/**
+ * A helper method for updating the value in local storage.
+ * @param {int} newCount The desired new survey count value.
+ */
+function setSurveysShownWeekly(newCount) {
+  var items = {};
+  items[cesp.SURVEYS_SHOWN_THIS_WEEK] = newCount;
   chrome.storage.local.set(items);
 }
 
@@ -66,12 +78,17 @@ function setupState(details) {
   // Automatically uninstall the extension after 120 days.
   chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
   // Set the count of surveys shown to 0, and reset it each day at midnight.
-  setSurveysShownStorageValue(0);
+  setSurveysShownDaily(0);
+  setSurveysShownWeekly(0);
   var midnight = new Date();
   midnight.setHours(0, 0, 0, 0);
   // Midnight is the last midnight, so we set the alarm for one day from it.
-  chrome.alarms.create(cesp.SURVEY_THROTTLE_RESET_ALARM,
+  chrome.alarms.create(cesp.SURVEY_THROTTLE_DAILY_RESET_ALARM,
       {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
+  // Reset the weekly throttle count every seven days at midnight.
+  chrome.alarms.create(cesp.SURVEY_THROTTLE_WEEKLY_RESET_ALARM,
+      {when: midnight.getTime(), periodInMinutes: 10080});
+
   // Process the pending survey submission queue every 20 minutes.
   chrome.alarms.create(SurveySubmission.QUEUE_ALARM_NAME,
       {delayInMinutes: 1, periodInMinutes: 20});
@@ -88,14 +105,24 @@ function handleUninstallAlarm(alarm) {
 chrome.alarms.onAlarm.addListener(handleUninstallAlarm);
 
 /**
- * Resets the count of surveys shown to 0.
+ * Resets the count of surveys shown today to 0.
  * @param {Alarm} alarm The alarm object from the onAlarm event.
  */
-function resetSurveyCount(alarm) {
-  if (alarm.name === cesp.SURVEY_THROTTLE_RESET_ALARM)
-    setSurveysShownStorageValue(0);
+function resetSurveyDailyCount(alarm) {
+  if (alarm.name === cesp.SURVEY_THROTTLE_DAILY_RESET_ALARM)
+    setSurveysShownDaily(0);
 }
-chrome.alarms.onAlarm.addListener(resetSurveyCount);
+chrome.alarms.onAlarm.addListener(resetSurveyDailyCount);
+
+/**
+ * Resets the count of surveys shown this week to 0.
+ * @param {Alarm} alarm The alarm object from the onAlarm event.
+ */
+function resetSurveyWeeklyCount(alarm) {
+  if (alarm.name === cesp.SURVEY_THROTTLE_WEEKLY_RESET_ALARM)
+    setSurveysShownWeekly(0);
+}
+chrome.alarms.onAlarm.addListener(resetSurveyWeeklyCount);
 
 /**
  * Checks whether participant has granted consent and/or completed the
@@ -236,8 +263,10 @@ function showSurveyNotification(element, decision) {
   chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
 
-    chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
-      if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
+    chrome.storage.local.get([cesp.SURVEYS_SHOWN_TODAY,
+                              cesp.SURVEYS_SHOWN_THIS_WEEK], function(items) {
+      if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY ||
+          items[cesp.SURVEYS_SHOWN_THIS_WEEK] >= cesp.MAX_SURVEYS_PER_WEEK) {
         return;
       }
 
@@ -275,7 +304,8 @@ function showSurveyNotification(element, decision) {
           });
       chrome.notifications.onClicked.addListener(clickHandler);
       chrome.notifications.onButtonClicked.addListener(clickHandler);
-      setSurveysShownStorageValue(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
+      setSurveysShownDaily(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
+      setSurveysShownWeekly(items[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
     });
   });
 }
