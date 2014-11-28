@@ -30,6 +30,8 @@ cesp.NOTIFICATION_ALARM_NAME = 'notificationTimeout';
 cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
+cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
+cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
 
 // SETUP
 
@@ -50,6 +52,15 @@ function setReadyForSurveysStorageValue(newState) {
 function setSurveysShownStorageValue(newCount) {
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
+  chrome.storage.local.set(items);
+}
+
+/**
+ * Resets the last notification time value in local storage to the current time.
+ */
+function resetLastNotificationTimeStorageValue() {
+  var items = {};
+  items[cesp.LAST_NOTIFICATION_TIME] = Date.now();
   chrome.storage.local.set(items);
 }
 
@@ -233,8 +244,14 @@ function showSurveyNotification(element, decision) {
       // Unsupported events.
       return;
   }
-  chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
+  chrome.storage.local.get([cesp.READY_FOR_SURVEYS,
+                            cesp.LAST_NOTIFICATION_TIME], function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
+
+    // If we've shown a notification less than MINIMUM_SURVEY_DELAY ago, stop.
+    if (items[cesp.LAST_NOTIFICATION_TIME] &&
+        Date.now() - items[cesp.LAST_NOTIFICATION_TIME] <
+        cesp.MINIMUM_SURVEY_DELAY) return;
 
     chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
       if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY) {
@@ -276,6 +293,7 @@ function showSurveyNotification(element, decision) {
       chrome.notifications.onClicked.addListener(clickHandler);
       chrome.notifications.onButtonClicked.addListener(clickHandler);
       setSurveysShownStorageValue(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
+      resetLastNotificationTimeStorageValue();
     });
   });
 }
