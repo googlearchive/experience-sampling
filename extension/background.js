@@ -88,15 +88,13 @@ function setupState(details) {
   setReadyForSurveysStorageValue(false);
   // Automatically uninstall the extension after 120 days.
   chrome.alarms.create(cesp.UNINSTALL_ALARM_NAME, {delayInMinutes: 172800});
-  // Set the count of surveys shown to 0, and reset it each day at midnight.
+  // Set the count of surveys shown to 0. Reset it each day/week at midnight.
   setSurveysShownDaily(0);
   setSurveysShownWeekly(0);
   var midnight = new Date();
   midnight.setHours(0, 0, 0, 0);
-  // Midnight is the last midnight, so we set the alarm for one day from it.
   chrome.alarms.create(cesp.SURVEY_THROTTLE_DAILY_RESET_ALARM,
-      {when: midnight.getTime() + 86400000, periodInMinutes: 1440});
-  // Reset the weekly throttle count every seven days at midnight.
+      {when: midnight.getTime(), periodInMinutes: 1440});
   chrome.alarms.create(cesp.SURVEY_THROTTLE_WEEKLY_RESET_ALARM,
       {when: midnight.getTime(), periodInMinutes: 10080});
 
