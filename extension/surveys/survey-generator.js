@@ -18,11 +18,12 @@ function Question(questionType, question, required) {
 }
 
 /**
- * Set a short name.
- * @param {string} shortName The short name of the question to use.
+ * Set a placeholder version of the question. Instead of any URLs or private
+ * info that might be in the full question, this version should be PII-free.
+ * @param {string} placeholder The placeholder version of the question.
  */
-Question.prototype.setShortName = function(shortName) {
-  this.shortName = shortName;
+Question.prototype.setPlaceholder = function(placeholder) {
+  this.placeholder = placeholder;
 };
 
 /**
@@ -95,7 +96,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
   legend.textContent = this.question;
   container.appendChild(legend);
 
-  var shrunkenQuestion = getDomNameFromValue(this.shortName || this.question);
+  var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
   switch (this.questionType) {
     case constants.QuestionType.CHECKBOX:
     case constants.QuestionType.RADIO:
@@ -140,13 +141,13 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
         if (this.depChild && this.depChildAnswer === this.answers[i]) {
           var dependentQuestion = getDomNameFromValue(
-              this.depChild.shortName || this.depChild.question);
+              this.depChild.placeholder || this.depChild.question);
           input.addEventListener('change', function(unused) {
             $(dependentQuestion).classList.remove('hidden');
           });
         } else if (this.depChild) {
           var dependentQuestion = getDomNameFromValue(
-              this.depChild.shortName || this.depChild.question);
+              this.depChild.placeholder || this.depChild.question);
           input.addEventListener('change', function(unused) {
             $(dependentQuestion).classList.add('hidden');
           });
@@ -184,7 +185,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
       if (this.depChild && depAnswer) {
         var depQuest = getDomNameFromValue(
-            this.depChild.shortName || this.depChild.question);
+            this.depChild.placeholder || this.depChild.question);
         select.addEventListener('change', function(unused) {
           if (select.value === depAnswer)
             $(depQuest).classList.toggle('hidden');
@@ -203,7 +204,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
     var child = this.depChild.makeDOMTree();
     child.setAttribute(
         'id',
-        getDomNameFromValue(this.depChild.shortName || this.depChild.question));
+        getDomNameFromValue(this.depChild.placeholder || this.depChild.question));
     container.appendChild(child);
   }
 
@@ -330,7 +331,7 @@ ScaleQuestion.prototype.makeDOMTree = function() {
   container.appendChild(legend);
 
   var reverse = this.randomize == constants.Randomize.NONE ? false : coinToss();
-  var shrunkenQuestion = getDomNameFromValue(this.shortName || this.question);
+  var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
   if (multi) {
     var shuffledAttributes =
         knuthShuffle(this.attributes, constants.Randomize.ALL);
@@ -391,7 +392,7 @@ EssayQuestion.prototype.makeDOMTree = function() {
       var input = document.createElement('input');
       input.setAttribute('type', 'text');
       input.setAttribute(
-          'name', getDomNameFromValue(this.shortName || this.question));
+          'name', getDomNameFromValue(this.placeholder || this.question));
       input.setAttribute('size', 60);
       if (this.required)
         input.setAttribute('required', this.required);
@@ -401,7 +402,7 @@ EssayQuestion.prototype.makeDOMTree = function() {
     case constants.QuestionType.LONG_ESSAY:
       var textarea = document.createElement('textarea');
       textarea.setAttribute(
-          'name', getDomNameFromValue(this.shortName || this.question));
+          'name', getDomNameFromValue(this.placeholder || this.question));
       textarea.setAttribute('cols', 60);
       textarea.setAttribute(
           'rows',
@@ -500,7 +501,8 @@ function makeSubmitButtonDOM() {
 function getFormValues(questionArr, form) {
   var responses = [];
   function grabQuestion(question) {
-    var questionStr = question.shortName || question.question;  // Question text
+    var questionStr =
+        question.placeholder || question.question;  // The question text.
     var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.

@@ -297,7 +297,7 @@ function showSurveyNotification(element, decision) {
             clearNotifications();
           }
         };
-        var opt = {
+        var options = {
           type: 'basic',
           iconUrl: cesp.ICON_FILE,
           title: cesp.NOTIFICATION_TITLE,
@@ -311,12 +311,12 @@ function showSurveyNotification(element, decision) {
         };
         chrome.notifications.create(
             cesp.NOTIFICATION_TAG,
-            opt,
+            options,
             function(id) {
               chrome.alarms.create(
                   cesp.NOTIFICATION_ALARM_NAME,
                   {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
-            });
+        });
         chrome.notifications.onClicked.addListener(clickHandler);
         chrome.notifications.onButtonClicked.addListener(clickHandler);
         setSurveysShownDaily(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
