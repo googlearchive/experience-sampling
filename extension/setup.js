@@ -13,7 +13,7 @@ setupSurvey.questions = [];
 function setSetupStorageValue(newState) {
   var items = {};
   items[constants.SETUP_KEY] = newState;
-  chrome.storage.local.set(items);
+  chrome.storage.sync.set(items);
 }
 
 /**
@@ -521,7 +521,7 @@ function setupFormSubmitted(event) {
  */
 function getInitialState() {
   console.log('Setup survey loading');
-  chrome.storage.local.get(constants.SETUP_KEY, setupSurveyForm);
+  chrome.storage.sync.get(constants.SETUP_KEY, setupSurveyForm);
 }
 
 document.addEventListener('DOMContentLoaded', getInitialState);

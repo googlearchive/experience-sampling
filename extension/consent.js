@@ -13,7 +13,7 @@ consentForm.status = constants.CONSENT_PENDING;
 function setConsentStorageValue(newState) {
   var items = {};
   items[constants.CONSENT_KEY] = newState;
-  chrome.storage.local.set(items);
+  chrome.storage.sync.set(items);
 }
 
 /**
@@ -80,7 +80,7 @@ function userRejectConsent(event) {
  */
 function getInitialState() {
   console.log('Consent page loading');
-  chrome.storage.local.get(constants.CONSENT_KEY, setupConsentForm);
+  chrome.storage.sync.get(constants.CONSENT_KEY, setupConsentForm);
 }
 
 document.addEventListener('DOMContentLoaded', getInitialState);
