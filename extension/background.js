@@ -413,7 +413,6 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
  * Handle the submission of a completed survey.
  */
 function handleCompletedSurvey(message) {
-  console.log(JSON.stringify(message));
   getParticipantId().then(function(participantId) {
     var record = new SurveySubmission.SurveyRecord(
         message['survey_type'],

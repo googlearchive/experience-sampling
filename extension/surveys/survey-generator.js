@@ -500,8 +500,7 @@ function makeSubmitButtonDOM() {
 function getFormValues(questionArr, form) {
   var responses = [];
   function grabQuestion(question) {
-    var questionStr = question.shortName ?
-        question.shortName : question.question;  // The question text
+    var questionStr = question.shortName || question.question;  // Question text
     var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
