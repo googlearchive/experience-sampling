@@ -44,6 +44,9 @@ commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
       'You chose the "' + chosen + '" option, or you closed the page.' +
       ' Why did you choose not to proceed to ' + surveyDriver.questionUrl +
       '?', true);
+  howChoose.setShortName(
+      'You chose the "' + chosen + '" option, or you closed the page.' +
+      ' Why did you choose not to proceed to [URL]?');
   return howChoose;
 };
 
@@ -123,6 +126,7 @@ commonQuestions.createHistoryQuestions = function() {
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
+  hist.setShortName('Have you visited [URL] before?');
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
       'Have you seen a page like the one pictured above when trying to visit ' +
@@ -130,6 +134,9 @@ commonQuestions.createHistoryQuestions = function() {
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
+  errorBefore.setShortName(
+      'Have you seen a page like the one pictured above when trying to visit ' +
+      '[URL] before?');
   hist.addDependentQuestion(errorBefore, 'Yes');
   return hist;
 };
@@ -180,6 +187,7 @@ commonQuestions.createAccountQuestion = function() {
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
       constants.Randomize.ANCHOR_LAST);
+  account.setShortName('Do you have an account on [URL]?');
   return account;
 };
 
@@ -195,6 +203,8 @@ commonQuestions.createVisitQuestion = function() {
       true,
       ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
       constants.Randomize.ANCHOR_LAST);
+  visit.setShortName('Were you trying to visit [URL] when you saw the page '
+      + 'instead?');
   return visit;
 };
 
@@ -215,6 +225,7 @@ commonQuestions.createTrustQuestion = function() {
         'Strongly trust'
       ],
       constants.Randomize.ALL);
+  trust.setShortName('How much do you trust [URL]?');
   return trust;
 };
 
@@ -289,6 +300,9 @@ commonQuestions.createRecordUrlQuestion = function() {
       true,
       ['Yes', 'No'],
       constants.Randomize.NONE);
+  url.setShortName(
+      'May we record the URL of the website you were trying to visit, ' +
+      '[URL], with your responses?');
   return url;
 };
 
