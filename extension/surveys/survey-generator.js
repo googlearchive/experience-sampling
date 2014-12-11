@@ -94,6 +94,8 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
   var legend = document.createElement('legend');
   legend.textContent = this.question;
+  if (this.required)
+    addRequiredMarker(legend);
   container.appendChild(legend);
 
   var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
@@ -328,6 +330,8 @@ ScaleQuestion.prototype.makeDOMTree = function() {
 
   var legend = document.createElement('legend');
   legend.textContent = this.question;
+  if (this.required)
+    addRequiredMarker(legend);
   container.appendChild(legend);
 
   var reverse = this.randomize == constants.Randomize.NONE ? false : coinToss();
@@ -385,6 +389,8 @@ EssayQuestion.prototype.makeDOMTree = function() {
 
   var legend = document.createElement('legend');
   legend.textContent = this.question;
+  if (this.required)
+    addRequiredMarker(legend);
   container.appendChild(legend);
 
   switch (this.questionType) {
@@ -490,6 +496,17 @@ function makeSubmitButtonDOM() {
   fieldset.classList.add('submit');
   fieldset.appendChild(button);
   return fieldset;
+}
+
+/**
+ * Makes an asterisk to mark required questions, and appends it to |parentNode|.
+ * @param {Object} parentNode The DOM node the asterisk should be added to.
+ */
+function addRequiredMarker(parentNode) {
+  var req = document.createElement('span');
+  req.classList.add('alert');
+  req.textContent = ' *';
+  parentNode.appendChild(req);
 }
 
 /**
