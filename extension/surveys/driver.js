@@ -101,6 +101,28 @@ function loadSurveyScript() {
 }
 
 /**
+ * Return a pretty-printed version of the user's operating system.
+ * Suitable for display.
+ * @returns {string} The user's OS.
+ */
+function prettyPrintOS() {
+  switch (surveyDriver.operatingSystem) {
+    case constants.OS.MAC:
+      return 'Mac OS X';
+    case constants.OS.WIN:
+      return 'Windows';
+    case constants.OS.CROS:
+      return 'Chrome OS';
+    case constants.OS.LINUX:
+      return 'Linux';
+    case constants.OS.OTHER:
+    default:
+      return 'Your operating system';
+  }
+  return 'Your operating system';
+}
+
+/**
  * Sets up the survey form.
  */
 function setupSurvey() {

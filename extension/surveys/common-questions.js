@@ -87,7 +87,7 @@ commonQuestions.createPageSourceQuestion = function() {
       [
         'Chrome (my browser)',
         'A hacker',
-        'Windows',
+        prettyPrintOS(),
         surveyDriver.questionUrl,
         constants.OTHER
       ],
@@ -108,7 +108,7 @@ commonQuestions.createDialogSourceQuestion = function() {
       [
         'Chrome (my browser)',
         'A hacker',
-        'Windows',
+        prettyPrintOS(),
         constants.OTHER
       ],
       constants.Randomize.ANCHOR_LAST);
