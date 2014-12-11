@@ -506,6 +506,7 @@ function addRequiredMarker(parentNode) {
   var req = document.createElement('span');
   req.classList.add('alert');
   req.textContent = ' *';
+  req.title = 'This question is required.';
   parentNode.appendChild(req);
 }
 
