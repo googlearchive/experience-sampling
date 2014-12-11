@@ -104,6 +104,59 @@ function setupState(details) {
 }
 
 /**
+ * Previously, we were storing all values locally. Now that they are being
+ * synced, some users will need to be transitioned from local to sync storage.
+ * We need to make sure to not lose the SETUP and CONSENT values in the process.
+ * @returns {Promise} A promise that resolves when everything has been checked.
+ */
+function migrateLocalToSync() {
+  return new Promise(function(resolve, reject) {
+    // Consent state.
+    chrome.storage.local.get(constants.CONSENT_KEY, function(localItems) {
+      if (!localItems || !localItems[constants.CONSENT_KEY])
+        resolve();
+      chrome.storage.local.remove(constants.CONSENT_KEY);
+
+      // If consent has been rejected, always sync it as rejected.
+      // If nothing is set in sync, push the local value to sync storage.
+      // If the sync value is PENDING, push the local value to sync storage.
+      if (localItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
+        chrome.storage.sync.set(localItems);
+        resolve();
+      }
+      chrome.storage.sync.get(constants.CONSENT_KEY, function(syncItems) {
+        if (!syncItems || !syncItems[constants.CONSENT_KEY] ||
+            chrome.runtime.lastError) {
+          chrome.storage.sync.set(localItems);
+          resolve();
+        }
+        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_PENDING &&
+            localItems[constants.CONSENT_KEY] === CONSENT_GRANTED) {
+          chrome.storage.sync.set(localItems);
+        }
+      });
+    });
+
+    // Setup state.
+    // If it's been completed locally, always sync it as completed.
+    // If the sync storage is empty, set it as PENDING too.
+    chrome.storage.local.get(constants.SETUP_KEY, function(localItems) {
+      if (!localItems || !localItems[constants.SETUP_KEY])
+        resolve();
+      chrome.storage.local.remove(constants.SETUP_KEY);
+      if (localItems[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
+        chrome.storage.sync.set(localItems);
+        resolve();
+      }
+      chrome.storage.sync.get(constants.SETUP_KEY, function(syncItems) {
+        if (chrome.runtime.lastError)
+          chrome.storage.sync.set(localItems);
+      });
+    });
+  });
+}
+
+/**
  * Handles the uninstall alarm.
  * @param {Alarm} alarm The alarm object from the onAlarm event.
 */
@@ -165,7 +218,11 @@ function maybeShowConsentOrSetupSurvey() {
       chrome.storage.sync.get(constants.SETUP_KEY, setupCallback);
     }
   };
-  chrome.storage.sync.get(constants.CONSENT_KEY, consentCallback);
+
+  // Only do these lookups after ensuring that local storage has been migrated.
+  migrateLocalToSync().then(function() {
+    chrome.storage.sync.get(constants.CONSENT_KEY, consentCallback);
+  });
 }
 
 /**
