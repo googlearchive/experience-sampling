@@ -278,50 +278,51 @@ function showSurveyNotification(element, decision) {
         Date.now() - items[cesp.LAST_NOTIFICATION_TIME] <
         cesp.MINIMUM_SURVEY_DELAY) return;
 
-    chrome.storage.local.get([cesp.SURVEYS_SHOWN_TODAY,
-                              cesp.SURVEYS_SHOWN_THIS_WEEK], function(items) {
-      if (items[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY ||
-          items[cesp.SURVEYS_SHOWN_THIS_WEEK] >= cesp.MAX_SURVEYS_PER_WEEK) {
+    chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(today) {
+      if (today[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY)
         return;
-      }
+      chrome.storage.local.get(cesp.SURVEYS_SHOWN_THIS_WEEK, function(week) {
+        if (week[cesp.SURVEYS_SHOWN_THIS_WEEK] >= cesp.MAX_SURVEYS_PER_WEEK)
+          return;
 
-      clearNotifications();
+        clearNotifications();
 
-      var timePromptShown = new Date();
-      var clickHandler = function(notificationId, buttonIndex) {
-        if (buttonIndex === 1) {
-          chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
-        } else {
-          var timePromptClicked = new Date();
-          loadSurvey(element, decision, timePromptShown, timePromptClicked);
-          clearNotifications();
-        }
-      };
-      var opt = {
-        type: 'basic',
-        iconUrl: cesp.ICON_FILE,
-        title: cesp.NOTIFICATION_TITLE,
-        message: cesp.NOTIFICATION_BODY,
-        eventTime: Date.now(),
-        buttons: [
-          {title: cesp.NOTIFICATION_BUTTON},
-          {title: cesp.NOTIFICATION_CONSENT_LINK}
-        ],
-        isClickable: true
-      };
-      chrome.notifications.create(
-          cesp.NOTIFICATION_TAG,
-          opt,
-          function(id) {
-            chrome.alarms.create(
-                cesp.NOTIFICATION_ALARM_NAME,
-                {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
-          });
-      chrome.notifications.onClicked.addListener(clickHandler);
-      chrome.notifications.onButtonClicked.addListener(clickHandler);
-      setSurveysShownDaily(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
-      setSurveysShownWeekly(items[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
-      resetLastNotificationTimeStorageValue();
+        var timePromptShown = new Date();
+        var clickHandler = function(notificationId, buttonIndex) {
+          if (buttonIndex === 1) {
+            chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
+          } else {
+            var timePromptClicked = new Date();
+            loadSurvey(element, decision, timePromptShown, timePromptClicked);
+            clearNotifications();
+          }
+        };
+        var options = {
+          type: 'basic',
+          iconUrl: cesp.ICON_FILE,
+          title: cesp.NOTIFICATION_TITLE,
+          message: cesp.NOTIFICATION_BODY,
+          eventTime: Date.now(),
+          buttons: [
+            {title: cesp.NOTIFICATION_BUTTON},
+            {title: cesp.NOTIFICATION_CONSENT_LINK}
+          ],
+          isClickable: true
+        };
+        chrome.notifications.create(
+            cesp.NOTIFICATION_TAG,
+            options,
+            function(id) {
+              chrome.alarms.create(
+                  cesp.NOTIFICATION_ALARM_NAME,
+                  {delayInMinutes: cesp.NOTIFICATION_DEFAULT_TIMEOUT});
+        });
+        chrome.notifications.onClicked.addListener(clickHandler);
+        chrome.notifications.onButtonClicked.addListener(clickHandler);
+        setSurveysShownDaily(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
+        setSurveysShownWeekly(items[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
+        resetLastNotificationTimeStorageValue();
+      });
     });
   });
 }

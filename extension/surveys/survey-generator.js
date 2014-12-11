@@ -18,6 +18,15 @@ function Question(questionType, question, required) {
 }
 
 /**
+ * Set a placeholder version of the question. Instead of any URLs or private
+ * info that might be in the full question, this version should be PII-free.
+ * @param {string} placeholder The placeholder version of the question.
+ */
+Question.prototype.setPlaceholder = function(placeholder) {
+  this.placeholder = placeholder;
+};
+
+/**
  * Stores the answer chosen by the user. Should be used after the respondent
  * has submitted the survey form.
  * @param {string} The text of the user's answer.
@@ -87,7 +96,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
   legend.textContent = this.question;
   container.appendChild(legend);
 
-  var shrunkenQuestion = getDomNameFromValue(this.question);
+  var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
   switch (this.questionType) {
     case constants.QuestionType.CHECKBOX:
     case constants.QuestionType.RADIO:
@@ -131,12 +140,14 @@ FixedQuestion.prototype.makeDOMTree = function() {
         }
 
         if (this.depChild && this.depChildAnswer === this.answers[i]) {
-          var dependentQuestion = getDomNameFromValue(this.depChild.question);
+          var dependentQuestion = getDomNameFromValue(
+              this.depChild.placeholder || this.depChild.question);
           input.addEventListener('change', function(unused) {
             $(dependentQuestion).classList.remove('hidden');
           });
         } else if (this.depChild) {
-          var dependentQuestion = getDomNameFromValue(this.depChild.question);
+          var dependentQuestion = getDomNameFromValue(
+              this.depChild.placeholder || this.depChild.question);
           input.addEventListener('change', function(unused) {
             $(dependentQuestion).classList.add('hidden');
           });
@@ -173,7 +184,8 @@ FixedQuestion.prototype.makeDOMTree = function() {
         select.appendChild(answerChoices[i]);
 
       if (this.depChild && depAnswer) {
-        var depQuest = getDomNameFromValue(this.depChild.question);
+        var depQuest = getDomNameFromValue(
+            this.depChild.placeholder || this.depChild.question);
         select.addEventListener('change', function(unused) {
           if (select.value === depAnswer)
             $(depQuest).classList.toggle('hidden');
@@ -190,7 +202,9 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
   if (this.depChild) {
     var child = this.depChild.makeDOMTree();
-    child.setAttribute('id', getDomNameFromValue(this.depChild.question));
+    child.setAttribute(
+        'id',
+        getDomNameFromValue(this.depChild.placeholder || this.depChild.question));
     container.appendChild(child);
   }
 
@@ -317,7 +331,7 @@ ScaleQuestion.prototype.makeDOMTree = function() {
   container.appendChild(legend);
 
   var reverse = this.randomize == constants.Randomize.NONE ? false : coinToss();
-  var shrunkenQuestion = getDomNameFromValue(this.question);
+  var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
   if (multi) {
     var shuffledAttributes =
         knuthShuffle(this.attributes, constants.Randomize.ALL);
@@ -377,7 +391,8 @@ EssayQuestion.prototype.makeDOMTree = function() {
     case constants.QuestionType.SHORT_STRING:
       var input = document.createElement('input');
       input.setAttribute('type', 'text');
-      input.setAttribute('name', getDomNameFromValue(this.question));
+      input.setAttribute(
+          'name', getDomNameFromValue(this.placeholder || this.question));
       input.setAttribute('size', 60);
       if (this.required)
         input.setAttribute('required', this.required);
@@ -386,7 +401,8 @@ EssayQuestion.prototype.makeDOMTree = function() {
     case constants.QuestionType.SHORT_ESSAY:
     case constants.QuestionType.LONG_ESSAY:
       var textarea = document.createElement('textarea');
-      textarea.setAttribute('name', getDomNameFromValue(this.question));
+      textarea.setAttribute(
+          'name', getDomNameFromValue(this.placeholder || this.question));
       textarea.setAttribute('cols', 60);
       textarea.setAttribute(
           'rows',
@@ -485,7 +501,8 @@ function makeSubmitButtonDOM() {
 function getFormValues(questionArr, form) {
   var responses = [];
   function grabQuestion(question) {
-    var questionStr = question.question;  // The question text
+    var questionStr =
+        question.placeholder || question.question;  // The question text.
     var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
