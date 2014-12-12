@@ -105,8 +105,13 @@ function setupState(details) {
 
 /**
  * Previously, we were storing all values locally. Now that they are being
- * synced, some users will need to be transitioned from local to sync storage.
- * We need to make sure to not lose the CONSENT value in the process.
+ * synced, some users will need to be transitioned from local to sync storage,
+ * with the following rules:
+ *   - If nothing is set locally, no work to do.
+ *   - If either localStorage or syncStorage is set to CONSENT_REJECTED,
+ *     uninstall the extension.
+ *   - If there localStorage is set but syncStorage is not, set sync = local.
+ *   - If syncStorage is still 'pending', set sync = local.
  * @returns {Promise} A promise that resolves when the CONSENT value is migrated
  */
 // TODO: Remove this when migration is no longer needed.
@@ -118,11 +123,9 @@ function migrateLocalConsent() {
         resolve();
       chrome.storage.local.remove(constants.CONSENT_KEY);
 
-      // If consent has been rejected, always sync it as rejected.
-      // If nothing is set in sync, push the local value to sync storage.
-      // If the sync value is PENDING, push the local value to sync storage.
       if (localItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
-        chrome.storage.sync.set(localItems);
+        chrome.storage.sync.set(localItems);  // Just in case.
+        chrome.management.uninstallSelf();
         resolve();
       }
       chrome.storage.sync.get(constants.CONSENT_KEY, function(syncItems) {
@@ -131,8 +134,11 @@ function migrateLocalConsent() {
           chrome.storage.sync.set(localItems);
           resolve();
         }
-        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_PENDING &&
-            localItems[constants.CONSENT_KEY] === CONSENT_GRANTED) {
+        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
+          chrome.management.uninstallSelf();
+          resolve();
+        }
+        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
           chrome.storage.sync.set(localItems);
         }
         resolve();
@@ -143,8 +149,11 @@ function migrateLocalConsent() {
 
 /**
  * Previously, we were storing all values locally. Now that they are being
- * synced, some users will need to be transitioned from local to sync storage.
- * We need to make sure to not lose the SETUP value in the process.
+ * synced, some users will need to be transitioned from local to sync storage,
+ * with the following rules:
+ *   - If nothing is set locally, no work to do.
+ *   - If localStorage is set as completed, set sync = local.
+ *   - If syncStorage doesn't have a value, set sync = local.
  * @returns {Promise} A promise that resolves when the SETUP value is migrated
  */
 // TODO: Remove this when migration is no longer needed.

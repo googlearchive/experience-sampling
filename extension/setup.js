@@ -534,8 +534,9 @@ document.addEventListener('DOMContentLoaded', getInitialState);
  */
 function setupMaybeDoneElsewhere(message) {
   if (message[constants.MSG_TYPE] !== constants.MSG_SETUP ||
-      setupSurvey.status === constants.SETUP_COMPLETED)
+      setupSurvey.status === constants.SETUP_COMPLETED) {
     return;
+  }
 
   window.close();
 }

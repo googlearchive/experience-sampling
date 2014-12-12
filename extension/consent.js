@@ -101,8 +101,9 @@ function consentMaybeGrantedElsewhere(message) {
     return;
 
   if (consentForm.status === constants.CONSENT_GRANTED ||
-      consentForm.status === constants.CONSENT_REJECTED)
+      consentForm.status === constants.CONSENT_REJECTED) {
     return;
+  }
 
   window.close();
 }
