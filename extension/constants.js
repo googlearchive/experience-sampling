@@ -15,6 +15,12 @@ constants.SETUP_KEY = 'setup';  // Setup lookup key.
 constants.SETUP_PENDING = 'pending';
 constants.SETUP_COMPLETED = 'completed';
 
+// Constants for message passing.
+constants.MSG_TYPE = 'message_type';
+constants.MSG_CONSENT = 'consent_complete'; // Consent complete.
+constants.MSG_SETUP = 'setup_complete'; // Setup complete.
+constants.MSG_SURVEY = 'survey_complete';  // Survey finished.
+
 // The different types of survey questions that are possible.
 constants.QuestionType = {
   // Handled by the Fixed class.

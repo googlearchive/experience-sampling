@@ -11,6 +11,7 @@ setupSurvey.questions = [];
  * @param {string} newState The desired new state for the setup pref.
  */
 function setSetupStorageValue(newState) {
+  setupSurvey.status = newState;
   var items = {};
   items[constants.SETUP_KEY] = newState;
   chrome.storage.sync.set(items);
@@ -503,6 +504,7 @@ function setupFormSubmitted(event) {
   responses.push(os);
   chrome.runtime.sendMessage(
     {
+      'message_type': constants.MSG_SURVEY,
       'survey_type': constants.SurveyLocation.SETUP,
       'responses': responses
     }
@@ -525,3 +527,16 @@ function getInitialState() {
 }
 
 document.addEventListener('DOMContentLoaded', getInitialState);
+
+/**
+ * The sync'ed setup value has been updated. This might mean the user has
+ * done setup on another computer, and this window should be closed.
+ */
+function setupMaybeDoneElsewhere(message) {
+  if (message[constants.MSG_TYPE] !== constants.MSG_SETUP ||
+      setupSurvey.status === constants.SETUP_COMPLETED)
+    return;
+
+  window.close();
+}
+chrome.runtime.onMessage.addListener(setupMaybeDoneElsewhere);

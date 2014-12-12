@@ -11,6 +11,7 @@ consentForm.status = constants.CONSENT_PENDING;
  * @param {string} newState The desired new state for the consent pref.
  */
 function setConsentStorageValue(newState) {
+  consentForm.status = newState;
   var items = {};
   items[constants.CONSENT_KEY] = newState;
   chrome.storage.sync.set(items);
@@ -84,3 +85,25 @@ function getInitialState() {
 }
 
 document.addEventListener('DOMContentLoaded', getInitialState);
+
+/**
+ * The sync'ed consent value has been updated. This might mean the user has
+ * given consent on another computer, and this window should be closed.
+ */
+function consentMaybeGrantedElsewhere(message) {
+  if (message[constants.MSG_TYPE] === constants.MSG_SURVEY)
+    return;
+
+  if (message[constants.MSG_TYPE] === constants.MSG_SETUP)
+    window.close();
+
+  if (message[constants.MSG_TYPE] !== constants.MSG_CONSENT)
+    return;
+
+  if (consentForm.status === constants.CONSENT_GRANTED ||
+      consentForm.status === constants.CONSENT_REJECTED)
+    return;
+
+  window.close();
+}
+chrome.runtime.onMessage.addListener(consentMaybeGrantedElsewhere);

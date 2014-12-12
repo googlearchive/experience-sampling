@@ -232,9 +232,16 @@ function maybeShowConsentOrSetupSurvey() {
  * @param {string} areaName The name of the storage area.
  */
 function storageUpdated(changes, areaName) {
-  if (changes && changes[constants.SETUP_KEY] &&
-      changes[constants.SETUP_KEY].newValue == constants.SETUP_COMPLETED) {
+  if (!changes)
+    return;
+  if (changes[constants.CONSENT_KEY] &&
+      changes[constants.CONSENT_KEY].newValue === constants.CONSENT_GRANTED) {
+    chrome.runtime.sendMessage({ 'message_type': constants.MSG_CONSENT; });
+  }
+  if (changes[constants.SETUP_KEY] &&
+      changes[constants.SETUP_KEY].newValue === constants.SETUP_COMPLETED) {
     setReadyForSurveysStorageValue(true);
+    chrome.runtime.sendMessage({ 'message_type': constants.MSG_SETUP; });
   }
 }
 
@@ -470,6 +477,8 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
  * Handle the submission of a completed survey.
  */
 function handleCompletedSurvey(message) {
+  if (message[constants.MSG_TYPE] !== constants.MSG_SURVEY)
+    return;
   getParticipantId().then(function(participantId) {
     var record = new SurveySubmission.SurveyRecord(
         message['survey_type'],
