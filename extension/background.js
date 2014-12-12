@@ -106,10 +106,11 @@ function setupState(details) {
 /**
  * Previously, we were storing all values locally. Now that they are being
  * synced, some users will need to be transitioned from local to sync storage.
- * We need to make sure to not lose the SETUP and CONSENT values in the process.
- * @returns {Promise} A promise that resolves when everything has been checked.
+ * We need to make sure to not lose the CONSENT value in the process.
+ * @returns {Promise} A promise that resolves when the CONSENT value is migrated
  */
-function migrateLocalToSync() {
+// TODO: Remove this when migration is no longer needed.
+function migrateLocalConsent() {
   return new Promise(function(resolve, reject) {
     // Consent state.
     chrome.storage.local.get(constants.CONSENT_KEY, function(localItems) {
@@ -134,9 +135,21 @@ function migrateLocalToSync() {
             localItems[constants.CONSENT_KEY] === CONSENT_GRANTED) {
           chrome.storage.sync.set(localItems);
         }
+        resolve();
       });
     });
+  });
+}
 
+/**
+ * Previously, we were storing all values locally. Now that they are being
+ * synced, some users will need to be transitioned from local to sync storage.
+ * We need to make sure to not lose the SETUP value in the process.
+ * @returns {Promise} A promise that resolves when the SETUP value is migrated
+ */
+// TODO: Remove this when migration is no longer needed.
+function migrateLocalSetup() {
+  return new Promise(function(resolve, reject) {
     // Setup state.
     // If it's been completed locally, always sync it as completed.
     // If the sync storage is empty, set it as PENDING too.
@@ -151,6 +164,7 @@ function migrateLocalToSync() {
       chrome.storage.sync.get(constants.SETUP_KEY, function(syncItems) {
         if (chrome.runtime.lastError)
           chrome.storage.sync.set(localItems);
+        resolve();
       });
     });
   });
@@ -220,7 +234,7 @@ function maybeShowConsentOrSetupSurvey() {
   };
 
   // Only do these lookups after ensuring that local storage has been migrated.
-  migrateLocalToSync().then(function() {
+  migrateLocalConsent().then(migrateLocalSetup).then(function() {
     chrome.storage.sync.get(constants.CONSENT_KEY, consentCallback);
   });
 }
@@ -334,7 +348,7 @@ function showSurveyNotification(element, decision) {
       return;
   }
   chrome.storage.sync.get([cesp.READY_FOR_SURVEYS,
-                            cesp.LAST_NOTIFICATION_TIME], function(items) {
+                           cesp.LAST_NOTIFICATION_TIME], function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
 
     // If we've shown a notification less than MINIMUM_SURVEY_DELAY ago, stop.
