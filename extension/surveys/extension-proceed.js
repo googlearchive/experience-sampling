@@ -35,4 +35,8 @@ function setScreenshot() {
     default:
       $('example-img').src = 'screenshots/extension-win.png';
   }
+
+  // For extensions, we also want to update the caption.
+  $('saw-a-page').textContent =
+      'You just now saw a dialog like the one pictured above.';
 }
