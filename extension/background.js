@@ -110,7 +110,7 @@ function setupState(details) {
  *   - If nothing is set locally, no work to do.
  *   - If either localStorage or syncStorage is set to CONSENT_REJECTED,
  *     uninstall the extension.
- *   - If there localStorage is set but syncStorage is not, set sync = local.
+ *   - If localStorage is set but syncStorage is not, set sync = local.
  *   - If syncStorage is still 'pending', set sync = local.
  * @returns {Promise} A promise that resolves when the CONSENT value is migrated
  */
