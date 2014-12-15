@@ -159,6 +159,7 @@ function setupFormSubmitted(event) {
   }
   chrome.runtime.sendMessage(
     {
+      'message_type': constants.MSG_SURVEY,
       'survey_type': surveyDriver.surveyType,
       'responses': responses
     }

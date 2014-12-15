@@ -44,7 +44,7 @@ cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
 function setReadyForSurveysStorageValue(newState) {
   var items = {};
   items[cesp.READY_FOR_SURVEYS] = newState;
-  chrome.storage.local.set(items);
+  chrome.storage.sync.set(items);
 }
 
 /**
@@ -54,7 +54,7 @@ function setReadyForSurveysStorageValue(newState) {
 function setSurveysShownDaily(newCount) {
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
-  chrome.storage.local.set(items);
+  chrome.storage.sync.set(items);
 }
 
 /**
@@ -64,7 +64,7 @@ function setSurveysShownDaily(newCount) {
 function setSurveysShownWeekly(newCount) {
   var items = {};
   items[cesp.SURVEYS_SHOWN_THIS_WEEK] = newCount;
-  chrome.storage.local.set(items);
+  chrome.storage.sync.set(items);
 }
 
 /**
@@ -73,7 +73,7 @@ function setSurveysShownWeekly(newCount) {
 function resetLastNotificationTimeStorageValue() {
   var items = {};
   items[cesp.LAST_NOTIFICATION_TIME] = Date.now();
-  chrome.storage.local.set(items);
+  chrome.storage.sync.set(items);
 }
 
 /**
@@ -101,6 +101,82 @@ function setupState(details) {
   // Process the pending survey submission queue every 20 minutes.
   chrome.alarms.create(SurveySubmission.QUEUE_ALARM_NAME,
       {delayInMinutes: 1, periodInMinutes: 20});
+}
+
+/**
+ * Previously, we were storing all values locally. Now that they are being
+ * synced, some users will need to be transitioned from local to sync storage,
+ * with the following rules:
+ *   - If nothing is set locally, no work to do.
+ *   - If either localStorage or syncStorage is set to CONSENT_REJECTED,
+ *     uninstall the extension.
+ *   - If localStorage is set but syncStorage is not, set sync = local.
+ *   - If syncStorage is still 'pending', set sync = local.
+ * @returns {Promise} A promise that resolves when the CONSENT value is migrated
+ */
+// TODO: Remove this when migration is no longer needed.
+function migrateLocalConsent() {
+  return new Promise(function(resolve, reject) {
+    // Consent state.
+    chrome.storage.local.get(constants.CONSENT_KEY, function(localItems) {
+      if (!localItems || !localItems[constants.CONSENT_KEY])
+        resolve();
+      chrome.storage.local.remove(constants.CONSENT_KEY);
+
+      if (localItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
+        chrome.storage.sync.set(localItems);  // Just in case.
+        chrome.management.uninstallSelf();
+        resolve();
+      }
+      chrome.storage.sync.get(constants.CONSENT_KEY, function(syncItems) {
+        if (!syncItems || !syncItems[constants.CONSENT_KEY] ||
+            chrome.runtime.lastError) {
+          chrome.storage.sync.set(localItems);
+          resolve();
+        }
+        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
+          chrome.management.uninstallSelf();
+          resolve();
+        }
+        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
+          chrome.storage.sync.set(localItems);
+        }
+        resolve();
+      });
+    });
+  });
+}
+
+/**
+ * Previously, we were storing all values locally. Now that they are being
+ * synced, some users will need to be transitioned from local to sync storage,
+ * with the following rules:
+ *   - If nothing is set locally, no work to do.
+ *   - If localStorage is set as completed, set sync = local.
+ *   - If syncStorage doesn't have a value, set sync = local.
+ * @returns {Promise} A promise that resolves when the SETUP value is migrated
+ */
+// TODO: Remove this when migration is no longer needed.
+function migrateLocalSetup() {
+  return new Promise(function(resolve, reject) {
+    // Setup state.
+    // If it's been completed locally, always sync it as completed.
+    // If the sync storage is empty, set it as PENDING too.
+    chrome.storage.local.get(constants.SETUP_KEY, function(localItems) {
+      if (!localItems || !localItems[constants.SETUP_KEY])
+        resolve();
+      chrome.storage.local.remove(constants.SETUP_KEY);
+      if (localItems[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
+        chrome.storage.sync.set(localItems);
+        resolve();
+      }
+      chrome.storage.sync.get(constants.SETUP_KEY, function(syncItems) {
+        if (chrome.runtime.lastError)
+          chrome.storage.sync.set(localItems);
+        resolve();
+      });
+    });
+  });
 }
 
 /**
@@ -162,10 +238,14 @@ function maybeShowConsentOrSetupSurvey() {
     } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_GRANTED) {
       // Someone might have filled out the consent form previously but not
       // filled out the setup survey. Check to see if that's the case.
-      chrome.storage.local.get(constants.SETUP_KEY, setupCallback);
+      chrome.storage.sync.get(constants.SETUP_KEY, setupCallback);
     }
   };
-  chrome.storage.local.get(constants.CONSENT_KEY, consentCallback);
+
+  // Only do these lookups after ensuring that local storage has been migrated.
+  migrateLocalConsent().then(migrateLocalSetup).then(function() {
+    chrome.storage.sync.get(constants.CONSENT_KEY, consentCallback);
+  });
 }
 
 /**
@@ -175,9 +255,16 @@ function maybeShowConsentOrSetupSurvey() {
  * @param {string} areaName The name of the storage area.
  */
 function storageUpdated(changes, areaName) {
-  if (changes && changes[constants.SETUP_KEY] &&
-      changes[constants.SETUP_KEY].newValue == constants.SETUP_COMPLETED) {
+  if (!changes)
+    return;
+  if (changes[constants.CONSENT_KEY] &&
+      changes[constants.CONSENT_KEY].newValue === constants.CONSENT_GRANTED) {
+    chrome.runtime.sendMessage({ 'message_type': constants.MSG_CONSENT });
+  }
+  if (changes[constants.SETUP_KEY] &&
+      changes[constants.SETUP_KEY].newValue === constants.SETUP_COMPLETED) {
     setReadyForSurveysStorageValue(true);
+    chrome.runtime.sendMessage({ 'message_type': constants.MSG_SETUP });
   }
 }
 
@@ -194,7 +281,7 @@ chrome.runtime.onInstalled.addListener(setupState);
  */
 function getParticipantId() {
   return new Promise(function(resolve, reject) {
-    chrome.storage.local.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
+    chrome.storage.sync.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
       if (lookup && lookup[cesp.PARTICIPANT_ID_LOOKUP])
         resolve(lookup[cesp.PARTICIPANT_ID_LOOKUP]);
 
@@ -207,7 +294,7 @@ function getParticipantId() {
       }
       var items = {};
       items[cesp.PARTICIPANT_ID_LOOKUP] = participantId;
-      chrome.storage.local.set(items);
+      chrome.storage.sync.set(items);
       resolve(participantId);
     });
   });
@@ -269,8 +356,8 @@ function showSurveyNotification(element, decision) {
       // Unsupported events.
       return;
   }
-  chrome.storage.local.get([cesp.READY_FOR_SURVEYS,
-                            cesp.LAST_NOTIFICATION_TIME], function(items) {
+  chrome.storage.sync.get([cesp.READY_FOR_SURVEYS,
+                           cesp.LAST_NOTIFICATION_TIME], function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
 
     // If we've shown a notification less than MINIMUM_SURVEY_DELAY ago, stop.
@@ -278,10 +365,10 @@ function showSurveyNotification(element, decision) {
         Date.now() - items[cesp.LAST_NOTIFICATION_TIME] <
         cesp.MINIMUM_SURVEY_DELAY) return;
 
-    chrome.storage.local.get(cesp.SURVEYS_SHOWN_TODAY, function(today) {
+    chrome.storage.sync.get(cesp.SURVEYS_SHOWN_TODAY, function(today) {
       if (today[cesp.SURVEYS_SHOWN_TODAY] >= cesp.MAX_SURVEYS_PER_DAY)
         return;
-      chrome.storage.local.get(cesp.SURVEYS_SHOWN_THIS_WEEK, function(week) {
+      chrome.storage.sync.get(cesp.SURVEYS_SHOWN_THIS_WEEK, function(week) {
         if (week[cesp.SURVEYS_SHOWN_THIS_WEEK] >= cesp.MAX_SURVEYS_PER_WEEK)
           return;
 
@@ -337,7 +424,7 @@ function showSurveyNotification(element, decision) {
  *     clicked the survey prompt notification.
  */
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
-  chrome.storage.local.get(cesp.READY_FOR_SURVEYS, function(items) {
+  chrome.storage.sync.get(cesp.READY_FOR_SURVEYS, function(items) {
     if (!items[cesp.READY_FOR_SURVEYS]) return;
     var userDecision = decision['name'];
     if (userDecision !== constants.DecisionType.PROCEED &&
@@ -413,6 +500,8 @@ chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
  * Handle the submission of a completed survey.
  */
 function handleCompletedSurvey(message) {
+  if (message[constants.MSG_TYPE] !== constants.MSG_SURVEY)
+    return;
   getParticipantId().then(function(participantId) {
     var record = new SurveySubmission.SurveyRecord(
         message['survey_type'],
