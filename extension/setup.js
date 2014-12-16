@@ -43,7 +43,8 @@ function addQuestions(parentNode) {
         '35-44',
         '45-54',
         '55-64',
-        '65 or older'
+        '65 or older',
+        'I prefer not to answer'        
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, age);
@@ -66,14 +67,15 @@ function addQuestions(parentNode) {
       'What is the highest degree or level of school that you have completed?',
       true,
       [
-        'Graduate degree',
-        'Bachelors degree (for example, BS, BA)',
-        'Associates degree (for example, AS, AA)',
-        'Some university, no degree',
-        'Technical/trade school',
-        'High school or equivalent',
         'Some high school',
-        constants.OTHER
+        'High school or equivalent',
+        'Technical/Trade school',
+        'Some university, no degree',
+        'Associates degree (for example, AS, AA)',
+        'Bachelors degree (for example, BS, BA)',
+        'Graduate degree',
+        constants.OTHER,
+        'I prefer not to answer'
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, education);
@@ -81,13 +83,13 @@ function addQuestions(parentNode) {
   var occupation = new EssayQuestion(
       constants.QuestionType.SHORT_STRING,
       'What is your occupation?',
-      true);
+      false);
   addQuestion(parentNode, occupation);
 
   var country = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
       'In what country do you live?',
-      true,
+      false,
       [
         'United States of America',
         'Canada',
@@ -333,7 +335,7 @@ function addQuestions(parentNode) {
   var state = new FixedQuestion(
       constants.QuestionType.DROPDOWN,
       'Which state?',
-      true,
+      false,
       [
         'Alabama',
         'Alaska',
@@ -396,60 +398,67 @@ function addQuestions(parentNode) {
   country.addDependentQuestion(state, 'United States of America');
   addQuestion(parentNode, country);
 
-  var source = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'How did you learn about this study?',
-      true,
-      [
-        'Web advertisement',
-        'Chrome blog',
-        'Social media (Twitter, Facebook, Google+, etc.)',
-        'Word of mouth',
-        constants.OTHER
-      ],
-      constants.Randomize.ANCHOR_LAST);
+  var source = new EssayQuestion(
+      constants.QuestionType.SHORT_STRING,
+      'How did you hear about this study?',
+      false);
   addQuestion(parentNode, source);
-
-  var computer = new FixedQuestion(
-      constants.QuestionType.RADIO,
-      'What kind of computer are you using?',
-      true,
-      [
-        'Mac',
-        'Windows',
-        'Linux',
-        'Chromebook',
-        'I don\'t know',
-        constants.OTHER
-      ],
-      constants.Randomize.NONE);
-  addQuestion(parentNode, computer);
 
   var computerOwner = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Whose computer is it?',
+      'Whose computer are you using?',
       true,
       [
         'Mine',
         'A friend or family member\'s',
         'My employer\'s',
+        'My school\'s',
         'A library\'s',
-        constants.OTHER
+        constants.OTHER,
+        'I prefer not to answer'
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, computerOwner);
 
   var antivirus = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Does your computer have anti-virus software running on it?',
+      'Does the computer you\'re using have anti-virus software' +
+      ' running on it?',
       true,
       [
         'Yes',
         'No',
-        'I don\'t know'
+        'I don\'t know',
+        'I prefer not to answer'
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, antivirus);
+
+  var techFamiliar = new ScaleQuestion(
+      constants.QuestionType.MULT_HORIZ_SCALE,
+      'How familiar are you with each of the following computer and' +
+      ' Internet-related items? I have...',
+      false,
+      [
+        'No understanding',
+        'Little understanding',
+        'Some understanding',
+        'Good understanding',
+        'Full understanding'
+      ],
+      constants.Randomize.ALL);
+  techFamiliar.setAttributes(
+      [
+        'Captcha',
+        'Phishing',
+        'JavaScript',
+        'Linux',
+        'TCP/IP',
+        'FAQ',
+        'HTRMB',
+        'DendoPort'
+      ]);
+  addQuestion(parentNode, techFamiliar);
 }
 
 /**
