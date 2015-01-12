@@ -341,9 +341,14 @@ function showSurveyNotification(element, decision) {
     case constants.EventType.MALWARE:
     case constants.EventType.PHISHING:
     case constants.EventType.EXTENSION_INSTALL:
-    case constants.EventType.EXTENSION_INLINE_INSTALL:
     case constants.EventType.EXTENSION_BUNDLE:
       // Supported events.
+      break;
+    case constants.EventType.EXTENSION_INLINE_INSTALL:
+      // Don't survey for an inline install if the user cancels.
+      // See https://github.com/GoogleChrome/experience-sampling/issues/74.
+      if (decision['name'] === constants.DecisionType.DENY)
+        return;
       break;
     case constants.EventType.HARMFUL:
     case constants.EventType.SB_OTHER:
