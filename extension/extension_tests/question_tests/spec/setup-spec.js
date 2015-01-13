@@ -155,11 +155,16 @@ describe('setup', function() {
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(5);
 
-    expect(labels[0].textContent).toContain('No understanding');
-    expect(labels[1].textContent).toContain('Little understanding');
-    expect(labels[2].textContent).toContain('Some understanding');
-    expect(labels[3].textContent).toContain('Good understanding');
-    expect(labels[4].textContent).toContain('Full understanding');
+    var labelTexts = '';
+    for (var i = 0; i < labels.length; i++) {
+      labelTexts += labels[i].textContent;
+    }
+
+    expect(labelTexts).toContain('No understanding');
+    expect(labelTexts).toContain('Little understanding');
+    expect(labelTexts).toContain('Some understanding');
+    expect(labelTexts).toContain('Good understanding');
+    expect(labelTexts).toContain('Full understanding');
   });
 
 });
