@@ -29,6 +29,8 @@ commonQuestions.createChoiceQuestion = function(chosen, alternative) {
       'You chose "' + chosen + '" instead of "' + alternative + '."' +
           ' How did you choose between the two options?',
       true);
+  howChoose.setPlaceholder('You chose "[CHOSEN]" instead of "[ALTERNATIVE]."' +
+      ' How did you choose between the two options?');
   return howChoose;
 };
 
