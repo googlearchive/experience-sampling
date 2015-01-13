@@ -273,7 +273,7 @@ commonQuestions.createDialogAttributesQuestion = function() {
         'Not at all',
         'A little bit',
         'A moderate amount',
-        'Very much',
+        'A lot',
         'A great deal',
         'I\'m not sure'
       ],
