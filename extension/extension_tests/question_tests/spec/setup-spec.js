@@ -79,7 +79,7 @@ describe('setup', function() {
       function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
-        .toEqual('In what country do you live? *');
+        .toEqual('In what country do you live?');
     expect(parentNode.getElementsByTagName('legend')[5].textContent)
         .toEqual('Which state?');
 
@@ -155,11 +155,11 @@ describe('setup', function() {
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(5);
 
-    expect(labels[0].textContent).toEqual('No understanding');
-    expect(labels[1].textContent).toEqual('Little understanding');
-    expect(labels[2].textContent).toEqual('Some understanding');
-    expect(labels[3].textContent).toEqual('Good understanding');
-    expect(labels[4].textContent).toEqual('Full understanding');
+    expect(labels[0].textContent).toContain('No understanding');
+    expect(labels[1].textContent).toContain('Little understanding');
+    expect(labels[2].textContent).toContain('Some understanding');
+    expect(labels[3].textContent).toContain('Good understanding');
+    expect(labels[4].textContent).toContain('Full understanding');
   });
 
 });
