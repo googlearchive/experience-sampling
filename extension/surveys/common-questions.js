@@ -244,10 +244,11 @@ commonQuestions.createAttributesQuestion = function() {
         'Not at all',
         'A little bit',
         'A moderate amount',
-        'Very much',
-        'A great deal'
+        'A lot',
+        'A great deal',
+        'I\'m not sure'
       ],
-      constants.Randomize.ALL);
+      constants.Randomize.ANCHOR_LAST);
   attributes.setAttributes(
       [
         'annoying',
@@ -274,10 +275,11 @@ commonQuestions.createDialogAttributesQuestion = function() {
         'Not at all',
         'A little bit',
         'A moderate amount',
-        'Very much',
-        'A great deal'
+        'A lot',
+        'A great deal',
+        'I\'m not sure'
       ],
-      constants.Randomize.ALL);
+      constants.Randomize.ANCHOR_LAST);
   attributes.setAttributes(
       [
         'annoying',
