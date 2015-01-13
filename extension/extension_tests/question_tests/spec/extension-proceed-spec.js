@@ -23,7 +23,8 @@ describe('extension-proceed', function() {
   it('generates the page-meaning question 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
-        .toEqual('What was the dialog trying to tell you, in your own words? *');
+        .toEqual('What was the dialog trying to tell you,' +
+        ' in your own words? *');
   });
 
   it('generates the page-source question and responses 3rd', function() {
@@ -69,7 +70,7 @@ describe('extension-proceed', function() {
     expect(labelTexts).toContain('Not at all');
     expect(labelTexts).toContain('A little bit');
     expect(labelTexts).toContain('A moderate amount');
-    expect(labelTexts).toContain('Very much');
+    expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
   });
 

@@ -135,7 +135,7 @@ describe('ssl-nonoverridable', function() {
     expect(labelTexts).toContain('Not at all');
     expect(labelTexts).toContain('A little bit');
     expect(labelTexts).toContain('A moderate amount');
-    expect(labelTexts).toContain('Very much');
+    expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
   });
 
