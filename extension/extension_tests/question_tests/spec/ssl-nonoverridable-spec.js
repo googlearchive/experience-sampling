@@ -126,7 +126,7 @@ describe('ssl-nonoverridable', function() {
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[6];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -137,6 +137,7 @@ describe('ssl-nonoverridable', function() {
     expect(labelTexts).toContain('A moderate amount');
     expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
+    expect(labelTexts).toContain('I\'m not sure');
   });
 
   it('generates the record-URL question and responses 9th', function() {

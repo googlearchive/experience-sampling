@@ -15,7 +15,7 @@ describe('setup', function() {
   it('generates the age question and responses 1st', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[0].textContent)
-        .toEqual('What is your age?');
+        .toEqual('What is your age? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[0];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -34,7 +34,7 @@ describe('setup', function() {
   it('generates the gender question and responses 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
-        .toEqual('What is your gender?');
+        .toEqual('What is your gender? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[1];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -50,7 +50,7 @@ describe('setup', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
         .toEqual('What is the highest degree or level of school that' +
-        ' you have completed?');
+        ' you have completed? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[2];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -79,7 +79,7 @@ describe('setup', function() {
       function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
-        .toEqual('In what country do you live?');
+        .toEqual('In what country do you live? *');
     expect(parentNode.getElementsByTagName('legend')[5].textContent)
         .toEqual('Which state?');
 
@@ -114,7 +114,7 @@ describe('setup', function() {
   it('generates the computerOwner question and responses 8th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[7].textContent)
-        .toEqual('Whose computer are you using?');
+        .toEqual('Whose computer are you using? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[6];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -133,7 +133,7 @@ describe('setup', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[8].textContent)
         .toEqual('Does the computer you\'re using have anti-virus' +
-        ' software running on it?');
+        ' software running on it? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
     var labels = fieldsetElement.getElementsByTagName('label');

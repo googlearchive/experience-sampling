@@ -134,7 +134,7 @@ describe('ssl-overridable-proceed', function() {
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -143,8 +143,9 @@ describe('ssl-overridable-proceed', function() {
     expect(labelTexts).toContain('Not at all');
     expect(labelTexts).toContain('A little bit');
     expect(labelTexts).toContain('A moderate amount');
-    expect(labelTexts).toContain('Very much');
+    expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
+    expect(labelTexts).toContain('I\'m not sure');
   });
 
   it('generates the record-URL question and responses 10th', function() {

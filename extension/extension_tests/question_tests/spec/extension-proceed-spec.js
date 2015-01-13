@@ -61,7 +61,7 @@ describe('extension-proceed', function() {
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[4];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -72,6 +72,7 @@ describe('extension-proceed', function() {
     expect(labelTexts).toContain('A moderate amount');
     expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
+    expect(labelTexts).toContain('I\'m not sure');
   });
 
   it('generates the what-extension question 6th', function() {
