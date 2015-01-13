@@ -1,12 +1,3 @@
-/**
- * Adapted from driver.js. This function is needed for testing, but 
- * including the whole driver.js file in SpecRunner.html causes a redirect
- * to consent.html, so testing is prevented.
- */
-function addQuestion(parentNode, question) {
-  parentNode.appendChild(question.makeDOMTree());
-}
-
 describe('setup', function() {
   var parentNode;
 
