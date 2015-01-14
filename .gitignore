@@ -1,3 +1,6 @@
 *.pyc
 /backend/lib
 *~
+*.csv
+*.json
+*#
