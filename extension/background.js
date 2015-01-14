@@ -508,12 +508,12 @@ function recordEvent(element, decision) {
   responses.push(new SurveySubmission.Response(
       'Learn more', decision['learn_more']));
   getParticipantId().then(function(participantId) {
-    var record = new SurveySubmission.SurveyRecord(
-      constants.FindEventType(element['name']),
-      participantId,
-      (new Date),
-      responses);
-    SurveySubmission.saveSurveyRecord(record);
+      var record = new SurveySubmission.SurveyRecord(
+        constants.FindEventType(element['name']),
+        participantId,
+        (new Date),
+        responses);
+      SurveySubmission.saveSurveyRecord(record);
   });
 }
 
