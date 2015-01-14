@@ -497,9 +497,35 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   });
 }
 
-// Trigger the new survey prompt when the participant makes a decision about an
-// experience sampling element.
+/**
+ * Record basic information about the event.
+ * @param {object} element The browser element of interest.
+ * @param {object} decision The decision the participant made.
+ */
+function recordEvent(element, decision) {
+  var responses = [];
+  responses.push(new SurveySubmission.Response(
+      'Full event type', element['name']));
+  responses.push(new SurveySubmission.Response(
+      'Response', decision['name']));
+  responses.push(new SurveySubmission.Response(
+      'Details', decision['details']));
+  responses.push(new SurveySubmission.Response(
+      'Learn more', decision['learn_more']));
+  getParticipantId().then(function(participantId) {
+      var record = new SurveySubmission.SurveyRecord(
+        constants.FindEventType(element['name']),
+        participantId,
+        (new Date),
+        responses);
+      SurveySubmission.saveSurveyRecord(record);
+  });
+}
+
+// Trigger the new survey prompt and record the event when the participant
+// makes a decision about an experience sampling element.
 chrome.experienceSamplingPrivate.onDecision.addListener(showSurveyNotification);
+chrome.experienceSamplingPrivate.onDecision.addListener(recordEvent);
 
 /**
  * Handle the submission of a completed survey.
