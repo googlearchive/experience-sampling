@@ -1,15 +1,3 @@
-var surveyDriver = {};
-surveyDriver.questionUrl = 'example.com';
-
-/**
- * Adapted from driver.js. This function is needed for testing, but 
- * including the whole driver.js file in SpecRunner.html causes a redirect
- * to consent.html, so testing is prevented.
- */
-function addQuestion(parentNode, question) {
-  parentNode.appendChild(question.makeDOMTree());
-}
-
 describe('extension-noproceed', function() {
   var parentNode;
 
@@ -29,23 +17,24 @@ describe('extension-noproceed', function() {
     expect(parentNode.getElementsByTagName('legend')[0].textContent)
         .toEqual('You chose "Cancel"' +
         ' instead of "Add." How did you choose between' +
-        ' the two options?');
+        ' the two options? *');
   });
 
   it('generates the page-meaning question 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
-        .toEqual('What was the dialog trying to tell you, in your own words?');
+        .toEqual('What was the dialog trying to tell you,' +
+        ' in your own words? *');
   });
 
   it('generates the page-source question and responses 3rd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
-        .toEqual('Who was the dialog from?');
+        .toEqual('Who was the dialog from? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[2];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(4);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -53,8 +42,7 @@ describe('extension-noproceed', function() {
     }
     expect(labelTexts).toContain('Chrome (my browser)');
     expect(labelTexts).toContain('A hacker');
-    expect(labelTexts).toContain('Windows');
-    expect(labelTexts).toContain('example.com');
+    expect(labelTexts).toContain(prettyPrintOS());
     expect(labelTexts).toContain('Other');
   });
 
@@ -62,18 +50,18 @@ describe('extension-noproceed', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[3].textContent)
         .toEqual('What led you to try to install the extension or app' +
-        ' mentioned in the dialog?');
+        ' mentioned in the dialog? *');
   });
 
   it('generates the attributes question and responses 5th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
         .toEqual('To what degree do each of the following adjectives' +
-        ' describe the dialog?');
+        ' describe the dialog? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[4];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -82,8 +70,9 @@ describe('extension-noproceed', function() {
     expect(labelTexts).toContain('Not at all');
     expect(labelTexts).toContain('A little bit');
     expect(labelTexts).toContain('A moderate amount');
-    expect(labelTexts).toContain('Very much');
+    expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
+    expect(labelTexts).toContain('I\'m not sure');
   });
 
   it('generates the what-extension question 6th', function() {

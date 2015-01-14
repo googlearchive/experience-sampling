@@ -1,15 +1,3 @@
-var surveyDriver = {};
-surveyDriver.questionUrl = 'example.com';
-
-/**
- * Adapted from driver.js. This function is needed for testing, but 
- * including the whole driver.js file in SpecRunner.html causes a redirect
- * to consent.html, so testing is prevented.
- */
-function addQuestion(parentNode, question) {
-  parentNode.appendChild(question.makeDOMTree());
-}
-
 describe('ssl-nonoverridable', function() {
   var parentNode;
 
@@ -27,13 +15,13 @@ describe('ssl-nonoverridable', function() {
   it('generates the page-meaning question 1st', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[0].textContent)
-        .toEqual('What was the page trying to tell you, in your own words?');
+        .toEqual('What was the page trying to tell you, in your own words? *');
   });
 
   it('generates the page-source question and responses 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
-        .toEqual('Who was the page from?');
+        .toEqual('Who was the page from? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[1];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -45,7 +33,7 @@ describe('ssl-nonoverridable', function() {
     }
     expect(labelTexts).toContain('Chrome (my browser)');
     expect(labelTexts).toContain('A hacker');
-    expect(labelTexts).toContain('Windows');
+    expect(labelTexts).toContain(prettyPrintOS());
     expect(labelTexts).toContain('example.com');
     expect(labelTexts).toContain('Other');
   });
@@ -53,7 +41,7 @@ describe('ssl-nonoverridable', function() {
   it('generates the 2 history questions and responses 3rd and 4th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
-        .toEqual('Have you visited example.com before?');
+        .toEqual('Have you visited example.com before? *');
     expect(parentNode.getElementsByTagName('legend')[3].textContent)
         .toEqual('Have you seen a page like the one pictured above when' +
         ' trying to visit example.com before?');
@@ -74,7 +62,7 @@ describe('ssl-nonoverridable', function() {
   it('generates the referrer question and responses 5th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
-        .toEqual('What led you to the page?');
+        .toEqual('What led you to the page? *');
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[3];
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(6);
@@ -94,7 +82,7 @@ describe('ssl-nonoverridable', function() {
   it('generates the account question and responses 6th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[5].textContent)
-        .toEqual('Do you have an account on example.com?');
+        .toEqual('Do you have an account on example.com? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[4];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -113,7 +101,7 @@ describe('ssl-nonoverridable', function() {
   it('generates the trust question and responses 7th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[6].textContent)
-        .toEqual('How much do you trust example.com?');
+        .toEqual('How much do you trust example.com? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[5];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -133,11 +121,12 @@ describe('ssl-nonoverridable', function() {
   it('generates the attributes question and responses 8th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[7].textContent)
-        .toEqual('To what degree do each of the following adjectives describe this page?');
+        .toEqual('To what degree do each of the following adjectives ' +
+        'describe this page? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[6];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -146,15 +135,16 @@ describe('ssl-nonoverridable', function() {
     expect(labelTexts).toContain('Not at all');
     expect(labelTexts).toContain('A little bit');
     expect(labelTexts).toContain('A moderate amount');
-    expect(labelTexts).toContain('Very much');
+    expect(labelTexts).toContain('A lot');
     expect(labelTexts).toContain('A great deal');
+    expect(labelTexts).toContain('I\'m not sure');
   });
 
   it('generates the record-URL question and responses 9th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[8].textContent)
         .toEqual('May we record the URL of the website you were trying' +
-        ' to visit, example.com, with your responses?');
+        ' to visit, example.com, with your responses? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
     var labels = fieldsetElement.getElementsByTagName('label');
