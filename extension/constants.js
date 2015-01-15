@@ -46,8 +46,9 @@ constants.Randomize = {
   ANCHOR_LAST: 'anchorLast'  // Last element will stay in its place.
 };
 
-// Handle "other" specially.
+// Handle "other" and "I prefer not to answer" specially.
 constants.OTHER = 'Other: ';
+constants.NO_ANSWER = 'I prefer not to answer';
 
 // The different types of events that trigger survey notifications.
 // The strings need to match the definitions in Chrome.

@@ -44,7 +44,7 @@ function addQuestions(parentNode) {
         '45-54',
         '55-64',
         '65 or older',
-        'I prefer not to answer'        
+        constants.NO_ANSWER
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, age);
@@ -57,7 +57,7 @@ function addQuestions(parentNode) {
         'Female',
         'Male',
         constants.OTHER,
-        'I prefer not to answer'
+        constants.NO_ANSWER
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, gender);
@@ -75,7 +75,7 @@ function addQuestions(parentNode) {
         'Bachelors degree (for example, BS, BA)',
         'Graduate degree',
         constants.OTHER,
-        'I prefer not to answer'
+        constants.NO_ANSWER
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, education);
@@ -415,7 +415,7 @@ function addQuestions(parentNode) {
         'My school\'s',
         'A library\'s',
         constants.OTHER,
-        'I prefer not to answer'
+        constants.NO_ANSWER
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, computerOwner);
@@ -429,7 +429,7 @@ function addQuestions(parentNode) {
         'Yes',
         'No',
         'I don\'t know',
-        'I prefer not to answer'
+        constants.NO_ANSWER
       ],
       constants.Randomize.NONE);
   addQuestion(parentNode, antivirus);

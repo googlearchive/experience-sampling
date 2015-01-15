@@ -119,14 +119,20 @@ FixedQuestion.prototype.makeDOMTree = function() {
             elems[i].removeEventListener('click', removeRequired);
           }
         };
-        if (this.required) {
-          input.setAttribute('required', this.required);
-          if (this.questionType === constants.QuestionType.CHECKBOX) {
-            // By default, HTML5 requires *all* of the checkboxes to be checked
-            // for submission. Since we only want one of a group to be
-            // submitted, remove the requirement once one is checked.
-            input.addEventListener('change', removeRequired);
+        if (this.required && constants.QuestionType.CHECKBOX) {
+          // Remove the requirement once one is checked.
+          input.addEventListener('change', removeRequired);
+          // If there is a "prefer not to answer" option, mark that one as
+          // required but leave the others alone. If there isn't, mark them
+          // all as required.
+          if (this.answers[i] === constants.NO_ANSWER) {
+            input.setAttribute('required', this.required);
+          } else if (this.answers[this.answers.length - 1] !=
+                     constants.NO_ANSWER) {
+            input.setAttribute('required', this.required);
           }
+        } else if (this.required) {
+          input.setAttribute('required', this.required);
         }
         answer.appendChild(input);
 
