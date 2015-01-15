@@ -187,7 +187,7 @@ commonQuestions.createAccountQuestion = function() {
       constants.QuestionType.RADIO,
       'Do you have an account on ' + surveyDriver.questionUrl + '?',
       true,
-      ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
+      ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
   account.setPlaceholder('Do you have an account on [URL]?');
   return account;
@@ -203,7 +203,7 @@ commonQuestions.createVisitQuestion = function() {
       'Were you trying to visit ' + surveyDriver.questionUrl +
            ' when you saw the page instead?',
       true,
-      ['Yes', 'No', 'I\'m not sure', 'I prefer not to answer'],
+      ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
   visit.setPlaceholder('Were you trying to visit [URL] when you saw the page ' +
       'instead?');
