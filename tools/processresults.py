@@ -4,7 +4,6 @@ Has one public function, ProcessResults, used like this from interpreter:
     ProcessResults('2015-01-06cuesDogfoodData.json', '2015-01-06-')
 """
 
-import copy
 import csv
 from datetime import datetime
 import json
@@ -40,7 +39,7 @@ def ProcessResults(json_in_file, csv_prefix):
   Returns:
     None
   """
-  parsed_demo, parsed_events = _ParseSurveyResults(json_in_file)
+  parsed_events = _ParseSurveyResults(json_in_file)
   parsed_events = _DiscardResultsBeforeDate(parsed_events, DOGFOOD_START_DATE)
 
   for c in CONDITIONS:
@@ -55,11 +54,10 @@ def ProcessResults(json_in_file, csv_prefix):
   
 def _ParseSurveyResults(in_file):
   with open(in_file, 'r') as json_file:
-      s = json_file.read()
+    s = json_file.read()
   parsed = _ParseJsonObjects(s)
-  demographic = filter(lambda x: x['survey_type'] == 'setup.js', parsed)
   events = filter(lambda x: x['survey_type'] != 'setup.js', parsed)
-  return demographic, events
+  return events
   
 def _ParseJsonObjects(s):
   decoder = json.JSONDecoder()
@@ -99,14 +97,15 @@ def _FilterByCondition(cond, results):
   Raises:
     ValueError: A unrecognized condition was passed in.
   """
-  if cond not in CONDITIONS: raise ValueError(
-      cond + ' is not a valid condition')
+  if cond not in CONDITIONS:
+    raise ValueError(cond + ' is not a valid condition')
 
   return [pr for pr in results if pr['survey_type'] == cond + '.js']
 
 
 class QuestionError(BaseException):
   def __init__(self, value):
+    BaseException.__init__(self, value)
     self.value = value
   def __str__(self):
     return(repr(self.value))
@@ -114,6 +113,7 @@ class QuestionError(BaseException):
 
 class UnexpectedFormatException(BaseException):
   def __init__(self, value):
+    BaseException.__init__(self, value)
     self.value = value
   def __str__(self):
     return(repr(self.value))
@@ -270,7 +270,7 @@ def _ReorderAttributeQuestions(results):
   # for all results and should appear consecutively. Since they should be the
   # same for all results, we grab the min and max index from the first result.
   if not attribute_question_indices:
-      raise UnexpectedFormatException ('Attributes questions not found.')
+    raise UnexpectedFormatException ('Attributes questions not found.')
   min_index = attribute_question_indices[0][0]
   max_index = attribute_question_indices[0][-1]
   for i, index_list in enumerate(attribute_question_indices):
@@ -278,7 +278,7 @@ def _ReorderAttributeQuestions(results):
       raise UnexpectedFormatException(
           'min and max indices in list %d not equal to min and max index '
           'in list 0' % (i))
-    if index_list != range(min_index,max_index+1): # Check for consecutive
+    if index_list != range(min_index, max_index+1): # Check for consecutive
       raise UnexpectedFormatException(
           'indices in list %d not consecutive' % (i))
 

@@ -277,7 +277,7 @@ class TestProcessResults(unittest.TestCase):
 
     for r in results:
       self.assertEqual(
-          r['responses'][0]['question'], 'blah "Proceed to [URL]" "blah" blah')    
+          r['responses'][0]['question'], 'blah "Proceed to [URL]" "blah" blah')
   
   def test__CanonicalizeQuestions_returns_canonical_index(self):
     results = [r for r in self.mock_results
@@ -292,53 +292,12 @@ class TestProcessResults(unittest.TestCase):
     self.assertRaises(processresults.QuestionError,
                       processresults._CanonicalizeQuestions, results)
 
-  def test_ProcessResults_creates_two_csv_files_with_expected_data(self):
-    results = self.mock_results
-    with open('processresults_test_input.json', 'w') as json_file:
-      json_file.write(json.dumps(results)[1:-1])
-    processresults.ProcessResults('processresults_test_input.json',
-                                  'processresults_test_')
-
-    metadata_headers = ('date_received,date_taken,participant_id,survey_type')
-    with open('processresults_test_ssl-overridable-proceed.csv') as csv_file:
-      csv_headers = csv_file.readline()
-      self.assertIn(metadata_headers, csv_headers)
-      self.assertIn(('"blah ""Proceed to [URL]"" ""blah"" blah",Q2,Q3,'
-                     'To what degree do each of the following '
-                     'adjectives describe this page?(A),'
-                     'To what degree do each of the following '
-                     'adjectives describe this page?(B),'
-                     'To what degree do each of the following '
-                     'adjectives describe this page?(C),Q7,URL'), csv_headers)
-      
-      test_line = csv_file.readline()
-      self.assertIn('P2A1,P2A2,P2A3,P2AttributeAAnswer,'
-                    'P2AttributeBAnswer,P2AttributeCAnswer,P2A7', test_line)
-      test_line = csv_file.readline()
-      self.assertIn('P3A1,P3A2,P3A3,P3AttributeAAnswer,'
-                    'P3AttributeBAnswer,P3AttributeCAnswer,P3A7', test_line)
-
-    with open('processresults_test_malware-noproceed.csv') as csv_file:
-      csv_headers = csv_file.readline()
-      self.assertIn(metadata_headers, csv_headers)
-      self.assertIn(('"blah ""Back to safety"" ""blah"" blah",Q2,Q3,'
-                     'To what degree do each of the following '
-                     'adjectives describe this page?(A),'
-                     'To what degree do each of the following '
-                     'adjectives describe this page?(B),'
-                     'To what degree do each of the following '
-                     'adjectives describe this page?(C),Q7'), csv_headers)
-
-      test_line = csv_file.readline()
-      self.assertIn('P4A1,P4A2,P4A3,P4AttributeAAnswer,'
-                    'P4AttributeBAnswer,P4AttributeCAnswer,P4A7', test_line)
-              
   def tearDown(self):
     try:
       os.remove('processresults_test_input.json')
       os.remove('processresults_test_ssl-overridable-proceed.csv')
       os.remove('processresults_test_malware-noproceed.csv')
-    except OSError as e:
+    except OSError:
       pass
         
 if __name__ == '__main__':
