@@ -43,11 +43,11 @@ html, body {
 .scroll-scroll {
   bottom: 220px;
   border-bottom: 1px solid #B8B8B8;
-  left:5%;
+  left: 5%;
   overflow-x: hidden;
   overflow-y: scroll;
   position: absolute;
-  right:5%;
+  right: 5%;
   top: 0;
 }
 
