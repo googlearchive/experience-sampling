@@ -59,11 +59,11 @@
   background-color: #ECF3FE;
   border: none;
   margin-bottom: 1em;
-  padding-top: 8px;
+  min-width: 900px;
   padding-bottom: 8px;
   padding-left: 3%;
   padding-right: 3%;
-  min-width: 900px;
+  padding-top: 8px;
 }
 
 .first-rowlabel {
