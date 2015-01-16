@@ -1,4 +1,7 @@
 """Functions for processing CUES data in AppEngine JSON format into CSV format
+
+Has one public function, ProcessResults, used like this from interpreter:
+    ProcessResults('2015-01-06cuesDogfoodData.json', '2015-01-06-')
 """
 
 import copy
@@ -9,7 +12,6 @@ import re
 
 DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 DOGFOOD_START_DATE = datetime(2014, 12, 01, 0, 0, 0, 0)
-PLACEHOLDER_END_DATE = datetime(2014, 12, 18, 18, 44, 40, 954000)
 CONDITIONS = [
     'ssl-overridable-proceed', 'ssl-overridable-noproceed',
     'ssl-nonoverridable', 'malware-proceed', 'malware-noproceed',
