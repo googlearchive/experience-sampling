@@ -28,7 +28,7 @@
 
 .centered {
   margin: 0 auto;
-  width: 800px;
+  width: 80%;
 }
 
 .clear-div {
@@ -132,7 +132,7 @@ p {
 
 .scroll-scroll {
   bottom: 0;
-  border-top: 1px solid #fafafa;
+  border: 1px solid #B8B8B8;
   left: 0;
   overflow-x: hidden;
   overflow-y: scroll;
@@ -156,15 +156,15 @@ p {
 }
  
 ::-webkit-scrollbar-track {
-  background: #fafafa;
+  background: #E8E8E8;
 }
 
 ::-webkit-scrollbar-thumb {
     -webkit-border-radius: 10px;
     border-radius: 10px;
-    background: #e6e6e6; 
+    background: #B8B8B8; 
 }
 
 ::-webkit-scrollbar-thumb:window-inactive {
-	background: #e6e6e6; 
+	background: #D8D8D8; 
 }

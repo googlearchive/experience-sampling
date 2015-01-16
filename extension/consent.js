@@ -35,7 +35,7 @@ function setupConsentForm(savedState) {
     $('study-information').classList.remove('hidden');
     $('top-blurb').classList.remove('hidden');
     $('consent-form-holder').classList.remove('hidden');
-    $('give-consent').addEventListener('click', userGrantConsent);
+    $('consent-button').addEventListener('click', userGrantConsent);
     $('give-consent').href = 'surveys/setup.html?' +
         window.location.search.substring(1);
     $('no-consent').addEventListener('click', userRejectConsent)
@@ -60,6 +60,7 @@ function userGrantConsent(event) {
   console.log('Consent granted');
   setConsentStorageValue(constants.CONSENT_GRANTED);
   $('consent-form-holder').classList.add('hidden');
+  window.location.href = $('give-consent').href;
 }
 
 /**
