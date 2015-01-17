@@ -55,7 +55,9 @@ def ProcessResults(json_in_file, csv_prefix):
 def _ParseSurveyResults(in_file):
   with open(in_file, 'r') as json_file:
     s = json_file.read()
-  parsed = _ParseJsonObjects(s)
+#    parsed = json.loads(s)
+    print s[64270:64283]
+#  parsed = _ParseJsonObjects(s)
   events = filter(lambda x: x['survey_type'] != 'setup.js', parsed)
   return events
   

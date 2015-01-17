@@ -86,7 +86,7 @@ class ExportWorker(webapp2.RequestHandler):
           for record in records[1:]:
             f.write(delim)
             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
-          f.write(']')
+        f.write(']')
 
     export_data(filename)
 
