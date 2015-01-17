@@ -83,7 +83,7 @@ class ExportWorker(webapp2.RequestHandler):
           gc.collect()
           if records:
             f.write(json.dumps(records[0].to_dict(), cls=ModelEncoder))
-          for record in records.[1:]:
+          for record in records[1:]:
             f.write(delim)
             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
           f.write(']')
