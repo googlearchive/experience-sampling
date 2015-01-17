@@ -76,16 +76,15 @@ class ExportWorker(webapp2.RequestHandler):
         query = SurveyModel.query()
         cursor = None
         more = True
-        delim = ',\n'
+        delim = ''
         f.write('[')
         while more:
           records, cursor, more = query.fetch_page(50, start_cursor=cursor)
           gc.collect()
-          if records:
-            f.write(json.dumps(records[0].to_dict(), cls=ModelEncoder))
-          for record in records[1:]:
+          for record in records:
             f.write(delim)
             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+            delim = ',\n'
         f.write(']')
 
     export_data(filename)
