@@ -14,177 +14,11 @@ import unittest
 class TestProcessResults(unittest.TestCase):
   
   def setUp(self):
-    self.mock_results = [
-        {
-            u'date_received': u'2014-11-05T13:14:15.123456',
-            u'date_taken': u'2014-11-05T01:02:03.789123',
-            u'participant_id': u'P1',
-            u'survey_type': 'ssl-overridable-proceed.js',
-            u'responses': [
-                {
-                    u'answer': u'P1A1',
-                    u'question':
-                        u'blah "Proceed to exampleP1Q1.com:23" "blah" blah'
-                },
-                {u'answer': u'P1A2', u'question': u'Q2'},
-                {u'answer': u'P1A3', u'question': u'Q3'},
-                {
-                    u'answer': u'P1AttributeCAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(C)'
-                },
-                {
-                    u'answer': u'P1AttributeAAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(A)'
-                },
-                {
-                    u'answer': u'P1AttributeBAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(B)'
-                },
-                {u'answer': u'P1A7', u'question': u'Q7'},
-            ]
-        },
-        {
-            u'date_received': u'2015-01-05T12:02:12.687920',
-            u'date_taken': u'2015-01-05T11:48:39.760000',
-            u'participant_id': u'P2',
-            u'survey_type': 'ssl-overridable-proceed.js',
-            u'responses': [
-                {
-                    u'answer': u'P2A1',
-                    u'question':
-                        u'blah "Proceed to exampleP2Q1.com:23" "blah" blah'
-                },
-                {u'answer': u'P2A2', u'question': u'Q2'},
-                {u'answer': u'P2A3', u'question': u'Q3'},
-                {
-                    u'answer': u'P2AttributeBAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(B)'
-                },
-                {
-                    u'answer': u'P2AttributeCAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(C)'
-                },
-                {
-                    u'answer': u'P2AttributeAAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(A)'
-                },
-                {u'answer': u'P2A7', u'question': u'Q7'},
-                {u'answer': u'www.example.com', u'question': u'URL'}
-            ]
-        },
-        {
-            u'date_received': u'2015-01-12T00:01:02.345678',
-            u'date_taken': u'2015-01-05T00:00:00.123456',
-            u'participant_id': u'P3',
-            u'survey_type': 'ssl-overridable-proceed.js',
-            u'responses': [
-                {
-                    u'answer': u'P3A1',
-                    u'question':
-                        u'blah "Proceed to exampleP3Q1.com:23" "blah" blah'
-                },
-                {u'answer': u'P3A2', u'question': u'Q2'},
-                {u'answer': u'P3A3', u'question': u'Q3'},
-                {
-                    u'answer': u'P3AttributeAAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(A)'
-                },
-                {
-                    u'answer': u'P3AttributeBAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(B)'
-                },
-                {
-                    u'answer': u'P3AttributeCAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(C)'
-                },
-                {u'answer': u'P3A7', u'question': u'Q7'}
-            ]
-        },
-        {
-            u'date_received': u'2015-01-12T00:01:02.345678',
-            u'date_taken': u'2015-01-05T01:02:03.123456',
-            u'participant_id': u'P4',
-            u'survey_type': 'malware-noproceed.js',
-            u'responses': [
-                {
-                    u'answer': u'P4A1',
-                    u'question':
-                        u'blah "Back to safety" "blah" blah'
-                },
-                {u'answer': u'P4A2', u'question': u'Q2'},
-                {u'answer': u'P4A3', u'question': u'Q3'},
-                {
-                    u'answer': u'P4AttributeCAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(C)'
-                },
-                {
-                    u'answer': u'P4AttributeAAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(A)'
-                },
-                {
-                    u'answer': u'P4AttributeBAnswer',
-                    u'question':
-                        u'To what degree do each of the following ' +
-                        u'adjectives describe this page?(B)'
-                },
-                {u'answer': u'P4A7', u'question': u'Q7'},
-            ]
-        },
-        {
-            u'date_received': u'2014-11-05T13:14:15.123456',
-            u'date_taken': u'2014-11-05T01:02:03.789123',
-            u'participant_id': u'P5',
-            u'survey_type': 'malware-noproceed.js',
-            u'responses': [
-                {
-                    u'answer': u'P5A1',
-                    u'question': u'PLACEHOLDER'
-                },
-                {u'answer': u'P5A2', u'question': u'PLACEHOLDER'},
-                {u'answer': u'P5A3', u'question': u'PLACEHOLDER'},
-                {
-                    u'answer': u'P5AttributeAAnswer',
-                    u'question': u'PLACEHOLDER'
-                },
-                {
-                    u'answer': u'P5AttributeBAnswer',
-                    u'question': u'PLACEHOLDER'
-                },
-                {
-                    u'answer': u'P5AttributeCAnswer',
-                    u'question': u'PLACEHOLDER'
-                },
-                {u'answer': u'P5A7', u'question': u'PLACEHOLDER'}
-            ]
-        }          
-    ]
+    with open('processresults_test_input.json', 'r') as json_file:
+      s = json_file.read()
+      self.mock_results = json.loads(s)
     
   def test_ProcessResults_creates_two_csv_files_with_expected_data(self):
-    results = self.mock_results
-    with open('processresults_test_input.json', 'w') as json_file:
-      json_file.write(json.dumps(results)[1:-1])
     processresults.ProcessResults('processresults_test_input.json',
                                   'processresults_test_')
 
@@ -294,7 +128,6 @@ class TestProcessResults(unittest.TestCase):
 
   def tearDown(self):
     try:
-      os.remove('processresults_test_input.json')
       os.remove('processresults_test_ssl-overridable-proceed.csv')
       os.remove('processresults_test_malware-noproceed.csv')
     except OSError:

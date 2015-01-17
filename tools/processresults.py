@@ -55,22 +55,10 @@ def ProcessResults(json_in_file, csv_prefix):
 def _ParseSurveyResults(in_file):
   with open(in_file, 'r') as json_file:
     s = json_file.read()
-#    parsed = json.loads(s)
-    print s[64270:64283]
-#  parsed = _ParseJsonObjects(s)
+    parsed = json.loads(s)
   events = filter(lambda x: x['survey_type'] != 'setup.js', parsed)
   return events
   
-def _ParseJsonObjects(s):
-  decoder = json.JSONDecoder()
-  objs = []
-  end = 0
-  while end < len(s) and end != -1:
-    obj, end = decoder.raw_decode(s, idx=end)
-    objs.append(obj)
-    end = s.find('{', end)
-  return objs
-
 def _DiscardResultsBeforeDate(results, date):
   """Return a list of results that occur after the given date.
 
