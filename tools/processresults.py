@@ -5,6 +5,7 @@ Has one public function, ProcessResults, used like this from interpreter:
 """
 
 import csv
+import dateutil.parser
 from datetime import datetime
 import json
 import re
@@ -71,7 +72,7 @@ def _DiscardResultsBeforeDate(results, date):
   """
   return [
     r for r in results
-    if datetime.strptime(r['date_taken'].split('.')[0], DATE_FORMAT) >= date]
+    if dateutil.parser.parse(r['date_taken']) >= date]
 
 def _FilterByCondition(cond, results):
   """Return a list of results for the given condition only.
@@ -174,7 +175,7 @@ def _CanonicalizeQuestions(results):
       results[canonical_index]['responses']):
     for j, r in enumerate(results):
       if i < len(r['responses']):
-        if (qa_pair['question'] != r['responses'][i]['question']):
+        if qa_pair['question'] != r['responses'][i]['question']:
           raise QuestionError(
               'Question text differs: Result %d question %d is {%s}. Result '
               '%d question %d is {%s}.'
@@ -236,7 +237,7 @@ def _ReorderAttributeQuestions(results):
 
   Args:
     results: A list of dicts containing parsed and filtered results.
-        Is it assumed that results has been filtered for a given survey
+        It is assumed that results has been filtered for a given survey
         condition, such that attributes questions should all appear in the
         same place.
 
