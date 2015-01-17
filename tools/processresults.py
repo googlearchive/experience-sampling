@@ -10,7 +10,6 @@ from datetime import datetime
 import json
 import re
 
-DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 DOGFOOD_START_DATE = datetime(2014, 12, 01, 0, 0, 0, 0)
 CONDITIONS = [
     'ssl-overridable-proceed', 'ssl-overridable-noproceed',
