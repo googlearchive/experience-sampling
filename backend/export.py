@@ -77,13 +77,15 @@ class ExportWorker(webapp2.RequestHandler):
         cursor = None
         more = True
         delim = ''
+        f.write('[')
         while more:
           records, cursor, more = query.fetch_page(50, start_cursor=cursor)
           gc.collect()
           for record in records:
             f.write(delim)
             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
-          delim = ',\n'
+            delim = ',\n'
+        f.write(']')
 
     export_data(filename)
 
