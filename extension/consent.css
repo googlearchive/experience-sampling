@@ -2,8 +2,18 @@
   padding: 30px 0 10px 0;
 }
 
+#consent-button {
+  background-color: #4285F4;
+  border-radius: 2px;
+  cursor: pointer;
+  margin-bottom: 10px;
+  margin: 0 auto;
+  max-width: 800px;
+  padding: 15px;
+}
+
 #give-consent {
-  color: #4285F4;
+  color: white;
   font-size: 1.1em;
   font-weight: bold;
 }
@@ -19,7 +29,7 @@ html, body {
 
 .scroll-constant {
   bottom: 0;
-  height: 80px;
+  height: 180px;
   left: 0;
   position: absolute;
   right: 0;
@@ -31,13 +41,13 @@ html, body {
 }
 
 .scroll-scroll {
-  bottom: 80px;
-  border-bottom: 1px solid #F2F2F2;
-  left: 30;
+  bottom: 220px;
+  border-bottom: 1px solid #B8B8B8;
+  left: 5%;
   overflow-x: hidden;
   overflow-y: scroll;
   position: absolute;
-  right: 30;
+  right: 5%;
   top: 0;
 }
 

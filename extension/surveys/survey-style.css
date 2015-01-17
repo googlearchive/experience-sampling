@@ -26,9 +26,14 @@
   color: #4285F4;
 }
 
+#survey-form {
+  margin: 0 auto;
+  width: 100%;
+}
+
 .centered {
   margin: 0 auto;
-  width: 800px;
+  width: 90%;
 }
 
 .clear-div {
@@ -46,6 +51,7 @@
 }
 
 #explanation {
+  max-width: 600px;
   padding-bottom: 20px;
 }
 
@@ -53,7 +59,11 @@
   background-color: #ECF3FE;
   border: none;
   margin-bottom: 1em;
-  padding: 8px;
+  min-width: 900px;
+  padding-bottom: 8px;
+  padding-left: 3%;
+  padding-right: 3%;
+  padding-top: 8px;
 }
 
 .first-rowlabel {
@@ -132,9 +142,9 @@ p {
 
 .scroll-scroll {
   bottom: 0;
-  border-top: 1px solid #fafafa;
+  border: 1px solid #B8B8B8;
   left: 0;
-  overflow-x: hidden;
+  overflow-x: auto;
   overflow-y: scroll;
   position: absolute;
   right: 0;
@@ -152,19 +162,19 @@ p {
 }
 
 ::-webkit-scrollbar {
-    width: 12px;
+  width: 12px;
 }
  
 ::-webkit-scrollbar-track {
-  background: #fafafa;
+  background: #E8E8E8;
 }
 
 ::-webkit-scrollbar-thumb {
-    -webkit-border-radius: 10px;
-    border-radius: 10px;
-    background: #e6e6e6; 
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  background: #B8B8B8; 
 }
 
 ::-webkit-scrollbar-thumb:window-inactive {
-	background: #e6e6e6; 
+  background: #B8B8B8; 
 }
