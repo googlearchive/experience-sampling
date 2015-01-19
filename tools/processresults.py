@@ -47,15 +47,14 @@ def ProcessResults(json_in_file, csv_prefix):
       filtered_results = _FilterByCondition(c, parsed_events)
       canonical_index = _CanonicalizeQuestions(filtered_results)
       _WriteToCsv(filtered_results, canonical_index, csv_prefix + c + '.csv')
-    # Print UnexpectedFormatException and continue, since they are usually
-    # due to lack of data for a condition.
     except UnexpectedFormatException as e:
+      # Print UnexpectedFormatException and continue, since they are usually
+      # due to lack of data for a condition.
       print 'Exception in %s: %s' % (c, e.value)
   
 def _ParseSurveyResults(in_file):
   with open(in_file, 'r') as json_file:
-    s = json_file.read()
-    parsed = json.loads(s)
+    parsed = json.loads(json_file)
   events = filter(lambda x: x['survey_type'] != 'setup.js', parsed)
   return events
   
@@ -70,8 +69,8 @@ def _DiscardResultsBeforeDate(results, date):
     List of results whose date_taken value comes after the given date.
   """
   return [
-    r for r in results
-    if dateutil.parser.parse(r['date_taken']) >= date]
+      r for r in results
+      if dateutil.parser.parse(r['date_taken']) >= date]
 
 def _FilterByCondition(cond, results):
   """Return a list of results for the given condition only.
