@@ -1,1 +1,186 @@
-[{"survey_type": "ssl-overridable-proceed.js", "participant_id": "P1", "responses": [{"answer": "P1A1", "question": "blah \"Proceed to exampleP1Q1.com:23\" \"blah\" blah"}, {"answer": "P1A2", "question": "Q2"}, {"answer": "P1A3", "question": "Q3"}, {"answer": "P1AttributeCAnswer", "question": "To what degree do each of the following adjectives describe this page?(C)"}, {"answer": "P1AttributeAAnswer", "question": "To what degree do each of the following adjectives describe this page?(A)"}, {"answer": "P1AttributeBAnswer", "question": "To what degree do each of the following adjectives describe this page?(B)"}, {"answer": "P1A7", "question": "Q7"}], "date_taken": "2014-11-05T01:02:03.789123", "date_received": "2014-11-05T13:14:15.123456"}, {"survey_type": "ssl-overridable-proceed.js", "participant_id": "P2", "responses": [{"answer": "P2A1", "question": "blah \"Proceed to exampleP2Q1.com:23\" \"blah\" blah"}, {"answer": "P2A2", "question": "Q2"}, {"answer": "P2A3", "question": "Q3"}, {"answer": "P2AttributeBAnswer", "question": "To what degree do each of the following adjectives describe this page?(B)"}, {"answer": "P2AttributeCAnswer", "question": "To what degree do each of the following adjectives describe this page?(C)"}, {"answer": "P2AttributeAAnswer", "question": "To what degree do each of the following adjectives describe this page?(A)"}, {"answer": "P2A7", "question": "Q7"}, {"answer": "www.example.com", "question": "URL"}], "date_taken": "2015-01-05T11:48:39.760000", "date_received": "2015-01-05T12:02:12.687920"}, {"survey_type": "ssl-overridable-proceed.js", "participant_id": "P3", "responses": [{"answer": "P3A1", "question": "blah \"Proceed to exampleP3Q1.com:23\" \"blah\" blah"}, {"answer": "P3A2", "question": "Q2"}, {"answer": "P3A3", "question": "Q3"}, {"answer": "P3AttributeAAnswer", "question": "To what degree do each of the following adjectives describe this page?(A)"}, {"answer": "P3AttributeBAnswer", "question": "To what degree do each of the following adjectives describe this page?(B)"}, {"answer": "P3AttributeCAnswer", "question": "To what degree do each of the following adjectives describe this page?(C)"}, {"answer": "P3A7", "question": "Q7"}], "date_taken": "2015-01-05T00:00:00.123456", "date_received": "2015-01-12T00:01:02.345678"}, {"survey_type": "malware-noproceed.js", "participant_id": "P4", "responses": [{"answer": "P4A1", "question": "blah \"Back to safety\" \"blah\" blah"}, {"answer": "P4A2", "question": "Q2"}, {"answer": "P4A3", "question": "Q3"}, {"answer": "P4AttributeCAnswer", "question": "To what degree do each of the following adjectives describe this page?(C)"}, {"answer": "P4AttributeAAnswer", "question": "To what degree do each of the following adjectives describe this page?(A)"}, {"answer": "P4AttributeBAnswer", "question": "To what degree do each of the following adjectives describe this page?(B)"}, {"answer": "P4A7", "question": "Q7"}], "date_taken": "2015-01-05T01:02:03.123456", "date_received": "2015-01-12T00:01:02.345678"}, {"survey_type": "malware-noproceed.js", "participant_id": "P5", "responses": [{"answer": "P5A1", "question": "PLACEHOLDER"}, {"answer": "P5A2", "question": "PLACEHOLDER"}, {"answer": "P5A3", "question": "PLACEHOLDER"}, {"answer": "P5AttributeAAnswer", "question": "PLACEHOLDER"}, {"answer": "P5AttributeBAnswer", "question": "PLACEHOLDER"}, {"answer": "P5AttributeCAnswer", "question": "PLACEHOLDER"}, {"answer": "P5A7", "question": "PLACEHOLDER"}], "date_taken": "2014-11-05T01:02:03.789123", "date_received": "2014-11-05T13:14:15.123456"}]
+[
+  {
+    "survey_type": "ssl-overridable-proceed.js",
+    "date_received": "2014-11-05T13:14:15.123456",
+    "responses": [
+      {
+        "answer": "P1A1",
+        "question": "blah \"Proceed to exampleP1Q1.com:23\" \"blah\" blah"
+      },
+      {
+        "answer": "P1A2",
+        "question": "Q2"
+      },
+      {
+        "answer": "P1A3",
+        "question": "Q3"
+      },
+      {
+        "answer": "P1AttributeCAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(C)"
+      },
+      {
+        "answer": "P1AttributeAAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(A)"
+      },
+      {
+        "answer": "P1AttributeBAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(B)"
+      },
+      {
+        "answer": "P1A7",
+        "question": "Q7"
+      }
+    ],
+    "date_taken": "2014-11-05T01:02:03.789123",
+    "participant_id": "P1"
+  },
+  {
+    "survey_type": "ssl-overridable-proceed.js",
+    "date_received": "2015-01-05T12:02:12.687920",
+    "responses": [
+      {
+        "answer": "P2A1",
+        "question": "blah \"Proceed to exampleP2Q1.com:23\" \"blah\" blah"
+      },
+      {
+        "answer": "P2A2",
+        "question": "Q2"
+      },
+      {
+        "answer": "P2A3",
+        "question": "Q3"
+      },
+      {
+        "answer": "P2AttributeBAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(B)"
+      },
+      {
+        "answer": "P2AttributeCAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(C)"
+      },
+      {
+        "answer": "P2AttributeAAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(A)"
+      },
+      {
+        "answer": "P2A7",
+        "question": "Q7"
+      },
+      {
+        "answer": "www.example.com",
+        "question": "URL"
+      }
+    ],
+    "date_taken": "2015-01-05T11:48:39.760000",
+    "participant_id": "P2"
+  },
+  {
+    "survey_type": "ssl-overridable-proceed.js",
+    "date_received": "2015-01-12T00:01:02.345678",
+    "responses": [
+      {
+        "answer": "P3A1",
+        "question": "blah \"Proceed to exampleP3Q1.com:23\" \"blah\" blah"
+      },
+      {
+        "answer": "P3A2",
+        "question": "Q2"
+      },
+      {
+        "answer": "P3A3",
+        "question": "Q3"
+      },
+      {
+        "answer": "P3AttributeAAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(A)"
+      },
+      {
+        "answer": "P3AttributeBAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(B)"
+      },
+      {
+        "answer": "P3AttributeCAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(C)"
+      },
+      {
+        "answer": "P3A7",
+        "question": "Q7"
+      }
+    ],
+    "date_taken": "2015-01-05T00:00:00.123456",
+    "participant_id": "P3"
+  },
+  {
+    "survey_type": "malware-noproceed.js",
+    "date_received": "2015-01-12T00:01:02.345678",
+    "responses": [
+      {
+        "answer": "P4A1",
+        "question": "blah \"Back to safety\" \"blah\" blah"
+      },
+      {
+        "answer": "P4A2",
+        "question": "Q2"
+      },
+      {
+        "answer": "P4A3",
+        "question": "Q3"
+      },
+      {
+        "answer": "P4AttributeCAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(C)"
+      },
+      {
+        "answer": "P4AttributeAAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(A)"
+      },
+      {
+        "answer": "P4AttributeBAnswer",
+        "question": "To what degree do each of the following adjectives describe this page?(B)"
+      },
+      {
+        "answer": "P4A7",
+        "question": "Q7"
+      }
+    ],
+    "date_taken": "2015-01-05T01:02:03.123456",
+    "participant_id": "P4"
+  },
+  {
+    "survey_type": "malware-noproceed.js",
+    "date_received": "2014-11-05T13:14:15.123456",
+    "responses": [
+      {
+        "answer": "P5A1",
+        "question": "PLACEHOLDER"
+      },
+      {
+        "answer": "P5A2",
+        "question": "PLACEHOLDER"
+      },
+      {
+        "answer": "P5A3",
+        "question": "PLACEHOLDER"
+      },
+      {
+        "answer": "P5AttributeAAnswer",
+        "question": "PLACEHOLDER"
+      },
+      {
+        "answer": "P5AttributeBAnswer",
+        "question": "PLACEHOLDER"
+      },
+      {
+        "answer": "P5AttributeCAnswer",
+        "question": "PLACEHOLDER"
+      },
+      {
+        "answer": "P5A7",
+        "question": "PLACEHOLDER"
+      }
+    ],
+    "date_taken": "2014-11-05T01:02:03.789123",
+    "participant_id": "P5"
+  }
+]

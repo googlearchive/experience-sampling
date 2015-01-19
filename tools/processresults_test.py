@@ -15,8 +15,7 @@ class TestProcessResults(unittest.TestCase):
   
   def setUp(self):
     with open('processresults_test_input.json', 'r') as json_file:
-      s = json_file.read()
-      self.mock_results = json.loads(s)
+      self.mock_results = json.load(json_file)
     
   def test_ProcessResults_creates_two_csv_files_with_expected_data(self):
     processresults.ProcessResults('processresults_test_input.json',
