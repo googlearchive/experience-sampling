@@ -186,7 +186,7 @@ def _WriteToCsv(results, canonical_index, out_file):
   """Write results for a given condition to a CSV file
 
   Given a list of results in the expected format, writes
-  date_received, date_taken,  participant_id, survey_type, and
+  date_received, date_taken, participant_id, survey_type, and
   answers to each survey question to a CSV file. Uses
   canonical_questions as column headers for corresponding answers.
     
@@ -206,9 +206,11 @@ def _WriteToCsv(results, canonical_index, out_file):
       qa_pair['question']
       for qa_pair in results[canonical_index]['responses']]
 
-  # Use the Python csv library to write to csv format. The writer in this
-  # library requires data to be a list of rows in flat field_name:data form.
-  # So, we put it in the required form, open the CSV file, and write the data.
+  # Use the Python csv library to write to csv format. Our input data
+  # had survey questions and answers grouped under the 'responses' key, but we
+  # want to expand the 'responses' into question/answer pairs, so
+  # that each question gets its own column in the output CSV file. So, we put
+  # the data in the desired form, open the CSV file, and write it out.
   results_for_csv_writer = []
   for r in results:
     dict_for_csv_writer = {}
@@ -259,7 +261,7 @@ def _ReorderAttributeQuestions(results):
   # for all results and should appear consecutively. Since they should be the
   # same for all results, we grab the min and max index from the first result.
   if not attribute_question_indices:
-    raise UnexpectedFormatException ('Attributes questions not found.')
+    raise UnexpectedFormatException('Attributes questions not found.')
   min_index = attribute_question_indices[0][0]
   max_index = attribute_question_indices[0][-1]
   for i, index_list in enumerate(attribute_question_indices):
