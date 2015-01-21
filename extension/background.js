@@ -509,9 +509,9 @@ function recordEvent(element, decision) {
   responses.push(new SurveySubmission.Response(
       'Response', decision['name']));
   responses.push(new SurveySubmission.Response(
-      'Details', decision['details']));
+      'Details', decision['details'].toString()));
   responses.push(new SurveySubmission.Response(
-      'Learn more', decision['learn_more']));
+      'Learn more', decision['learn_more'].toString()));
   getParticipantId().then(function(participantId) {
       var record = new SurveySubmission.SurveyRecord(
         constants.FindEventType(element['name']),
