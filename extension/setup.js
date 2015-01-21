@@ -506,10 +506,11 @@ function setupFormSubmitted(event) {
     chrome.management.uninstallSelf();
     return;
   } else if (ageQuestion.value === '7-Iprefernottoanswer-Whatisyourage') {
-    var provideAge = confirm(
-        "We need to know your age to make sure you're over 18.");
-    if (!provideAge)  // User did not click "OK".
+    if (!confirm("We need to know your approximate age to make sure you're " +
+        "over 18.")) {
+      // User did not click "OK".
       chrome.management.uninstallSelf();
+    }
     return;
   }
 
