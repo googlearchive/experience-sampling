@@ -28,9 +28,9 @@ SurveySubmission.Response = function(question, answer) {
   this.question = question;
   this.answer = answer;
   if (typeof this.question !== "string")
-    console.error(JSON.stringify(question) + " is not a string!");
+    console.error(JSON.stringify(this.question) + " is not a string!");
   if (typeof this.answer !== "string")
-    console.error(JSON.stringify(question) + " is not a string!");
+    console.error(JSON.stringify(this.answer) + " is not a string!");
 }
 
 /**
