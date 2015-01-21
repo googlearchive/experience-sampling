@@ -502,8 +502,15 @@ function setupFormSubmitted(event) {
 
   // Check whether the participant is underage.
   var ageQuestion = document['survey-form']['Whatisyourage'];
-  if (ageQuestion.value === '0-17yearsoldoryounger') {
+  if (ageQuestion.value === '0-17yearsoldoryounger-Whatisyourage') {
     chrome.management.uninstallSelf();
+    return;
+  } else if (ageQuestion.value === '7-Iprefernottoanswer-Whatisyourage') {
+    if (!confirm("We need to know your approximate age to make sure you're " +
+        "over 18.")) {
+      // User did not click "OK".
+      chrome.management.uninstallSelf();
+    }
     return;
   }
 
