@@ -27,6 +27,10 @@ SurveySubmission.QUEUE_ALARM_NAME = 'surveySubmissionAlarm';
 SurveySubmission.Response = function(question, answer) {
   this.question = question;
   this.answer = answer;
+  if (typeof this.question !== "string")
+    console.error(JSON.stringify(question) + " is not a string!");
+  if (typeof this.answer !== "string")
+    console.error(JSON.stringify(question) + " is not a string!");
 }
 
 /**
