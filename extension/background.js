@@ -282,8 +282,10 @@ chrome.runtime.onInstalled.addListener(setupState);
 function getParticipantId() {
   return new Promise(function(resolve, reject) {
     chrome.storage.sync.get(cesp.PARTICIPANT_ID_LOOKUP, function(lookup) {
-      if (lookup && lookup[cesp.PARTICIPANT_ID_LOOKUP])
+      if (lookup && lookup[cesp.PARTICIPANT_ID_LOOKUP]) {
         resolve(lookup[cesp.PARTICIPANT_ID_LOOKUP]);
+        return;
+      }
 
       var charset = 
           "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
