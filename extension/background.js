@@ -380,6 +380,7 @@ function showSurveyNotification(element, decision) {
           return;
 
         clearNotifications();
+        recordShowedNotification(eventType);
 
         var timePromptShown = new Date();
         var clickHandler = function(notificationId, buttonIndex) {
@@ -507,6 +508,8 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
 function recordEvent(element, decision) {
   var responses = [];
   responses.push(new SurveySubmission.Response(
+      'MANUFACTURED', 'Recording event'));
+  responses.push(new SurveySubmission.Response(
       'Full event type', element['name']));
   responses.push(new SurveySubmission.Response(
       'Response', decision['name']));
@@ -516,10 +519,28 @@ function recordEvent(element, decision) {
       'Learn more', decision['learn_more'].toString()));
   getParticipantId().then(function(participantId) {
       var record = new SurveySubmission.SurveyRecord(
-        constants.FindEventType(element['name']),
-        participantId,
-        (new Date),
-        responses);
+          constants.FindEventType(element['name']),
+          participantId,
+          (new Date),
+          responses);
+      SurveySubmission.saveSurveyRecord(record);
+  });
+}
+
+/**
+ * Record that a notification was displayed.
+ * @param {string} eventType The event type (one of constants.EventType)
+ */
+function recordShowedNotification(eventType) {
+  var responses = [];
+  responses.push(new SurveySubmission.Response(
+      'MANUFACTURED', 'Showed notification'));
+  getParticipantId().then(function(participantId) {
+      var record = new SurveySubmission.SurveyRecord(
+          eventType,
+          participantId,
+          (new Date),
+          responses);
       SurveySubmission.saveSurveyRecord(record);
   });
 }
