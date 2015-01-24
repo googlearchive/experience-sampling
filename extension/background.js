@@ -517,10 +517,10 @@ function recordEvent(element, decision) {
       'Learn more', decision['learn_more'].toString()));
   getParticipantId().then(function(participantId) {
       var record = new SurveySubmission.SurveyRecord(
-        constants.FindEventType(element['name']),
-        participantId,
-        (new Date),
-        responses);
+          constants.FindEventType(element['name']),
+          participantId,
+          (new Date),
+          responses);
       SurveySubmission.saveSurveyRecord(record);
   });
 }
@@ -535,10 +535,10 @@ function recordShowedNotification(eventType) {
       'MANUFACTURED', 'Showed notification'));
   getParticipantId().then(function(participantId) {
       var record = new SurveySubmission.SurveyRecord(
-        eventType,
-        participantId,
-        (new Date),
-        responses);
+          eventType,
+          participantId,
+          (new Date),
+          responses);
       SurveySubmission.saveSurveyRecord(record);
   });
 }
