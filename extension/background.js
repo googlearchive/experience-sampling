@@ -104,82 +104,6 @@ function setupState(details) {
 }
 
 /**
- * Previously, we were storing all values locally. Now that they are being
- * synced, some users will need to be transitioned from local to sync storage,
- * with the following rules:
- *   - If nothing is set locally, no work to do.
- *   - If either localStorage or syncStorage is set to CONSENT_REJECTED,
- *     uninstall the extension.
- *   - If localStorage is set but syncStorage is not, set sync = local.
- *   - If syncStorage is still 'pending', set sync = local.
- * @returns {Promise} A promise that resolves when the CONSENT value is migrated
- */
-// TODO: Remove this when migration is no longer needed.
-function migrateLocalConsent() {
-  return new Promise(function(resolve, reject) {
-    // Consent state.
-    chrome.storage.local.get(constants.CONSENT_KEY, function(localItems) {
-      if (!localItems || !localItems[constants.CONSENT_KEY])
-        resolve();
-      chrome.storage.local.remove(constants.CONSENT_KEY);
-
-      if (localItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
-        chrome.storage.sync.set(localItems);  // Just in case.
-        chrome.management.uninstallSelf();
-        resolve();
-      }
-      chrome.storage.sync.get(constants.CONSENT_KEY, function(syncItems) {
-        if (!syncItems || !syncItems[constants.CONSENT_KEY] ||
-            chrome.runtime.lastError) {
-          chrome.storage.sync.set(localItems);
-          resolve();
-        }
-        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
-          chrome.management.uninstallSelf();
-          resolve();
-        }
-        if (syncItems[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
-          chrome.storage.sync.set(localItems);
-        }
-        resolve();
-      });
-    });
-  });
-}
-
-/**
- * Previously, we were storing all values locally. Now that they are being
- * synced, some users will need to be transitioned from local to sync storage,
- * with the following rules:
- *   - If nothing is set locally, no work to do.
- *   - If localStorage is set as completed, set sync = local.
- *   - If syncStorage doesn't have a value, set sync = local.
- * @returns {Promise} A promise that resolves when the SETUP value is migrated
- */
-// TODO: Remove this when migration is no longer needed.
-function migrateLocalSetup() {
-  return new Promise(function(resolve, reject) {
-    // Setup state.
-    // If it's been completed locally, always sync it as completed.
-    // If the sync storage is empty, set it as PENDING too.
-    chrome.storage.local.get(constants.SETUP_KEY, function(localItems) {
-      if (!localItems || !localItems[constants.SETUP_KEY])
-        resolve();
-      chrome.storage.local.remove(constants.SETUP_KEY);
-      if (localItems[constants.SETUP_KEY] === constants.SETUP_COMPLETED) {
-        chrome.storage.sync.set(localItems);
-        resolve();
-      }
-      chrome.storage.sync.get(constants.SETUP_KEY, function(syncItems) {
-        if (chrome.runtime.lastError)
-          chrome.storage.sync.set(localItems);
-        resolve();
-      });
-    });
-  });
-}
-
-/**
  * Handles the uninstall alarm.
  * @param {Alarm} alarm The alarm object from the onAlarm event.
 */
@@ -242,10 +166,7 @@ function maybeShowConsentOrSetupSurvey() {
     }
   };
 
-  // Only do these lookups after ensuring that local storage has been migrated.
-  migrateLocalConsent().then(migrateLocalSetup).then(function() {
-    chrome.storage.sync.get(constants.CONSENT_KEY, consentCallback);
-  });
+  chrome.storage.sync.get(constants.CONSENT_KEY, consentCallback);
 }
 
 /**
