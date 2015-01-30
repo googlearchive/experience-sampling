@@ -51,7 +51,7 @@ def ProcessResults(json_in_file, csv_prefix):
       # Print UnexpectedFormatException and continue, since they are usually
       # due to lack of data for a condition.
       print 'Exception in %s: %s' % (c, e.value)
-        
+
 def _ParseSurveyResults(in_file):
   with open(in_file, 'r') as json_file:
     parsed = json.load(json_file)
