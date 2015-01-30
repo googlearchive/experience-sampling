@@ -25,7 +25,7 @@ class TestProcessResults(unittest.TestCase):
     with open('processresults_test_ssl-overridable-proceed.csv') as csv_file:
       csv_headers = csv_file.readline()
       self.assertIn(metadata_headers, csv_headers)
-      self.assertIn(('"blah ""Proceed to [URL]"" ""blah"" blah",Q2,Q3,'
+      self.assertIn(('"blah ""[CHOSEN]"" ""[ALTERNATIVE]."" blah",Q2,Q3,'
                      'To what degree do each of the following '
                      'adjectives describe this page?(A),'
                      'To what degree do each of the following '
@@ -110,7 +110,7 @@ class TestProcessResults(unittest.TestCase):
 
     for r in results:
       self.assertEqual(
-          r['responses'][0]['question'], 'blah "Proceed to [URL]" "blah" blah')
+          r['responses'][0]['question'], 'blah "[CHOSEN]" "[ALTERNATIVE]." blah')
   
   def test__CanonicalizeQuestions_returns_canonical_index(self):
     results = [r for r in self.mock_results

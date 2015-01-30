@@ -51,7 +51,7 @@ def ProcessResults(json_in_file, csv_prefix):
       # Print UnexpectedFormatException and continue, since they are usually
       # due to lack of data for a condition.
       print 'Exception in %s: %s' % (c, e.value)
-  
+
 def _ParseSurveyResults(in_file):
   with open(in_file, 'r') as json_file:
     parsed = json.load(json_file)
@@ -215,7 +215,8 @@ def _WriteToCsv(results, canonical_index, out_file):
   for r in results:
     dict_for_csv_writer = {}
     for qa_pair in r['responses']:
-      dict_for_csv_writer[qa_pair['question']] = qa_pair['answer']
+      dict_for_csv_writer[qa_pair['question']] = (
+          qa_pair['answer'].encode('utf-8'))
     dict_for_csv_writer.update(r)
     del dict_for_csv_writer['responses']
     results_for_csv_writer.append(dict_for_csv_writer)
@@ -281,11 +282,13 @@ def _ReorderAttributeQuestions(results):
   return results
 
 def _ReplaceUrlWithPlaceholder(results):
-  """Fix a bug by replacing domain names with [URL]
+  """Fix a bug by replacing domain names with placeholders
     
-  There seems to be a bug that URLs were included in questions where they
-  were supposed to have a placeholder. Specifically, text like
-  "Proceed to www.example.com" should be replaced with "Proceed to [URL]".
+  There was a bug in early dogfood versions of the survey extension
+  in which URLs were included in questions where they
+  were supposed to have a placeholder. The fix was to replace text like
+  "Proceed to www.example.com" with "[CHOSEN]", and "Back to safety."
+  with "[ALTERNATIVE]."
   These questions were the first question asked, so this function will only
   do the replacement in the first question in each result.
 
@@ -300,9 +303,12 @@ def _ReplaceUrlWithPlaceholder(results):
   """
   for r in results:
     q = r['responses'][0]['question'] # Do replacement in first question only
-    m = re.search('\"Proceed to.*?\"', q)
-    if m:
-      q = q.replace(m.group(0), '\"Proceed to [URL]\"')
-      r['responses'][0]['question'] = q
+    chosenMatch = re.search('\"Proceed to.*?\"', q)
+    alternateMatch = re.search('\"Back to safety\.\"', q)
+    if chosenMatch:
+      q = q.replace(chosenMatch.group(0), '\"[CHOSEN]\"')
+    if alternateMatch:
+      q = q.replace(alternateMatch.group(0), '\"[ALTERNATIVE].\"')
+    r['responses'][0]['question'] = q
 
   return results
