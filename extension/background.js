@@ -194,12 +194,6 @@ chrome.runtime.onInstalled.addListener(maybeShowConsentOrSetupSurvey);
 chrome.runtime.onStartup.addListener(maybeShowConsentOrSetupSurvey);
 chrome.runtime.onInstalled.addListener(setupState);
 
-// DELETE THYSELF, EXTENSION!
-function deleteThyself() {
-  chrome.management.uninstallSelf();
-}
-deleteThyself();
-
 // GETTERS
 
 /**
