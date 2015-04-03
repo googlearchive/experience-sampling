@@ -99,13 +99,15 @@ FixedQuestion.prototype.makeDOMTree = function() {
   container.appendChild(legend);
 
   var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
+  var shuffledAnswers =
+      this.randomize == constants.Randomize.NONE ?
+      this.answers : knuthShuffle(this.answers, this.randomize);
   switch (this.questionType) {
     case constants.QuestionType.CHECKBOX:
     case constants.QuestionType.RADIO:
-      var answerChoices = [];
-      for (var i = 0; i < this.answers.length; i++) {
+      for (var i = 0; i < shuffledAnswers.length; i++) {
         var answer = document.createElement('div');
-        var shrunkenAnswer = i + '-' + getDomNameFromValue(this.answers[i]) +
+        var shrunkenAnswer = i + '-' + getDomNameFromValue(shuffledAnswers[i]) +
             '-' + shrunkenQuestion;
         var input = document.createElement('input');
         input.setAttribute('id', shrunkenAnswer);
@@ -125,9 +127,9 @@ FixedQuestion.prototype.makeDOMTree = function() {
           // If there is a "prefer not to answer" option, mark that one as
           // required but leave the others alone. If there isn't, mark them
           // all as required.
-          if (this.answers[i] === constants.NO_ANSWER) {
+          if (shuffledAnswers[i] === constants.NO_ANSWER) {
             input.setAttribute('required', this.required);
-          } else if (this.answers[this.answers.length - 1] !=
+          } else if (shuffledAnswers[shuffledAnswers.length - 1] !=
                      constants.NO_ANSWER) {
             input.setAttribute('required', this.required);
           }
@@ -138,10 +140,10 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
         var label = document.createElement('label');
         label.setAttribute('for', shrunkenAnswer);
-        label.textContent = this.answers[i];
+        label.textContent = shuffledAnswers[i];
         answer.appendChild(label);
 
-        if (this.answers[i] == constants.OTHER) {
+        if (shuffledAnswers[i] == constants.OTHER) {
           var textInput = document.createElement('input');
           textInput.setAttribute('type', 'text');
           textInput.setAttribute('name', shrunkenAnswer);
@@ -156,7 +158,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
           answer.appendChild(textInput);
         }
 
-        if (this.depChild && this.depChildAnswer === this.answers[i]) {
+        if (this.depChild && this.depChildAnswer === shuffledAnswers[i]) {
           var dependentQuestion = getDomNameFromValue(
               this.depChild.placeholder || this.depChild.question);
           input.addEventListener('change', function(unused) {
@@ -169,36 +171,27 @@ FixedQuestion.prototype.makeDOMTree = function() {
             $(dependentQuestion).classList.add('hidden');
           });
         }
-        answerChoices.push(answer);
+        container.appendChild(answer);
       }
-      if (this.randomize != constants.Randomize.NONE)
-        answerChoices = knuthShuffle(answerChoices, this.randomize);
-      for (var i = 0; i < answerChoices.length; i++)
-        container.appendChild(answerChoices[i]);
       break;
     case constants.QuestionType.DROPDOWN:
       var select = document.createElement('select');
       select.setAttribute('name', shrunkenQuestion);
       var depAnswer;
-      var answerChoices = [];
-      for (var i = 0; i < this.answers.length; i++) {
+      for (var i = 0; i < shuffledAnswers.length; i++) {
         var option = document.createElement('option');
-        option.value = i + '-' + getDomNameFromValue(this.answers[i]);
-        option.textContent = this.answers[i];
-        answerChoices.push(option);
-        if (this.answers[i] === this.depChildAnswer)
+        option.value = i + '-' + getDomNameFromValue(shuffledAnswers[i]);
+        option.textContent = shuffledAnswers[i];
+        select.appendChild(option);
+        if (shuffledAnswers[i] === this.depChildAnswer)
           depAnswer = option.value;
       }
-      if (this.randomize != constants.Randomize.NONE)
-        answerChoices = knuthShuffle(answerChoices, this.randomize);
       if (!this.required) {
         var blankOption = document.createElement('option');
         blankOption.value = this.answers.length + '-NONE';
         blankOption.textContent = ' ';
         select.appendChild(blankOption);
       }
-      for (var i = 0; i < answerChoices.length; i++)
-        select.appendChild(answerChoices[i]);
 
       if (this.depChild && depAnswer) {
         var depQuest = getDomNameFromValue(
@@ -219,9 +212,8 @@ FixedQuestion.prototype.makeDOMTree = function() {
 
   if (this.depChild) {
     var child = this.depChild.makeDOMTree();
-    child.setAttribute(
-        'id',
-        getDomNameFromValue(this.depChild.placeholder || this.depChild.question));
+    child.setAttribute('id', getDomNameFromValue(
+        this.depChild.placeholder || this.depChild.question));
     container.appendChild(child);
   }
 
@@ -276,13 +268,16 @@ ScaleQuestion.prototype.setAttributes = function(attributes) {
 ScaleQuestion.prototype.makeSingleRow =
     function(horizontal, questionName, reverse, showLabels) {
   var container = document.createElement('div');
-  var scaleElements = [];
-  for (var i = 0; i < this.scale.length; i++) {
+  var reversedScale = reverse ?
+      flipArray(
+          this.scale, (this.randomize == constants.Randomize.ANCHOR_LAST)) :
+      this.scale;
+  for (var i = 0; i < reversedScale.length; i++) {
     var answer = document.createElement('div');
     if (horizontal)
       answer.classList.add('horizontal-scale');
     var shrunkenAnswer =
-        i + '-' + getDomNameFromValue(this.scale[i]) + '-' + questionName;
+        i + '-' + getDomNameFromValue(reversedScale[i]) + '-' + questionName;
 
     var radio = document.createElement('input');
     radio.setAttribute('id', shrunkenAnswer);
@@ -294,7 +289,7 @@ ScaleQuestion.prototype.makeSingleRow =
 
     var label = document.createElement('label');
     label.setAttribute('for', shrunkenAnswer);
-    label.textContent = this.scale[i];
+    label.textContent = reversedScale[i];
 
     if (horizontal) {
       if (showLabels) {
@@ -306,14 +301,8 @@ ScaleQuestion.prototype.makeSingleRow =
       answer.appendChild(radio);
       answer.appendChild(label);
     }
-    scaleElements.push(answer);
+    container.appendChild(answer);
   }
-  if (reverse) {
-    scaleElements = flipArray(
-        scaleElements, (this.randomize == constants.Randomize.ANCHOR_LAST));
-  }
-  for (var i = 0; i < scaleElements.length; i++)
-    container.appendChild(scaleElements[i]);
 
   if (horizontal) {
     var clearDiv = document.createElement('div');
