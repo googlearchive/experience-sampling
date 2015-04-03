@@ -477,7 +477,6 @@ chrome.experienceSamplingPrivate.onDecision.addListener(recordEvent);
 function handleCompletedSurvey(message) {
   if (message[constants.MSG_TYPE] !== constants.MSG_SURVEY)
     return;
-  console.log(JSON.stringify(message));
   getParticipantId().then(function(participantId) {
     var record = new SurveySubmission.SurveyRecord(
         message['survey_type'],
