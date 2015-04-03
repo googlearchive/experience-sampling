@@ -13,12 +13,10 @@
   "permissions": [
     "alarms",
     "experienceSamplingPrivate",
-    "identity",
     "notifications",
     "storage",
     "unlimitedStorage",
-    "https://chrome-experience-sampling.appspot.com/_ah/api/*",
-    "https://www.google.com/*"
+    "https://chrome-experience-sampling.appspot.com/_ah/api/*"
   ],
 
   "icons": {
