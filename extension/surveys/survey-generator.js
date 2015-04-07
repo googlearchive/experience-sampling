@@ -459,8 +459,11 @@ function getDomNameFromValue(answer) {
  * @returns {Array.Object} The randomized array.
  */
 function knuthShuffle(arr, randomType) {
-  var end = randomType == constants.Randomize.ANCHOR_LAST ?
-            arr.length - 1 : arr.length;
+  var end = arr.length;
+  if (randomType === constants.Randomize.ANCHOR_LAST)
+    end = arr.length - 1;
+  if (randomType === constants.Randomize.ANCHOR_LAST_TWO)
+    end = arr.length - 2; 
   for (var i = 0; i < end; i++) {
     // Random int: i <= randomIndex < arr.length
     var randomIndex = Math.floor(Math.random() * (end - i)) + i;
