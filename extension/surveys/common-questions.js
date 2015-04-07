@@ -91,9 +91,10 @@ commonQuestions.createPageSourceQuestion = function() {
         'A hacker',
         prettyPrintOS(),
         surveyDriver.questionUrl,
+        'I don\'t know',
         constants.OTHER
       ],
-      constants.Randomize.ANCHOR_LAST);
+      constants.Randomize.ANCHOR_LAST_TWO);
   return source;
 };
 
@@ -111,9 +112,10 @@ commonQuestions.createDialogSourceQuestion = function() {
         'Chrome (my browser)',
         'A hacker',
         prettyPrintOS(),
+        'I don\'t know',
         constants.OTHER
       ],
-      constants.Randomize.ANCHOR_LAST);
+      constants.Randomize.ANCHOR_LAST_TWO);
   return source;
 };
 
@@ -158,9 +160,10 @@ commonQuestions.createReferrerQuestion = function() {
         'Clicked link from an email message',
         'Clicked link in a chat window',
         'Clicked link on a web page',
+        'I don\'t know',
         constants.OTHER
       ],
-      constants.Randomize.ANCHOR_LAST);
+      constants.Randomize.ANCHOR_LAST_TWO);
   return referrer;
 };
 
@@ -224,9 +227,10 @@ commonQuestions.createTrustQuestion = function() {
         'Somewhat distrust',
         'Neither trust nor distrust',
         'Somewhat trust',
-        'Strongly trust'
+        'Strongly trust',
+        'I don\'t know'
       ],
-      constants.Randomize.ALL);
+      constants.Randomize.ANCHOR_LAST);
   trust.setPlaceholder('How much do you trust [URL]?');
   return trust;
 };

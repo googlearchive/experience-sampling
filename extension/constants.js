@@ -43,7 +43,8 @@ constants.QuestionType = {
 constants.Randomize = {
   NONE: 'none',
   ALL: 'all',
-  ANCHOR_LAST: 'anchorLast'  // Last element will stay in its place.
+  ANCHOR_LAST: 'anchorLast',  // Last element will stay in its place.
+  ANCHOR_LAST_TWO: 'anchorLastTwo' // Last 2 elements will stay in place.
 };
 
 // Handle "other" and "I prefer not to answer" specially.
