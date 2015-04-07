@@ -93,7 +93,7 @@ class TestProcessResults(unittest.TestCase):
   def test__CanonicalizeQuestions_filters_out_placeholder_questions(self):
     results = [r for r in self.mock_results
                if r['survey_type'] == 'malware-noproceed.js']
-    processresults._CanonicalizeQuestions(results)
+    results, canonical_index = processresults._CanonicalizeQuestions(results)
 
     self.assertEqual(len(results), 1)
     self.assertNotEqual(results[0]['responses'][0]['question'], 'PLACEHOLDER')
@@ -130,7 +130,7 @@ class TestProcessResults(unittest.TestCase):
   def test__CanonicalizeQuestions_returns_canonical_index(self):
     results = [r for r in self.mock_results
                if r['survey_type'] == 'ssl-overridable-proceed.js']
-    canonical_index = processresults._CanonicalizeQuestions(results)
+    results, canonical_index = processresults._CanonicalizeQuestions(results)
 
     # 2nd item (index 1) in mock_results should be selected as canonical
     self.assertEqual(canonical_index, 1)
@@ -144,7 +144,7 @@ class TestProcessResults(unittest.TestCase):
   def test__FilterDemographicResults_filters_out_december_5th_date(self):
     results = [r for r in self.mock_results
                if r['survey_type'] == 'setup.js']
-    processresults._FilterDemographicResults(
+    results, canonical_index = processresults._FilterDemographicResults(
         results, datetime.datetime(2014, 12, 18, 0, 0, 0, 0))
 
     self.assertEqual(len(results), 1)
@@ -153,7 +153,7 @@ class TestProcessResults(unittest.TestCase):
   def test__FilterDemographicResults_reorders_techfamiliar_questions(self):
     results = [r for r in self.mock_results
                if r['survey_type'] == 'setup.js']
-    processresults._FilterDemographicResults(
+    results, canonical_index = processresults._FilterDemographicResults(
         results, datetime.datetime(2014, 12, 18, 0, 0, 0, 0))
 
     self.assertEqual(len(results), 1)

@@ -46,7 +46,8 @@ def ProcessResults(json_in_file, csv_prefix):
   """
   demo_results, parsed_events = _ParseSurveyResults(json_in_file)
 
-  demo_index = _FilterDemographicResults(demo_results, DEMOGRAPHIC_STABLE_DATE)
+  demo_results, demo_index = _FilterDemographicResults(
+      demo_results, DEMOGRAPHIC_STABLE_DATE)
   _WriteToCsv(demo_results, demo_index, csv_prefix +
               DEMOGRAPHIC_CSV_PREFIX + '.csv')
 
@@ -55,7 +56,8 @@ def ProcessResults(json_in_file, csv_prefix):
   for c in CONDITIONS:
     try:
       filtered_results = _FilterByCondition(c, parsed_events)
-      canonical_index = _CanonicalizeQuestions(filtered_results)
+      filtered_results, canonical_index = _CanonicalizeQuestions(
+          filtered_results)
       _WriteToCsv(filtered_results, canonical_index, csv_prefix + c + '.csv')
     except UnexpectedFormatException as e:
       # Print UnexpectedFormatException and continue, since they are usually
@@ -72,7 +74,10 @@ def _ParseSurveyResults(in_file):
   
 
 def _FilterDemographicResults(demo_res, discard_before_date):
-  """Return a list of results that occur after the given date.
+  """Return a list of results that occur after the given date, that
+    don't use 'PLACEHOLDER' as the text for every question, and that
+    have their techFamiliar questions arranged in canonical (alphabetical)
+    order.
 
   Args:
     parsed_demo: Results from demographic survey parsed from a raw JSON
@@ -81,31 +86,32 @@ def _FilterDemographicResults(demo_res, discard_before_date):
       survey results before this date will be discarded
     
   Returns:
-    Integer index into the results list indicating which list
+    (1) List of filtered demographic results, filtering out
+    results with PLACEHOLDER for every question or whose date_taken comes
+    before the given date. Also reorders the techFamiliar questions
+    into canonical order.
+    (2) Integer index into the results list indicating which list
     element's questions can be considered canonical and complete.
-    Also modifies the input results to filter out results with
-    PLACEHOLDER for every question or whose date_taken comes
-    before the given date.
   """
-  demo_res[:] = _DiscardResultsBeforeDate(demo_res, discard_before_date)
+  filtered_res = _DiscardResultsBeforeDate(demo_res, discard_before_date)
 
   # Find responses that didn't use 'PLACEHOLDER' as the text for every question
-  demo_res[:] = [
-      r for r in demo_res
+  filtered_res = [
+      r for r in filtered_res
       if r['responses'][0]['question'] != 'PLACEHOLDER']
 
-  _ReorderAttributeQuestions(demo_res, TECHFAMILIAR_QUESTION_PREFIX)
+  _ReorderAttributeQuestions(filtered_res, TECHFAMILIAR_QUESTION_PREFIX)
   
   # Any response with the max number of questions should now be fine as
   # the canonical list of questions; find one such response.
-  max_list_len = len(demo_res[0]['responses'])
+  max_list_len = len(filtered_res[0]['responses'])
   canonical_index = 0
-  for i, r in enumerate(demo_res):
+  for i, r in enumerate(filtered_res):
     if len(r['responses']) > max_list_len:
       max_list_len = len(r['responses'])
       canonical_index = i
 
-  return canonical_index
+  return filtered_res, canonical_index
 
 
 def _DiscardResultsBeforeDate(results, date):
@@ -188,9 +194,9 @@ def _CanonicalizeQuestions(results):
       The results list should be filtered for one condition.
 
   Returns:
-    Integer index into the results list indicating which list
+    (1) List of results fixed to canonicalize all questions
+    (2) Integer index into the results list indicating which list
     element's questions can be considered canonical and complete.
-    Also modifies the input results to canonicalize all questions.
 
   Raises:
     QuestionError: A question in some response didn't match the expected
@@ -199,20 +205,20 @@ def _CanonicalizeQuestions(results):
         responses use PLACEHOLDER as the text for all questions
   """
   # Find responses that didn't use 'PLACEHOLDER' as the text for every question
-  results[:] = [r for r in results
+  fixed_results = [r for r in results
                       if r['responses'][0]['question'] != 'PLACEHOLDER']
-  if not results:
+  if not fixed_results:
     raise UnexpectedFormatException('No results with questions found')
 
-  _ReorderAttributeQuestions(results, ATTRIBUTE_QUESTION_PREFIX)
+  _ReorderAttributeQuestions(fixed_results, ATTRIBUTE_QUESTION_PREFIX)
 
-  _ReplaceUrlWithPlaceholder(results)
+  _ReplaceUrlWithPlaceholder(fixed_results)
 
   # Any response with the max number of questions should now be fine as
   # the canonical list of questions; find one such response.
-  max_list_len = len(results[0]['responses'])
+  max_list_len = len(fixed_results[0]['responses'])
   canonical_index = 0
-  for i, r in enumerate(results):
+  for i, r in enumerate(fixed_results):
     if len(r['responses']) > max_list_len:
       max_list_len = len(r['responses'])
       canonical_index = i
@@ -221,8 +227,8 @@ def _CanonicalizeQuestions(results):
   # except some question lists may have extra questions. So, check each list
   # of questions against the canonical list of questions.
   for i, qa_pair in enumerate(
-      results[canonical_index]['responses']):
-    for j, r in enumerate(results):
+      fixed_results[canonical_index]['responses']):
+    for j, r in enumerate(fixed_results):
       if i < len(r['responses']):
         if qa_pair['question'] != r['responses'][i]['question']:
           raise QuestionError(
@@ -231,7 +237,7 @@ def _CanonicalizeQuestions(results):
               % (canonical_index, i, qa_pair['question'],
                  j, i, r['responses'][i]['question']))
 
-  return canonical_index
+  return fixed_results, canonical_index
 
 
 def _WriteToCsv(results, canonical_index, out_file):
@@ -273,10 +279,10 @@ def _WriteToCsv(results, canonical_index, out_file):
     del dict_for_csv_writer['responses']
     results_for_csv_writer.append(dict_for_csv_writer)
 
+  field_names = ['date_received', 'date_taken', 'participant_id',
+      'survey_type']
+  field_names.extend(canonical_questions)
   with open(out_file, 'w') as csv_file:
-    field_names = ['date_received', 'date_taken', 'participant_id',
-        'survey_type']
-    field_names.extend(canonical_questions)
     csv_writer = csv.DictWriter(csv_file, field_names)
     csv_writer.writeheader()
     csv_writer.writerows(results_for_csv_writer)
