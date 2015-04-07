@@ -93,25 +93,25 @@ def _FilterDemographicResults(demo_res, discard_before_date):
     (2) Integer index into the results list indicating which list
     element's questions can be considered canonical and complete.
   """
-  filtered_res = _DiscardResultsBeforeDate(demo_res, discard_before_date)
+  filtered_results = _DiscardResultsBeforeDate(demo_res, discard_before_date)
 
   # Find responses that didn't use 'PLACEHOLDER' as the text for every question
-  filtered_res = [
-      r for r in filtered_res
+  filtered_results = [
+      r for r in filtered_results
       if r['responses'][0]['question'] != 'PLACEHOLDER']
 
-  _ReorderAttributeQuestions(filtered_res, TECHFAMILIAR_QUESTION_PREFIX)
+  _ReorderAttributeQuestions(filtered_results, TECHFAMILIAR_QUESTION_PREFIX)
   
   # Any response with the max number of questions should now be fine as
   # the canonical list of questions; find one such response.
-  max_list_len = len(filtered_res[0]['responses'])
+  max_list_len = len(filtered_results[0]['responses'])
   canonical_index = 0
-  for i, r in enumerate(filtered_res):
+  for i, r in enumerate(filtered_results):
     if len(r['responses']) > max_list_len:
       max_list_len = len(r['responses'])
       canonical_index = i
 
-  return filtered_res, canonical_index
+  return filtered_results, canonical_index
 
 
 def _DiscardResultsBeforeDate(results, date):
