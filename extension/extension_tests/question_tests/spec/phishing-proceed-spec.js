@@ -40,7 +40,7 @@ describe('phishing-proceed', function() {
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[3];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -50,6 +50,7 @@ describe('phishing-proceed', function() {
     expect(labelTexts).toContain('A hacker');
     expect(labelTexts).toContain(prettyPrintOS());
     expect(labelTexts).toContain('example.com');
+    expect(labelTexts).toContain('I don\'t know');
     expect(labelTexts).toContain('Other');
   });
 
@@ -80,7 +81,7 @@ describe('phishing-proceed', function() {
         .toEqual('What led you to the page? *');
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[5];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(6);
+    expect(labels.length).toEqual(7);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -91,6 +92,7 @@ describe('phishing-proceed', function() {
     expect(labelTexts).toContain('Clicked link from an email message');
     expect(labelTexts).toContain('Clicked link in a chat window');
     expect(labelTexts).toContain('Clicked link on a web page');
+    expect(labelTexts).toContain('I don\'t know');
     expect(labelTexts).toContain('Other');
   });
 
@@ -140,7 +142,7 @@ describe('phishing-proceed', function() {
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[8];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(5);
+    expect(labels.length).toEqual(6);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -151,6 +153,7 @@ describe('phishing-proceed', function() {
     expect(labelTexts).toContain('Neither trust nor distrust');
     expect(labelTexts).toContain('Somewhat trust');
     expect(labelTexts).toContain('Strongly trust');
+    expect(labelTexts).toContain('I don\'t know');
   });
 
   it('generates the attributes question and responses 11th', function() {

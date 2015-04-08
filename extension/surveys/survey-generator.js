@@ -269,8 +269,7 @@ ScaleQuestion.prototype.makeSingleRow =
     function(horizontal, questionName, reverse, showLabels) {
   var container = document.createElement('div');
   var reversedScale = reverse ?
-      flipArray(
-          this.scale, (this.randomize == constants.Randomize.ANCHOR_LAST)) :
+      flipArray(this.scale, this.randomize) :
       this.scale;
   for (var i = 0; i < reversedScale.length; i++) {
     var answer = document.createElement('div');
@@ -448,8 +447,11 @@ function getDomNameFromValue(answer) {
  * @returns {Array.Object} The randomized array.
  */
 function knuthShuffle(arr, randomType) {
-  var end = randomType == constants.Randomize.ANCHOR_LAST ?
-            arr.length - 1 : arr.length;
+  var end = arr.length;
+  if (randomType === constants.Randomize.ANCHOR_LAST)
+    end = arr.length - 1;
+  if (randomType === constants.Randomize.ANCHOR_LAST_TWO)
+    end = arr.length - 2; 
   for (var i = 0; i < end; i++) {
     // Random int: i <= randomIndex < arr.length
     var randomIndex = Math.floor(Math.random() * (end - i)) + i;
@@ -473,16 +475,25 @@ function coinToss() {
 /**
  * Flip an array.
  * @param {Array.Object} arr The array to flip.
- * @param {bool} anchorLast Whether to anchor the last element.
+ * @param {constants.Randomize} anchor Whether to anchor the last, the last 
+ *     two, or no elements.
  * @returns {Array.Object} The flipped array.
  */
-function flipArray(arr, anchorLast) {
-  var end = anchorLast ? arr.length - 1 : arr.length;
+function flipArray(arr, anchor) {
+  var end = arr.length;
+  if (anchor === constants.Randomize.ANCHOR_LAST)
+    end = arr.length - 1;
+  if (anchor === constants.Randomize.ANCHOR_LAST_TWO)
+    end = arr.length - 2; 
   var reverseArr = [];
   for (var i = end - 1; i >= 0; i--)
     reverseArr.push(arr[i]);
-  if (anchorLast)
+  if (anchor === constants.Randomize.ANCHOR_LAST)
     reverseArr.push(arr[arr.length - 1]);
+  if (anchor === constants.Randomize.ANCHOR_LAST_TWO) {
+    reverseArr.push(arr[arr.length - 2]);
+    reverseArr.push(arr[arr.length - 1]);
+  }
   return reverseArr;
 }
 

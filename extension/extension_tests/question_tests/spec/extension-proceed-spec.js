@@ -34,7 +34,7 @@ describe('extension-proceed', function() {
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[2];
     var labels = fieldsetElement.getElementsByTagName('label');
-    expect(labels.length).toEqual(4);
+    expect(labels.length).toEqual(5);
 
     var labelTexts = '';
     for (var i = 0; i < labels.length; i++) {
@@ -43,6 +43,7 @@ describe('extension-proceed', function() {
     expect(labelTexts).toContain('Chrome (my browser)');
     expect(labelTexts).toContain('A hacker');
     expect(labelTexts).toContain(prettyPrintOS());
+    expect(labelTexts).toContain('I don\'t know');
     expect(labelTexts).toContain('Other');
   });
 
