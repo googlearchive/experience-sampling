@@ -475,7 +475,8 @@ function coinToss() {
 /**
  * Flip an array.
  * @param {Array.Object} arr The array to flip.
- * @param {bool} anchor Whether to anchor the last,the last two, or no elements.
+ * @param {constants.Randomize} anchor Whether to anchor the last, the last 
+ *     two, or no elements.
  * @returns {Array.Object} The flipped array.
  */
 function flipArray(arr, anchor) {
