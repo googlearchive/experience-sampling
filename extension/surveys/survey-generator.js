@@ -481,16 +481,17 @@ function coinToss() {
  */
 function flipArray(arr, anchor) {
   var end = arr.length;
-  if (anchor === constants.Randomize.ANCHOR_LAST)
+  if (anchor === constants.Randomize.ANCHOR_LAST) {
     end = arr.length - 1;
-  if (anchor === constants.Randomize.ANCHOR_LAST_TWO)
-    end = arr.length - 2; 
+  } else if (anchor === constants.Randomize.ANCHOR_LAST_TWO) {
+    end = arr.length - 2;
+  }
   var reverseArr = [];
   for (var i = end - 1; i >= 0; i--)
     reverseArr.push(arr[i]);
-  if (anchor === constants.Randomize.ANCHOR_LAST)
+  if (anchor === constants.Randomize.ANCHOR_LAST) {
     reverseArr.push(arr[arr.length - 1]);
-  if (anchor === constants.Randomize.ANCHOR_LAST_TWO) {
+  } else if (anchor === constants.Randomize.ANCHOR_LAST_TWO) {
     reverseArr.push(arr[arr.length - 2]);
     reverseArr.push(arr[arr.length - 1]);
   }
