@@ -5,7 +5,7 @@
 var setupSurvey = {};  // Namespace variable
 setupSurvey.status = constants.SETUP_PENDING;
 setupSurvey.questions = [];
-setupSurvey.completionStatus = false;  // Whether the user submitted the form.
+setupSurvey.isSubmitted = false;  // Whether the user submitted the form.
 
 
 /**
@@ -501,7 +501,7 @@ function setupSurveyForm(savedState) {
  */
 function setupFormSubmitted(event) {
   event.preventDefault();
-  setupSurvey.completionStatus = true;
+  setupSurvey.isSubmitted = true;
 
   // Check whether the participant is underage.
   var ageQuestion = document['survey-form']['Whatisyourage'];
@@ -566,7 +566,7 @@ chrome.runtime.onMessage.addListener(setupMaybeDoneElsewhere);
  * @param {object} event The window close event.
  */
 function promptOnClose(event) {
-  if (setupSurvey.completionStatus) return;
+  if (setupSurvey.isSubmitted) return;
   if (!formHasContent($('survey-form'))) return;
 
   event.returnValue = "Oops! Closing now will throw away your answers.";
