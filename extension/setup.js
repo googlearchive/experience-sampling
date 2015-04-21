@@ -5,6 +5,8 @@
 var setupSurvey = {};  // Namespace variable
 setupSurvey.status = constants.SETUP_PENDING;
 setupSurvey.questions = [];
+setupSurvey.completionStatus = false;  // Whether the user submitted the form.
+
 
 /**
  * A helper method for updating the value in local storage.
@@ -499,6 +501,7 @@ function setupSurveyForm(savedState) {
  */
 function setupFormSubmitted(event) {
   event.preventDefault();
+  setupSurvey.completionStatus = true;
 
   // Check whether the participant is underage.
   var ageQuestion = document['survey-form']['Whatisyourage'];
@@ -557,3 +560,15 @@ function setupMaybeDoneElsewhere(message) {
   window.close();
 }
 chrome.runtime.onMessage.addListener(setupMaybeDoneElsewhere);
+
+/**
+ * Prompt the user on close, if the form has been started but not yet submitted.
+ * @param {object} event The window close event.
+ */
+function promptOnClose(event) {
+  if (setupSurvey.completionStatus) return;
+  if (!formHasContent($('survey-form'))) return;
+
+  event.returnValue = "Oops! Closing now will throw away your answers.";
+}
+window.addEventListener('beforeunload', promptOnClose);
