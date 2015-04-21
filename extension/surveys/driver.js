@@ -143,7 +143,7 @@ function setupSurvey() {
 
 /**
  * Handles the submission of the setup survey.
- * @param {object} The submission button click event.
+ * @param {object} event The submission button click event.
  */
 function setupFormSubmitted(event) {
   event.preventDefault();
@@ -171,9 +171,13 @@ function setupFormSubmitted(event) {
   $('thank-you').classList.remove('hidden');
   setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
 }
-
 document.addEventListener('DOMContentLoaded', loadSurveyScript);
 
+/**
+ * Checks whether a form has any responses or text in it.
+ * @param {object} form The form to check.
+ * @returns {boolean} True if the form has content.
+ */
 function formHasContent(form) {
   for (var i = 0; i < form.elements.length; i++) {
     var element = form.elements[i];
@@ -211,6 +215,10 @@ function formHasContent(form) {
   return false;
 }
 
+/**
+ * Prompt the user on close, if the form has been started but not yet submitted.
+ * @param {object} event The window close event.
+ */
 function promptOnClose(event) {
   if (surveyDriver.completionStatus) return;
   if (!formHasContent($('survey-form'))) return;
