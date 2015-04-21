@@ -571,3 +571,45 @@ function getFormValues(questionArr, form) {
   }
   return responses;
 }
+
+/**
+ * Checks whether a form has any responses or text in it.
+ * @param {object} form The form to check.
+ * @returns {boolean} True if the form has content.
+ */
+function formHasContent(form) {
+  for (var i = 0; i < form.elements.length; i++) {
+    var element = form.elements[i];
+    switch (element.type) {
+      case 'checkbox':
+      case 'radio':
+        if (element.checked)
+          return true;
+        break;
+      case 'text':
+      case 'password':
+      case 'number':
+      case 'date':
+      case 'color':
+      case 'range':
+      case 'month':
+      case 'week':
+      case 'time':
+      case 'datetime':
+      case 'datetime-local':
+      case 'email':
+      case 'search':
+      case 'tel':
+      case 'url':
+      case 'textarea':
+      case 'select':
+        if (element.value !== '')
+          return true;
+        break;
+      case 'submit':
+      case 'button':
+        break;
+    }
+  }
+  return false;
+}

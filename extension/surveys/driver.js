@@ -3,6 +3,7 @@ surveyDriver.surveyType = '';  // Holds the type of survey.
 surveyDriver.questionUrl = '';  // Holds the URL for putting into questions.
 surveyDriver.questions = [];  // Holds the questions for a given survey.
 surveyDriver.operatingSystem = ''; // mac, win, cros, or linux
+surveyDriver.isSubmitted = false;  // Whether the user submitted the form.
 
 /**
  * Convenience method for adding questions.
@@ -142,11 +143,12 @@ function setupSurvey() {
 
 /**
  * Handles the submission of the setup survey.
- * @param {object} The submission button click event.
+ * @param {object} event The submission button click event.
  */
 function setupFormSubmitted(event) {
   event.preventDefault();
 
+  surveyDriver.isSubmitted = true;
   var responses = getFormValues(
       surveyDriver.questions, document['survey-form']);
   var urlConsentQ = commonQuestions.createRecordUrlQuestion();
@@ -169,5 +171,16 @@ function setupFormSubmitted(event) {
   $('thank-you').classList.remove('hidden');
   setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
 }
-
 document.addEventListener('DOMContentLoaded', loadSurveyScript);
+
+/**
+ * Prompt the user on close, if the form has been started but not yet submitted.
+ * @param {object} event The window close event.
+ */
+function promptOnClose(event) {
+  if (surveyDriver.isSubmitted) return;
+  if (!formHasContent($('survey-form'))) return;
+
+  event.returnValue = "Oops! Closing now will throw away your answers.";
+}
+window.addEventListener('beforeunload', promptOnClose);
