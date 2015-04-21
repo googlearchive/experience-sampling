@@ -3,6 +3,7 @@ surveyDriver.surveyType = '';  // Holds the type of survey.
 surveyDriver.questionUrl = '';  // Holds the URL for putting into questions.
 surveyDriver.questions = [];  // Holds the questions for a given survey.
 surveyDriver.operatingSystem = ''; // mac, win, cros, or linux
+surveyDriver.completionStatus = false;  // Whether the user submitted the form.
 
 /**
  * Convenience method for adding questions.
@@ -147,6 +148,7 @@ function setupSurvey() {
 function setupFormSubmitted(event) {
   event.preventDefault();
 
+  surveyDriver.completionStatus = true;
   var responses = getFormValues(
       surveyDriver.questions, document['survey-form']);
   var urlConsentQ = commonQuestions.createRecordUrlQuestion();
@@ -171,3 +173,48 @@ function setupFormSubmitted(event) {
 }
 
 document.addEventListener('DOMContentLoaded', loadSurveyScript);
+
+function formHasContent(form) {
+  for (var i = 0; i < form.elements.length; i++) {
+    var element = form.elements[i];
+    switch (element.type) {
+      case 'checkbox':
+      case 'radio':
+        if (element.checked)
+          return true;
+        break;
+      case 'text':
+      case 'password':
+      case 'number':
+      case 'date':
+      case 'color':
+      case 'range':
+      case 'month':
+      case 'week':
+      case 'time':
+      case 'datetime':
+      case 'datetime-local':
+      case 'email':
+      case 'search':
+      case 'tel':
+      case 'url':
+      case 'textarea':
+      case 'select':
+        if (element.value !== '')
+          return true;
+        break;
+      case 'submit':
+      case 'button':
+        break;
+    }
+  }
+  return false;
+}
+
+function promptOnClose(event) {
+  if (surveyDriver.completionStatus) return;
+  if (!formHasContent($('survey-form'))) return;
+
+  event.returnValue = "Closing now will throw away your answers.";
+}
+window.addEventListener('beforeunload', promptOnClose);

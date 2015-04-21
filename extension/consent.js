@@ -84,7 +84,6 @@ function getInitialState() {
   console.log('Consent page loading');
   chrome.storage.sync.get(constants.CONSENT_KEY, setupConsentForm);
 }
-
 document.addEventListener('DOMContentLoaded', getInitialState);
 
 /**
