@@ -16,20 +16,21 @@ describe('ssl-overridable-noproceed', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[0].textContent)
         .toEqual('You chose the "Back to safety" option,' +
-        ' or you closed the page. Why did you choose not to proceed to' +
-        ' example.com? *');
+        ' or you closed the page (shown above). Why did you choose not to' +
+        ' proceed to example.com? *');
   });
 
   it('generates the page-meaning question 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
-        .toEqual('What was the page trying to tell you, in your own words? *');
+        .toEqual('What was the page (shown above) trying to tell you, in' +
+        ' your own words? *');
   });
 
   it('generates the page-source question and responses 3rd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
-        .toEqual('Who was the page from? *');
+        .toEqual('Who was the page (shown above) from? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[2];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -52,7 +53,7 @@ describe('ssl-overridable-noproceed', function() {
     expect(parentNode.getElementsByTagName('legend')[3].textContent)
         .toEqual('Have you visited example.com before? *');
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
-        .toEqual('Have you seen a page like the one pictured above when' +
+        .toEqual('Have you seen a page like the one shown above when' +
         ' trying to visit example.com before?');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[3];
@@ -71,7 +72,7 @@ describe('ssl-overridable-noproceed', function() {
   it('generates the referrer question and responses 6th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[5].textContent)
-        .toEqual('What led you to the page? *');
+        .toEqual('What led you to the page (shown above)? *');
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[4];
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(7);
@@ -133,7 +134,7 @@ describe('ssl-overridable-noproceed', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[8].textContent)
         .toEqual('To what degree do each of the following adjectives ' +
-        'describe this page? *');
+        'describe this page (shown above)? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
     var labels = fieldsetElement.getElementsByTagName('label');
