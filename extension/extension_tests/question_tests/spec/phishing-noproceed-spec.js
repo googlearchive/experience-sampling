@@ -15,28 +15,29 @@ describe('phishing-proceed', function() {
   it('generates the what-website question 1st', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[0].textContent)
-        .toEqual('What website were you trying to visit when the page was' +
-        ' displayed? *');
+        .toEqual('What website were you trying to visit when the page' +
+        ' (shown above) was displayed? *');
   });
 
   it('generates the not-proceed-choice question 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
         .toEqual('You chose the "Back to safety" option,' +
-        ' or you closed the page. Why did you choose not to proceed to' +
-        ' example.com? *');
+        ' or you closed the page (shown above). Why did you choose not to' +
+        ' proceed to example.com? *');
   });
 
   it('generates the page-meaning question 3rd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
-        .toEqual('What was the page trying to tell you, in your own words? *');
+        .toEqual('What was the page (shown above) trying to tell you, in' +
+        ' your own words? *');
   });
 
   it('generates the page-source question and responses 4th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[3].textContent)
-        .toEqual('Who was the page from? *');
+        .toEqual('Who was the page (shown above) from? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[3];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -59,7 +60,7 @@ describe('phishing-proceed', function() {
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
         .toEqual('Have you visited example.com before? *');
     expect(parentNode.getElementsByTagName('legend')[5].textContent)
-        .toEqual('Have you seen a page like the one pictured above when' +
+        .toEqual('Have you seen a page like the one shown above when' +
         ' trying to visit example.com before?');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[4];
@@ -78,7 +79,7 @@ describe('phishing-proceed', function() {
   it('generates the referrer question and responses 7th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[6].textContent)
-        .toEqual('What led you to the page? *');
+        .toEqual('What led you to the page (shown above)? *');
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[5];
     var labels = fieldsetElement.getElementsByTagName('label');
     expect(labels.length).toEqual(7);
@@ -118,8 +119,7 @@ describe('phishing-proceed', function() {
   it('generates the visit question and responses 9th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[8].textContent)
-        .toEqual('Were you trying to visit example.com when you saw' +
-        ' the page instead? *');
+        .toEqual('Were you trying to visit example.com? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[7];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -160,7 +160,7 @@ describe('phishing-proceed', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[10].textContent)
         .toEqual('To what degree do each of the following adjectives ' +
-            'describe this page? *');
+            'describe this page (shown above)? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[9];
     var labels = fieldsetElement.getElementsByTagName('label');

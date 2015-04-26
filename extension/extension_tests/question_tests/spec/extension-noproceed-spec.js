@@ -23,14 +23,14 @@ describe('extension-noproceed', function() {
   it('generates the page-meaning question 2nd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[1].textContent)
-        .toEqual('What was the dialog trying to tell you,' +
+        .toEqual('What was the dialog (shown above) trying to tell you,' +
         ' in your own words? *');
   });
 
   it('generates the page-source question and responses 3rd', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[2].textContent)
-        .toEqual('Who was the dialog from? *');
+        .toEqual('Who was the dialog (shown above) from? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[2];
     var labels = fieldsetElement.getElementsByTagName('label');
@@ -51,14 +51,14 @@ describe('extension-noproceed', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[3].textContent)
         .toEqual('What led you to try to install the extension or app' +
-        ' mentioned in the dialog? *');
+        ' mentioned in the dialog (shown above)? *');
   });
 
   it('generates the attributes question and responses 5th', function() {
     addQuestions(parentNode);
     expect(parentNode.getElementsByTagName('legend')[4].textContent)
         .toEqual('To what degree do each of the following adjectives' +
-        ' describe the dialog? *');
+        ' describe the dialog (shown above)? *');
 
     fieldsetElement = parentNode.getElementsByClassName('fieldset')[4];
     var labels = fieldsetElement.getElementsByTagName('label');

@@ -11,7 +11,8 @@ var commonQuestions = {};
 commonQuestions.createWhatWebsiteQuestion = function() {
   var whatWebsite = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'What website were you trying to visit when the page was displayed?',
+      'What website were you trying to visit when the page (shown above)' +
+          ' was displayed?',
       true);
   return whatWebsite;
 };
@@ -27,7 +28,7 @@ commonQuestions.createChoiceQuestion = function(chosen, alternative) {
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'You chose "' + chosen + '" instead of "' + alternative + '."' +
-          ' How did you choose between the two options?',
+      ' How did you choose between the two options?',
       true);
   howChoose.setPlaceholder('You chose "[CHOSEN]" instead of "[ALTERNATIVE]."' +
       ' How did you choose between the two options?');
@@ -43,11 +44,13 @@ commonQuestions.createChoiceQuestion = function(chosen, alternative) {
 commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
   var howChoose = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'You chose the "' + chosen + '" option, or you closed the page.' +
+      'You chose the "' + chosen + '" option, or you closed the page' +
+      ' (shown above).' +
       ' Why did you choose not to proceed to ' + surveyDriver.questionUrl +
       '?', true);
   howChoose.setPlaceholder(
-      'You chose the "' + chosen + '" option, or you closed the page.' +
+      'You chose the "' + chosen + '" option, or you closed the' +
+      ' page (shown above).' +
       ' Why did you choose not to proceed to [URL]?');
   return howChoose;
 };
@@ -59,7 +62,7 @@ commonQuestions.createNotProceedChoiceQuestion = function(chosen) {
 commonQuestions.createPageMeaningQuestion = function() {
   var meaning = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'What was the page trying to tell you, in your own words?',
+      'What was the page (shown above) trying to tell you, in your own words?',
       true);
   return meaning;
 };
@@ -72,7 +75,8 @@ commonQuestions.createPageMeaningQuestion = function() {
 commonQuestions.createDialogMeaningQuestion = function() {
   var meaning = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
-      'What was the dialog trying to tell you, in your own words?',
+      'What was the dialog (shown above) trying to tell you, in your own' +
+      ' words?',
       true);
   return meaning;
 };
@@ -84,7 +88,7 @@ commonQuestions.createDialogMeaningQuestion = function() {
 commonQuestions.createPageSourceQuestion = function() {
   var source = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Who was the page from?',
+      'Who was the page (shown above) from?',
       true,
       [
         'Chrome (my browser)',
@@ -106,7 +110,7 @@ commonQuestions.createPageSourceQuestion = function() {
 commonQuestions.createDialogSourceQuestion = function() {
   var source = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Who was the dialog from?',
+      'Who was the dialog (shown above) from?',
       true,
       [
         'Chrome (my browser)',
@@ -133,13 +137,13 @@ commonQuestions.createHistoryQuestions = function() {
   hist.setPlaceholder('Have you visited [URL] before?');
   var errorBefore = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you seen a page like the one pictured above when trying to visit ' +
+      'Have you seen a page like the one shown above when trying to visit ' +
           surveyDriver.questionUrl + ' before?',
       true,
       ['Yes', 'No', 'I don\'t know'],
       constants.Randomize.ANCHOR_LAST);
   errorBefore.setPlaceholder(
-      'Have you seen a page like the one pictured above when trying to visit ' +
+      'Have you seen a page like the one shown above when trying to visit ' +
       '[URL] before?');
   hist.addDependentQuestion(errorBefore, 'Yes');
   return hist;
@@ -152,7 +156,7 @@ commonQuestions.createHistoryQuestions = function() {
 commonQuestions.createReferrerQuestion = function() {
   var referrer = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'What led you to the page?',
+      'What led you to the page (shown above)?',
       true,
       [
         'Entered or typed a URL',
@@ -176,7 +180,7 @@ commonQuestions.createDialogReferrerQuestion = function() {
   var referrer = new EssayQuestion(
       constants.QuestionType.LONG_ESSAY,
       'What led you to try to install the extension or app mentioned' +
-      ' in the dialog?',
+      ' in the dialog (shown above)?',
       true);
   return referrer;
 };
@@ -203,13 +207,12 @@ commonQuestions.createAccountQuestion = function() {
 commonQuestions.createVisitQuestion = function() {
   var visit = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Were you trying to visit ' + surveyDriver.questionUrl +
-           ' when you saw the page instead?',
+      'Were you trying to visit ' + surveyDriver.questionUrl + '?',
       true,
       ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
-  visit.setPlaceholder('Were you trying to visit [URL] when you saw the page ' +
-      'instead?');
+  visit.setPlaceholder('Were you trying to visit [URL] when you saw the page' +
+      ' (shown above) instead?');
   return visit;
 };
 
@@ -242,7 +245,8 @@ commonQuestions.createTrustQuestion = function() {
 commonQuestions.createAttributesQuestion = function() {
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following adjectives describe this page?',
+      'To what degree do each of the following adjectives describe this' +
+      ' page (shown above)?',
       true,
       [
         'Not at all',
@@ -273,7 +277,8 @@ commonQuestions.createAttributesQuestion = function() {
 commonQuestions.createDialogAttributesQuestion = function() {
   var attributes = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
-      'To what degree do each of the following adjectives describe the dialog?',
+      'To what degree do each of the following adjectives describe the' +
+      ' dialog (shown above)?',
       true,
       [
         'Not at all',
