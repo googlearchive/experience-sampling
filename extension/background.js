@@ -305,13 +305,16 @@ function showSurveyNotification(element, decision) {
 
         var timePromptShown = new Date();
         var clickHandler = function(notificationId, buttonIndex) {
-          if (buttonIndex === 1) {
-            chrome.tabs.create({'url': chrome.extension.getURL('consent.html')});
-          } else {
-            var timePromptClicked = new Date();
-            loadSurvey(element, decision, timePromptShown, timePromptClicked);
-            clearNotifications();
-          }
+          var timePromptClicked = new Date();
+          var maybeOpenConsentForm = function() {
+            if (buttonIndex != 1) return;
+            chrome.tabs.create({
+              'url': chrome.extension.getURL('consent.html')
+            });
+          };
+          loadSurvey(element, decision, timePromptShown, timePromptClicked)
+              .then(maybeOpenConsentForm, maybeOpenConsentForm);
+          clearNotifications();
         };
         var options = {
           type: 'basic',
@@ -351,71 +354,78 @@ function showSurveyNotification(element, decision) {
  *     notification was shown to the participant.
  * @param {object} timePromptClicked Date object of when the participant
  *     clicked the survey prompt notification.
+ * @returns {Promise} A promise that resolves when the survey is done opening.
  */
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
-  chrome.storage.sync.get(cesp.READY_FOR_SURVEYS, function(items) {
-    if (!items[cesp.READY_FOR_SURVEYS]) return;
-    var userDecision = decision['name'];
-    if (userDecision !== constants.DecisionType.PROCEED &&
-        userDecision !== constants.DecisionType.DENY) {
-      return;
-    }
+  return new Promise(function(resolve, reject) {
+    chrome.storage.sync.get(cesp.READY_FOR_SURVEYS, function(items) {
+      if (!items[cesp.READY_FOR_SURVEYS]) return;
+      var userDecision = decision['name'];
+      if (userDecision !== constants.DecisionType.PROCEED &&
+          userDecision !== constants.DecisionType.DENY) {
+        reject();
+        return;
+      }
 
-    var surveyUrl, visitUrl;
-    var eventType = constants.FindEventType(element['name']);
-    switch (eventType) {
-      case constants.EventType.SSL_OVERRIDABLE:
-        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
-            constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED :
-            constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED;
-        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
-        break;
-      case constants.EventType.SSL_NONOVERRIDABLE:
-        surveyUrl = constants.SurveyLocation.SSL_NONOVERRIDABLE;
-        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
-        break;
-      case constants.EventType.MALWARE:
-        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
-            constants.SurveyLocation.MALWARE_PROCEED :
-            constants.SurveyLocation.MALWARE_NOPROCEED;
-        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
-        break;
-      case constants.EventType.PHISHING:
-        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
-            constants.SurveyLocation.PHISHING_PROCEED :
-            constants.SurveyLocation.PHISHING_NOPROCEED;
-        visitUrl = urlHandler.GetMinimalUrl(element['destination']);
-        break;
-      case constants.EventType.EXTENSION_INSTALL:
-      case constants.EventType.EXTENSION_INLINE_INSTALL:
-      case constants.EventType.EXTENSION_BUNDLE:
-        surveyUrl = userDecision === constants.DecisionType.PROCEED ?
-            constants.SurveyLocation.EXTENSION_PROCEED :
-            constants.SurveyLocation.EXTENSION_NOPROCEED;
-        break;
-      case constants.EventType.HARMFUL:
-      case constants.EventType.SB_OTHER:
-      case constants.EventType.DOWNLOAD_MALICIOUS:
-      case constants.EventType.DOWNLOAD_DANGEROUS:
-      case constants.EventType.DOWNLOAD_DANGER_PROMPT:
-      case constants.EventType.EXTENSION_OTHER:
-        // Don't survey about these.
-        return;
-      case constants.EventType.UNKNOWN:
-        throw new Error('Unknown event type: ' + element['name']);
-        return;
-    }
-    getOperatingSystem().then(function(os) {
-      visitUrl = encodeURIComponent(visitUrl);
-      var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl
-          + '&os=' + os;
-      chrome.tabs.create(
-          {'url': chrome.extension.getURL(openUrl)},
-          function(tab) {
-            try {
-              chrome.tabs.remove(cesp.openTabId);
-            } catch (err) { }
-            cesp.openTabId = tab.id;
+      var surveyUrl, visitUrl;
+      var eventType = constants.FindEventType(element['name']);
+      switch (eventType) {
+        case constants.EventType.SSL_OVERRIDABLE:
+          surveyUrl = userDecision === constants.DecisionType.PROCEED ?
+              constants.SurveyLocation.SSL_OVERRIDABLE_PROCEED :
+              constants.SurveyLocation.SSL_OVERRIDABLE_NOPROCEED;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
+        case constants.EventType.SSL_NONOVERRIDABLE:
+          surveyUrl = constants.SurveyLocation.SSL_NONOVERRIDABLE;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
+        case constants.EventType.MALWARE:
+          surveyUrl = userDecision === constants.DecisionType.PROCEED ?
+              constants.SurveyLocation.MALWARE_PROCEED :
+              constants.SurveyLocation.MALWARE_NOPROCEED;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
+        case constants.EventType.PHISHING:
+          surveyUrl = userDecision === constants.DecisionType.PROCEED ?
+              constants.SurveyLocation.PHISHING_PROCEED :
+              constants.SurveyLocation.PHISHING_NOPROCEED;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
+        case constants.EventType.EXTENSION_INSTALL:
+        case constants.EventType.EXTENSION_INLINE_INSTALL:
+        case constants.EventType.EXTENSION_BUNDLE:
+          surveyUrl = userDecision === constants.DecisionType.PROCEED ?
+              constants.SurveyLocation.EXTENSION_PROCEED :
+              constants.SurveyLocation.EXTENSION_NOPROCEED;
+          break;
+        case constants.EventType.HARMFUL:
+        case constants.EventType.SB_OTHER:
+        case constants.EventType.DOWNLOAD_MALICIOUS:
+        case constants.EventType.DOWNLOAD_DANGEROUS:
+        case constants.EventType.DOWNLOAD_DANGER_PROMPT:
+        case constants.EventType.EXTENSION_OTHER:
+          // Don't survey about these.
+          reject();
+          return;
+        case constants.EventType.UNKNOWN:
+          throw new Error('Unknown event type: ' + element['name']);
+          reject();
+          return;
+      }
+      getOperatingSystem().then(function(os) {
+        visitUrl = encodeURIComponent(visitUrl);
+        var openUrl = 'surveys/survey.html?js=' + surveyUrl + '&url=' + visitUrl
+            + '&os=' + os;
+        chrome.tabs.create(
+            {'url': chrome.extension.getURL(openUrl)},
+            function(tab) {
+              try {
+                chrome.tabs.remove(cesp.openTabId);
+              } catch (err) { }
+              cesp.openTabId = tab.id;
+              resolve();
+        });
       });
     });
   });
