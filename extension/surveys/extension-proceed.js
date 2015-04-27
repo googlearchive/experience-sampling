@@ -39,4 +39,6 @@ function setScreenshot() {
   // For extensions, we also want to update the caption.
   $('saw-a-page').textContent =
       'You just now saw a dialog like the one shown above.';
+  $('following-questions').textContent =
+      'The following questions are about that dialog.';
 }
