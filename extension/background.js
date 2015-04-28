@@ -34,8 +34,8 @@ cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
 cesp.MINIMUM_SURVEY_DELAY = 0;//300000;  // 5 minutes in ms.
-cesp.FIRST_SURVEY_DELAY_ALARM = 'firstSurveyAlarm';
-cesp.FIRST_SURVEY_DELAY = 1;//40;  // minutes
+cesp.FIRST_SURVEY_READY = 'firstSurveyReady';
+cesp.FIRST_SURVEY_DELAY_LENGTH = 1;//40;  // minutes
 
 // SETUP
 
@@ -56,6 +56,16 @@ function setReadyForSurveysStorageValue(newState) {
 function setSurveysShownDaily(newCount) {
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
+  chrome.storage.sync.set(items);
+}
+
+/**
+ * A helper method for updating the value in local storage.
+ * @param {bool} newState The desired new state for the first survey readiness.
+ */
+function setFirstSurveyReady(newState) {
+  var items = {};
+  items[cesp.FIRST_SURVEY_READY] = newState;
   chrome.storage.sync.set(items);
 }
 
@@ -93,6 +103,7 @@ function setupState(details) {
   // Set the count of surveys shown to 0. Reset it each day/week at midnight.
   setSurveysShownDaily(0);
   setSurveysShownWeekly(0);
+  setFirstSurveyReady(false);
   var midnight = new Date();
   midnight.setHours(0, 0, 0, 0);
   chrome.alarms.create(cesp.SURVEY_THROTTLE_DAILY_RESET_ALARM,
@@ -154,7 +165,6 @@ function maybeShowConsentOrSetupSurvey() {
   var consentCallback = function(lookup) {
     if (!lookup || !lookup[constants.CONSENT_KEY] ||
         lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
-      chrome.storage.onChanged.addListener(storageUpdated);
       getOperatingSystem().then(function(os) {
         chrome.tabs.create(
             {'url': chrome.extension.getURL('consent.html?os=' + os)});
@@ -188,10 +198,11 @@ function storageUpdated(changes, areaName) {
       changes[constants.SETUP_KEY].newValue === constants.SETUP_COMPLETED) {
     setReadyForSurveysStorageValue(true);
     chrome.runtime.sendMessage({ 'message_type': constants.MSG_SETUP });
-    chrome.alarms.create(cesp.FIRST_SURVEY_DELAY_ALARM,
-        {delayInMinutes: cesp.FIRST_SURVEY_DELAY});
+    chrome.alarms.create(cesp.FIRST_SURVEY_READY,
+        {delayInMinutes: cesp.FIRST_SURVEY_DELAY_LENGTH});
   }
 }
+chrome.storage.onChanged.addListener(storageUpdated);
 
 // Performs consent and registration checks on startup and install.
 chrome.runtime.onInstalled.addListener(maybeShowConsentOrSetupSurvey);
@@ -241,15 +252,38 @@ function getOperatingSystem() {
 
 // TRIGGERING THE FIRST SURVEY (HTTP OR HTTPS)
 
-function lookForFirstSurveyEvent(alarm) {
-  if (alarm.name !== cesp.FIRST_SURVEY_DELAY_ALARM)
-    return;
-  chrome.tabs.onUpdated.addListener(handleTabUpdated);
+/**
+ * Ensures the first (HTTP vs HTTPS) survey is completely ended.
+ */
+function endFirstSurvey() {
+  setFirstSurveyReady(false);
+  chrome.tabs.onUpdated.removeListener(handleTabUpdated);
+  chrome.alarms.onAlarm.removeListener(lookForFirstSurveyEvent);
+  chrome.alarms.clear(cesp.FIRST_SURVEY_READY);
 };
 
+/**
+ * After the initial wait time has completed, begin watching for potential
+ * events.
+ * @param {Alarm} alarm An alarm that may or may not be from the right timer.
+ */
+function lookForFirstSurveyEvent(alarm) {
+  if (alarm.name !== cesp.FIRST_SURVEY_READY)
+    return;
+  setFirstSurveyReady(true);
+};
+chrome.alarms.onAlarm.addListener(lookForFirstSurveyEvent);
+
+/**
+ * Look to see if a tab updated event would be appropriate for a survey. If so,
+ * fire a notification with an element and decision.
+ * @param {int} tabId The ID of the tab that was updated.
+ * @param {Object} changeInfo Information about the update event.
+ * @param {Tab} tab The tab that was updated.
+ */
 function handleTabUpdated(tabId, changeInfo, tab) {
-  chrome.storage.sync.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
-    if (items[cesp.SURVEYS_SHOWN_TODAY] > 0)
+  chrome.storage.sync.get(cesp.FIRST_SURVEY_READY, function(items) {
+    if (!items || !items[cesp.FIRST_SURVEY_READY])
       return;
 
     if (!tab.url) return;
@@ -269,10 +303,11 @@ function handleTabUpdated(tabId, changeInfo, tab) {
       name: 'N/A',
       time: timeFired
     };
+    endFirstSurvey();
     showSurveyNotification(element, decision);
-    chrome.tabs.onUpdated.removeListener(handleTabUpdated);
   });
 };
+chrome.tabs.onUpdated.addListener(handleTabUpdated);
 
 // SURVEY HANDLING
 
@@ -343,6 +378,7 @@ function showSurveyNotification(element, decision) {
 
         clearNotifications();
         recordShowedNotification(eventType);
+        endFirstSurvey();
 
         var timePromptShown = new Date();
         var clickHandler = function(notificationId, buttonIndex) {
