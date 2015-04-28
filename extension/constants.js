@@ -77,8 +77,8 @@ constants.EventType = {
   EXTENSION_OTHER: 'extension_install_dialog',  // Catch-all
 
   // Defined within the extension, in background.js.
-  HTTPS: 'https',
-  HTTP: 'http',
+  VISITED_HTTPS: 'https',
+  VISITED_HTTP: 'http',
 
   UNKNOWN: 'unknown',
 };
@@ -95,8 +95,8 @@ constants.SurveyLocation = {
   PHISHING_NOPROCEED: 'phishing-noproceed.js',
   EXTENSION_PROCEED: 'extension-proceed.js',
   EXTENSION_NOPROCEED: 'extension-noproceed.js',
-  HTTPS: 'httpwithans.js',
-  HTTP: 'httpnos.js'
+  VISITED_HTTPS: 'visited-https.js',
+  VISITED_HTTP: 'visited-http.js'
 };
 
 // The different types of user decisions.

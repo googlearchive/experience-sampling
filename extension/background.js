@@ -253,7 +253,9 @@ function getOperatingSystem() {
 // TRIGGERING THE FIRST SURVEY (HTTP OR HTTPS)
 
 /**
- * Ensures the first (HTTP vs HTTPS) survey is completely ended.
+ * Ensures the first (HTTP vs HTTPS) survey is completely ended. It should stop
+ * being available once the user takes it, or once the user takes any other
+ * survey.
  */
 function endFirstSurvey() {
   setFirstSurveyReady(false);
@@ -288,7 +290,7 @@ function handleTabUpdated(tabId, changeInfo, tab) {
 
     if (!tab.url) return;
     var scheme = tab.url.split(':')[0];
-    if (!(scheme === 'https' || scheme === 'http')) return;
+    if (scheme !== 'https' && scheme !== 'http') return;
 
     var timeFired = Date.now();
     var element = {
@@ -339,8 +341,8 @@ function showSurveyNotification(element, decision) {
     case constants.EventType.PHISHING:
     case constants.EventType.EXTENSION_INSTALL:
     case constants.EventType.EXTENSION_BUNDLE:
-    case constants.EventType.HTTPS:
-    case constants.EventType.HTTP:
+    case constants.EventType.VISITED_HTTPS:
+    case constants.EventType.VISITED_HTTP:
       // Supported events.
       break;
     case constants.EventType.EXTENSION_INLINE_INSTALL:
@@ -480,12 +482,12 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
               constants.SurveyLocation.EXTENSION_PROCEED :
               constants.SurveyLocation.EXTENSION_NOPROCEED;
           break;
-        case constants.EventType.HTTPS:
-          surveyUrl = constants.SurveyLocation.HTTPS;
+        case constants.EventType.VISITED_HTTPS:
+          surveyUrl = constants.SurveyLocation.VISITED_HTTPS;
           visitUrl = urlHandler.GetMinimalUrl(element['destination']);
           break;
-        case constants.EventType.HTTP:
-          surveyUrl = constants.SurveyLocation.HTTP;
+        case constants.EventType.VISITED_HTTP:
+          surveyUrl = constants.SurveyLocation.VISITED_HTTP;
           visitUrl = urlHandler.GetMinimalUrl(element['destination']);
           break;
         case constants.EventType.HARMFUL:
