@@ -12,6 +12,7 @@ import re
 
 DOGFOOD_START_DATE = datetime(2014, 12, 01, 0, 0, 0, 0)
 DEMOGRAPHIC_STABLE_DATE = datetime(2014, 12, 18, 0, 0, 0, 0)
+FRIENDS_AND_FAMILY_BETA_DATE = datetime(2015, 4, 9, 0, 0, 0, 0)
 DEMOGRAPHIC_CSV_PREFIX = 'demographics'
 CONDITIONS = [
     'ssl-overridable-proceed', 'ssl-overridable-noproceed',
@@ -23,7 +24,9 @@ TECHFAMILIAR_QUESTION_PREFIX = ('How familiar are you with each of the '
 ATTRIBUTE_QUESTION_PREFIX = 'To what degree do each of the following'
 
 
-def ProcessResults(json_in_file, csv_prefix):
+def ProcessResults(json_in_file, csv_prefix,
+                   start_date = FRIENDS_AND_FAMILY_BETA_DATE,
+                   demographic_start_date = FRIENDS_AND_FAMILY_BETA_DATE):
   """Take results from AppEngine JSON file, process, and write to CSV file.
 
   Results from the input JSON file will be filtered into the 9 experimental
@@ -47,11 +50,11 @@ def ProcessResults(json_in_file, csv_prefix):
   demo_results, parsed_events = _ParseSurveyResults(json_in_file)
 
   demo_results, demo_index = _FilterDemographicResults(
-      demo_results, DEMOGRAPHIC_STABLE_DATE)
+      demo_results, demographic_start_date)
   _WriteToCsv(demo_results, demo_index, csv_prefix +
               DEMOGRAPHIC_CSV_PREFIX + '.csv')
 
-  parsed_events = _DiscardResultsBeforeDate(parsed_events, DOGFOOD_START_DATE)
+  parsed_events = _DiscardResultsBeforeDate(parsed_events, start_date)
 
   for c in CONDITIONS:
     try:
@@ -71,7 +74,7 @@ def _ParseSurveyResults(in_file):
   demographic = filter(lambda x: x['survey_type'] == 'setup.js', parsed)
   events = filter(lambda x: x['survey_type'] != 'setup.js', parsed)
   return demographic, events
-  
+
 
 def _FilterDemographicResults(demo_res, discard_before_date):
   """Return a list of results that occur after the given date, that
@@ -84,7 +87,7 @@ def _FilterDemographicResults(demo_res, discard_before_date):
       file into list of dicts
     discard_before_date: A date of type datetime.datetime; demographic
       survey results before this date will be discarded
-    
+
   Returns:
     (1) List of filtered demographic results, filtering out
     results with PLACEHOLDER for every question or whose date_taken comes
@@ -101,7 +104,7 @@ def _FilterDemographicResults(demo_res, discard_before_date):
       if r['responses'][0]['question'] != 'PLACEHOLDER']
 
   _ReorderAttributeQuestions(filtered_results, TECHFAMILIAR_QUESTION_PREFIX)
-  
+
   # Any response with the max number of questions should now be fine as
   # the canonical list of questions; find one such response.
   max_list_len = len(filtered_results[0]['responses'])
@@ -120,7 +123,7 @@ def _DiscardResultsBeforeDate(results, date):
   Args:
     results: Results parsed from a raw JSON file into list of dicts
     date: A date of type datetime.datetime
-    
+
   Returns:
     List of results whose date_taken value comes after the given date.
   """
@@ -247,7 +250,7 @@ def _WriteToCsv(results, canonical_index, out_file):
   date_received, date_taken, participant_id, survey_type, and
   answers to each survey question to a CSV file. Uses
   canonical_questions as column headers for corresponding answers.
-    
+
   Args:
     results: List of results, where each result is a dict
         containing metadata and response data from a survey response.
@@ -305,7 +308,7 @@ def _ReorderAttributeQuestions(results, question_prefix):
     question_prefix: A string that uniquely defines the attribute questions
         to be reordered. A question in the results will be considered an
         attribute question to be reordered iff it starts with question_prefix.
-        
+
   Returns:
     The altered results. Modifies the input results list as well.
 
@@ -348,7 +351,7 @@ def _ReorderAttributeQuestions(results, question_prefix):
 
 def _ReplaceUrlWithPlaceholder(results):
   """Fix a bug by replacing domain names with placeholders
-    
+
   There was a bug in early dogfood versions of the survey extension
   in which URLs were included in questions where they
   were supposed to have a placeholder. The fix was to replace text like
