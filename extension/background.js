@@ -33,9 +33,9 @@ cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
-cesp.MINIMUM_SURVEY_DELAY = 0;//300000;  // 5 minutes in ms.
+cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
 cesp.FIRST_SURVEY_READY = 'firstSurveyReady';
-cesp.FIRST_SURVEY_DELAY_LENGTH = 1;//40;  // minutes
+cesp.FIRST_SURVEY_DELAY_LENGTH = 40;  // minutes
 
 // SETUP
 
