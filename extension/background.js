@@ -33,7 +33,9 @@ cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
-cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
+cesp.MINIMUM_SURVEY_DELAY = 0;//300000;  // 5 minutes in ms.
+cesp.FIRST_SURVEY_DELAY_ALARM = 'firstSurveyAlarm';
+cesp.FIRST_SURVEY_DELAY = 1;//40;  // minutes
 
 // SETUP
 
@@ -186,6 +188,8 @@ function storageUpdated(changes, areaName) {
       changes[constants.SETUP_KEY].newValue === constants.SETUP_COMPLETED) {
     setReadyForSurveysStorageValue(true);
     chrome.runtime.sendMessage({ 'message_type': constants.MSG_SETUP });
+    chrome.alarms.create(cesp.FIRST_SURVEY_DELAY_ALARM,
+        {delayInMinutes: cesp.FIRST_SURVEY_DELAY});
   }
 }
 
@@ -235,30 +239,40 @@ function getOperatingSystem() {
   });
 }
 
-// TRIGGERING EVENETS
+// TRIGGERING THE FIRST SURVEY (HTTP OR HTTPS)
+
+function lookForFirstSurveyEvent(alarm) {
+  if (alarm.name !== cesp.FIRST_SURVEY_DELAY_ALARM)
+    return;
+  chrome.tabs.onUpdated.addListener(handleTabUpdated);
+};
 
 function handleTabUpdated(tabId, changeInfo, tab) {
-  if (!tab.url) return;
-  var scheme = tab.url.split(':')[0];
-  if (!(scheme === 'https' || scheme === 'http')) return;
+  chrome.storage.sync.get(cesp.SURVEYS_SHOWN_TODAY, function(items) {
+    if (items[cesp.SURVEYS_SHOWN_TODAY] > 0)
+      return;
 
-  var timeFired = Date.now();
-  var element = {
-    destination: tab.url,
-    name: scheme,
-    referrer: '',
-    time: timeFired
-  };
-  var decision = {
-    details: false,
-    learn_more: false,
-    name: 'N/A',
-    time: timeFired
-  };
-  showSurveyNotification(element, decision);
-  // unregister
+    if (!tab.url) return;
+    var scheme = tab.url.split(':')[0];
+    if (!(scheme === 'https' || scheme === 'http')) return;
+
+    var timeFired = Date.now();
+    var element = {
+      destination: tab.url,
+      name: scheme,
+      referrer: '',
+      time: timeFired
+    };
+    var decision = {
+      details: false,
+      learn_more: false,
+      name: 'N/A',
+      time: timeFired
+    };
+    showSurveyNotification(element, decision);
+    chrome.tabs.onUpdated.removeListener(handleTabUpdated);
+  });
 };
-chrome.tabs.onUpdated.addListener(handleTabUpdated);
 
 // SURVEY HANDLING
 
@@ -282,8 +296,6 @@ chrome.alarms.onAlarm.addListener(clearNotifications);
  * @param {object} decision The decision the participant made.
  */
 function showSurveyNotification(element, decision) {
-  console.log(JSON.stringify(element));
-  console.log(JSON.stringify(decision));
   var eventType = constants.FindEventType(element['name']);
   switch (eventType) {
     case constants.EventType.SSL_OVERRIDABLE:
