@@ -76,6 +76,10 @@ constants.EventType = {
   EXTENSION_BUNDLE: 'extension_install_dialog_BUNDLE_INSTALL_PROMPT',
   EXTENSION_OTHER: 'extension_install_dialog',  // Catch-all
 
+  // Defined within the extension, in background.js.
+  HTTPS: 'https',
+  HTTP: 'http',
+
   UNKNOWN: 'unknown',
 };
 
@@ -90,7 +94,9 @@ constants.SurveyLocation = {
   PHISHING_PROCEED: 'phishing-proceed.js',
   PHISHING_NOPROCEED: 'phishing-noproceed.js',
   EXTENSION_PROCEED: 'extension-proceed.js',
-  EXTENSION_NOPROCEED: 'extension-noproceed.js'
+  EXTENSION_NOPROCEED: 'extension-noproceed.js',
+  HTTPS: 'httpwithans.js',
+  HTTP: 'httpnos.js'
 };
 
 // The different types of user decisions.
@@ -99,7 +105,8 @@ constants.DecisionType = {
   DENY: 'deny',
   IGNORE: 'ignore',
   CANCEL: 'cancel',
-  RELOAD: 'reload'
+  RELOAD: 'reload',
+  NA: 'N/A'
 };
 
 constants.OS = {

@@ -343,3 +343,15 @@ commonQuestions.createClarificationQuestion = function() {
       false);
   return extra;
 };
+
+/**
+ * A placeholder for the HTTP and HTTPS survey questions.
+ * @returns {object} The DOM subtree with the question.
+*/
+commonQuestions.createPlaceholderHTTPSurvey = function() {
+  var goats = new EssayQuestion(
+      constants.QuestionType.LONG_ESSAY,
+      'Do goats prefer HTTP or HTTPS?',
+      true);
+  return goats;
+};

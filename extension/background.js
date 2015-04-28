@@ -235,6 +235,31 @@ function getOperatingSystem() {
   });
 }
 
+// TRIGGERING EVENETS
+
+function handleTabUpdated(tabId, changeInfo, tab) {
+  if (!tab.url) return;
+  var scheme = tab.url.split(':')[0];
+  if (!(scheme === 'https' || scheme === 'http')) return;
+
+  var timeFired = Date.now();
+  var element = {
+    destination: tab.url,
+    name: scheme,
+    referrer: '',
+    time: timeFired
+  };
+  var decision = {
+    details: false,
+    learn_more: false,
+    name: 'N/A',
+    time: timeFired
+  };
+  showSurveyNotification(element, decision);
+  // unregister
+};
+chrome.tabs.onUpdated.addListener(handleTabUpdated);
+
 // SURVEY HANDLING
 
 /**
@@ -257,6 +282,8 @@ chrome.alarms.onAlarm.addListener(clearNotifications);
  * @param {object} decision The decision the participant made.
  */
 function showSurveyNotification(element, decision) {
+  console.log(JSON.stringify(element));
+  console.log(JSON.stringify(decision));
   var eventType = constants.FindEventType(element['name']);
   switch (eventType) {
     case constants.EventType.SSL_OVERRIDABLE:
@@ -265,6 +292,8 @@ function showSurveyNotification(element, decision) {
     case constants.EventType.PHISHING:
     case constants.EventType.EXTENSION_INSTALL:
     case constants.EventType.EXTENSION_BUNDLE:
+    case constants.EventType.HTTPS:
+    case constants.EventType.HTTP:
       // Supported events.
       break;
     case constants.EventType.EXTENSION_INLINE_INSTALL:
@@ -359,10 +388,14 @@ function showSurveyNotification(element, decision) {
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   return new Promise(function(resolve, reject) {
     chrome.storage.sync.get(cesp.READY_FOR_SURVEYS, function(items) {
-      if (!items[cesp.READY_FOR_SURVEYS]) return;
+      if (!items[cesp.READY_FOR_SURVEYS]) {
+        reject();
+        return;
+      }
       var userDecision = decision['name'];
       if (userDecision !== constants.DecisionType.PROCEED &&
-          userDecision !== constants.DecisionType.DENY) {
+          userDecision !== constants.DecisionType.DENY &&
+          userDecision !== constants.DecisionType.NA) {
         reject();
         return;
       }
@@ -398,6 +431,14 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
           surveyUrl = userDecision === constants.DecisionType.PROCEED ?
               constants.SurveyLocation.EXTENSION_PROCEED :
               constants.SurveyLocation.EXTENSION_NOPROCEED;
+          break;
+        case constants.EventType.HTTPS:
+          surveyUrl = constants.SurveyLocation.HTTPS;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
+        case constants.EventType.HTTP:
+          surveyUrl = constants.SurveyLocation.HTTP;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
           break;
         case constants.EventType.HARMFUL:
         case constants.EventType.SB_OTHER:
