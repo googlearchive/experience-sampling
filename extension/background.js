@@ -34,6 +34,8 @@ cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
 cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
+cesp.FIRST_SURVEY_READY = 'firstSurveyReady';
+cesp.FIRST_SURVEY_DELAY_LENGTH = 40;  // minutes
 
 // SETUP
 
@@ -54,6 +56,16 @@ function setReadyForSurveysStorageValue(newState) {
 function setSurveysShownDaily(newCount) {
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
+  chrome.storage.sync.set(items);
+}
+
+/**
+ * A helper method for updating the value in local storage.
+ * @param {bool} newState The desired new state for the first survey readiness.
+ */
+function setFirstSurveyReady(newState) {
+  var items = {};
+  items[cesp.FIRST_SURVEY_READY] = newState;
   chrome.storage.sync.set(items);
 }
 
@@ -91,6 +103,7 @@ function setupState(details) {
   // Set the count of surveys shown to 0. Reset it each day/week at midnight.
   setSurveysShownDaily(0);
   setSurveysShownWeekly(0);
+  setFirstSurveyReady(false);
   var midnight = new Date();
   midnight.setHours(0, 0, 0, 0);
   chrome.alarms.create(cesp.SURVEY_THROTTLE_DAILY_RESET_ALARM,
@@ -152,7 +165,6 @@ function maybeShowConsentOrSetupSurvey() {
   var consentCallback = function(lookup) {
     if (!lookup || !lookup[constants.CONSENT_KEY] ||
         lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
-      chrome.storage.onChanged.addListener(storageUpdated);
       getOperatingSystem().then(function(os) {
         chrome.tabs.create(
             {'url': chrome.extension.getURL('consent.html?os=' + os)});
@@ -186,8 +198,11 @@ function storageUpdated(changes, areaName) {
       changes[constants.SETUP_KEY].newValue === constants.SETUP_COMPLETED) {
     setReadyForSurveysStorageValue(true);
     chrome.runtime.sendMessage({ 'message_type': constants.MSG_SETUP });
+    chrome.alarms.create(cesp.FIRST_SURVEY_READY,
+        {delayInMinutes: cesp.FIRST_SURVEY_DELAY_LENGTH});
   }
 }
+chrome.storage.onChanged.addListener(storageUpdated);
 
 // Performs consent and registration checks on startup and install.
 chrome.runtime.onInstalled.addListener(maybeShowConsentOrSetupSurvey);
@@ -235,6 +250,67 @@ function getOperatingSystem() {
   });
 }
 
+// TRIGGERING THE FIRST SURVEY (HTTP OR HTTPS)
+
+/**
+ * Ensures the first (HTTP vs HTTPS) survey is completely ended. It should stop
+ * being available once the user takes it, or once the user takes any other
+ * survey.
+ */
+function endFirstSurvey() {
+  setFirstSurveyReady(false);
+  chrome.tabs.onUpdated.removeListener(handleTabUpdated);
+  chrome.alarms.onAlarm.removeListener(lookForFirstSurveyEvent);
+  chrome.alarms.clear(cesp.FIRST_SURVEY_READY);
+};
+
+/**
+ * After the initial wait time has completed, begin watching for potential
+ * events.
+ * @param {Alarm} alarm An alarm that may or may not be from the right timer.
+ */
+function lookForFirstSurveyEvent(alarm) {
+  if (alarm.name !== cesp.FIRST_SURVEY_READY)
+    return;
+  setFirstSurveyReady(true);
+};
+chrome.alarms.onAlarm.addListener(lookForFirstSurveyEvent);
+
+/**
+ * Look to see if a tab updated event would be appropriate for a survey. If so,
+ * fire a notification with an element and decision.
+ * @param {int} tabId The ID of the tab that was updated.
+ * @param {Object} changeInfo Information about the update event.
+ * @param {Tab} tab The tab that was updated.
+ */
+function handleTabUpdated(tabId, changeInfo, tab) {
+  chrome.storage.sync.get(cesp.FIRST_SURVEY_READY, function(items) {
+    if (!items || !items[cesp.FIRST_SURVEY_READY])
+      return;
+
+    if (!tab.url) return;
+    var scheme = tab.url.split(':')[0];
+    if (scheme !== 'https' && scheme !== 'http') return;
+
+    var timeFired = Date.now();
+    var element = {
+      destination: tab.url,
+      name: scheme,
+      referrer: '',
+      time: timeFired
+    };
+    var decision = {
+      details: false,
+      learn_more: false,
+      name: 'N/A',
+      time: timeFired
+    };
+    endFirstSurvey();
+    showSurveyNotification(element, decision);
+  });
+};
+chrome.tabs.onUpdated.addListener(handleTabUpdated);
+
 // SURVEY HANDLING
 
 /**
@@ -265,6 +341,8 @@ function showSurveyNotification(element, decision) {
     case constants.EventType.PHISHING:
     case constants.EventType.EXTENSION_INSTALL:
     case constants.EventType.EXTENSION_BUNDLE:
+    case constants.EventType.VISITED_HTTPS:
+    case constants.EventType.VISITED_HTTP:
       // Supported events.
       break;
     case constants.EventType.EXTENSION_INLINE_INSTALL:
@@ -302,6 +380,7 @@ function showSurveyNotification(element, decision) {
 
         clearNotifications();
         recordShowedNotification(eventType);
+        endFirstSurvey();
 
         var timePromptShown = new Date();
         var clickHandler = function(notificationId, buttonIndex) {
@@ -359,10 +438,14 @@ function showSurveyNotification(element, decision) {
 function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
   return new Promise(function(resolve, reject) {
     chrome.storage.sync.get(cesp.READY_FOR_SURVEYS, function(items) {
-      if (!items[cesp.READY_FOR_SURVEYS]) return;
+      if (!items[cesp.READY_FOR_SURVEYS]) {
+        reject();
+        return;
+      }
       var userDecision = decision['name'];
       if (userDecision !== constants.DecisionType.PROCEED &&
-          userDecision !== constants.DecisionType.DENY) {
+          userDecision !== constants.DecisionType.DENY &&
+          userDecision !== constants.DecisionType.NA) {
         reject();
         return;
       }
@@ -398,6 +481,14 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
           surveyUrl = userDecision === constants.DecisionType.PROCEED ?
               constants.SurveyLocation.EXTENSION_PROCEED :
               constants.SurveyLocation.EXTENSION_NOPROCEED;
+          break;
+        case constants.EventType.VISITED_HTTPS:
+          surveyUrl = constants.SurveyLocation.VISITED_HTTPS;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
+        case constants.EventType.VISITED_HTTP:
+          surveyUrl = constants.SurveyLocation.VISITED_HTTP;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
           break;
         case constants.EventType.HARMFUL:
         case constants.EventType.SB_OTHER:

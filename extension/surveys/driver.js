@@ -50,6 +50,8 @@ function loadSurveyScript() {
     case constants.SurveyLocation.MALWARE_NOPROCEED:
     case constants.SurveyLocation.PHISHING_PROCEED:
     case constants.SurveyLocation.PHISHING_NOPROCEED:
+    case constants.SurveyLocation.VISITED_HTTPS:
+    case constants.SurveyLocation.VISITED_HTTP:
       break;
     case constants.SurveyLocation.EXTENSION_PROCEED:
     case constants.SurveyLocation.EXTENSION_NOPROCEED:

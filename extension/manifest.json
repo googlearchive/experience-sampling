@@ -15,6 +15,7 @@
     "experienceSamplingPrivate",
     "notifications",
     "storage",
+    "tabs",
     "unlimitedStorage",
     "https://chrome-experience-sampling.appspot.com/_ah/api/*"
   ],
