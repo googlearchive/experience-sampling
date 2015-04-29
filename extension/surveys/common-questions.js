@@ -345,13 +345,44 @@ commonQuestions.createClarificationQuestion = function() {
 };
 
 /**
- * A placeholder for the HTTP and HTTPS survey questions.
+ * Did you notice the symbol on the left?
  * @returns {object} The DOM subtree with the question.
-*/
-commonQuestions.createPlaceholderHTTPSurvey = function() {
-  var goats = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'Do goats prefer HTTP or HTTPS?',
+ */
+commonQuestions.createNoticeSymbolQuestion = function() {
+  var symbol = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Have you ever noticed the symbol on the left of the screenshot?',
+      true,
+      ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
+      constants.Randomize.ANCHOR_LAST);
+  symbol.setPlaceholder('Have you ever noticed the symbol on the left of the ' +
+      'screenshot?');
+  return symbol;
+};
+
+/**
+ * What does the symbol mean?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createSymbolMeaningQuestion = function() {
+  var symbol = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'What does the symbol make you think of?',
       true);
-  return goats;
+  symbol.setPlaceholder('What does the symbol make you think of?');
+  return symbol;
+};
+
+/**
+ * Would you expect a difference between http://site and https://site?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createDifferenceQuestion = function() {
+  var difference = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'Would you expect a difference between ' + surveyDriver.questionUrl +
+          ' and ' + surveyDriver.questionUrl + '?',
+      true);
+  difference.setPlaceholder('What does the symbol make you think of?');
+  return difference;
 };
