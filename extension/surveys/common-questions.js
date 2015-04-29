@@ -345,13 +345,76 @@ commonQuestions.createClarificationQuestion = function() {
 };
 
 /**
- * A placeholder for the HTTP and HTTPS survey questions.
+ * Did you notice the symbol on the left?
  * @returns {object} The DOM subtree with the question.
-*/
-commonQuestions.createPlaceholderHTTPSurvey = function() {
-  var goats = new EssayQuestion(
-      constants.QuestionType.LONG_ESSAY,
-      'Do goats prefer HTTP or HTTPS?',
-      true);
-  return goats;
+ */
+commonQuestions.createHttpNoticeSymbolQuestion = function() {
+  var symbol = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Have you ever noticed a white symbol next to the URL before?',
+      true,
+      ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
+      constants.Randomize.ANCHOR_LAST);
+  symbol.setPlaceholder('Have you ever noticed the symbol on the left of the ' +
+      'screenshot?');
+  return symbol;
+};
+
+/**
+ * Did you notice the symbol on the left?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createHttpsNoticeSymbolQuestion = function() {
+  var symbol = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Have you ever noticed a green symbol next to the URL before?',
+      true,
+      ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
+      constants.Randomize.ANCHOR_LAST);
+  symbol.setPlaceholder('Have you ever noticed the symbol on the left of the ' +
+      'screenshot?');
+  return symbol;
+};
+
+
+/**
+ * What does the symbol make you think of? (HTTP version)
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createHttpSymbolMeaningQuestion = function() {
+  var symbol = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'What does the white symbol next to the URL make you think of?',
+      false);
+  symbol.setPlaceholder('What does the white symbol make you think of?');
+  return symbol;
+};
+
+/**
+ * What does the symbol make you think of? (HTTPS version)
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createHttpsSymbolMeaningQuestion = function() {
+  var symbol = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'What does the green symbol next to the URL make you think of?',
+      false);
+  symbol.setPlaceholder('What does the green symbol make you think of?');
+  return symbol;
+};
+
+/**
+ * Would you expect a difference between http://site and https://site?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createDifferenceQuestion = function() {
+  var difference = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'Would you expect a difference between http://' +
+          surveyDriver.questionUrl + ' and https://' +
+          surveyDriver.questionUrl + '?',
+      false);
+  difference.setPlaceholder('Would you expect a difference between [HTTP URL]' +
+      ' and [HTTPS URL]?');
+  return difference;
 };
