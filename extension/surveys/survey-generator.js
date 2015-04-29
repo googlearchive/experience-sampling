@@ -544,11 +544,12 @@ function getFormValues(questionArr, form) {
       // Checkboxes may have multiple answers.
       var answerList = document.querySelectorAll(
           'input[name="' + questionLookup + '"]:checked');
-      for (var j = 0; j < answerList.length; j++) {
-        var response = new SurveySubmission.Response(
-            questionStr, answerList[j].value || 'NOANSWER');
-        responses.push(response);
+      var answer = answerList[0].value || 'NOANSWER';
+      for (var j = 1; j < answerList.length; j++) {
+        answer = answer.concat(",", answerList[j].value)
       }
+      var response = new SurveySubmission.Response(questionStr, answer);
+      responses.push(response);
     } else if (question.questionType ===
                constants.QuestionType.MULT_HORIZ_SCALE) {
       // MULT_HOR_SCALE questions have multiple levels of responses.
