@@ -378,7 +378,7 @@ commonQuestions.createHttpsNoticeSymbolQuestion = function() {
 
 
 /**
- * What does the symbol mean?
+ * What does the symbol make you think of? (HTTP version)
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createHttpSymbolMeaningQuestion = function() {
@@ -386,12 +386,12 @@ commonQuestions.createHttpSymbolMeaningQuestion = function() {
       constants.QuestionType.SHORT_ESSAY,
       'What does the white symbol next to the URL make you think of?',
       false);
-  symbol.setPlaceholder('What does the symbol make you think of?');
+  symbol.setPlaceholder('What does the white symbol make you think of?');
   return symbol;
 };
 
 /**
- * What does the symbol mean?
+ * What does the symbol make you think of? (HTTPS version)
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createHttpsSymbolMeaningQuestion = function() {
@@ -399,7 +399,7 @@ commonQuestions.createHttpsSymbolMeaningQuestion = function() {
       constants.QuestionType.SHORT_ESSAY,
       'What does the green symbol next to the URL make you think of?',
       false);
-  symbol.setPlaceholder('What does the symbol make you think of?');
+  symbol.setPlaceholder('What does the green symbol make you think of?');
   return symbol;
 };
 
@@ -414,6 +414,7 @@ commonQuestions.createDifferenceQuestion = function() {
           surveyDriver.questionUrl + ' and https://' +
           surveyDriver.questionUrl + '?',
       false);
-  difference.setPlaceholder('What does the symbol make you think of?');
+  difference.setPlaceholder('Would you expect a difference between [HTTP URL]' +
+      ' and [HTTPS URL]?');
   return difference;
 };

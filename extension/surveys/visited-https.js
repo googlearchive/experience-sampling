@@ -18,13 +18,13 @@ function addQuestions(parentNode) {
 function setScreenshot() {
   switch (surveyDriver.operatingSystem) {
     case constants.OS.MAC:
+    case constants.OS.CROS:
       $('example-img').src = 'screenshots/https-mac.png';
       break;
     case constants.OS.LINUX:
       $('example-img').src = 'screenshots/https-linux.png';
       break;
     case constants.OS.WIN:
-    case constants.OS.CROS:
     default:
       $('example-img').src = 'screenshots/https-win.png';
   }
