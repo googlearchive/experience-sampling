@@ -348,10 +348,10 @@ commonQuestions.createClarificationQuestion = function() {
  * Did you notice the symbol on the left?
  * @returns {object} The DOM subtree with the question.
  */
-commonQuestions.createNoticeSymbolQuestion = function() {
+commonQuestions.createHttpNoticeSymbolQuestion = function() {
   var symbol = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you ever noticed the symbol on the left of the screenshot?',
+      'Have you ever noticed a white symbol next to the URL before?',
       true,
       ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
@@ -361,14 +361,44 @@ commonQuestions.createNoticeSymbolQuestion = function() {
 };
 
 /**
+ * Did you notice the symbol on the left?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createHttpsNoticeSymbolQuestion = function() {
+  var symbol = new FixedQuestion(
+      constants.QuestionType.RADIO,
+      'Have you ever noticed a green symbol next to the URL before?',
+      true,
+      ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
+      constants.Randomize.ANCHOR_LAST);
+  symbol.setPlaceholder('Have you ever noticed the symbol on the left of the ' +
+      'screenshot?');
+  return symbol;
+};
+
+
+/**
  * What does the symbol mean?
  * @returns {object} The DOM subtree with the question.
  */
-commonQuestions.createSymbolMeaningQuestion = function() {
+commonQuestions.createHttpSymbolMeaningQuestion = function() {
   var symbol = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
-      'What does the symbol make you think of?',
-      true);
+      'What does the white symbol next to the URL make you think of?',
+      false);
+  symbol.setPlaceholder('What does the symbol make you think of?');
+  return symbol;
+};
+
+/**
+ * What does the symbol mean?
+ * @returns {object} The DOM subtree with the question.
+ */
+commonQuestions.createHttpsSymbolMeaningQuestion = function() {
+  var symbol = new EssayQuestion(
+      constants.QuestionType.SHORT_ESSAY,
+      'What does the green symbol next to the URL make you think of?',
+      false);
   symbol.setPlaceholder('What does the symbol make you think of?');
   return symbol;
 };
@@ -380,9 +410,10 @@ commonQuestions.createSymbolMeaningQuestion = function() {
 commonQuestions.createDifferenceQuestion = function() {
   var difference = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
-      'Would you expect a difference between ' + surveyDriver.questionUrl +
-          ' and ' + surveyDriver.questionUrl + '?',
-      true);
+      'Would you expect a difference between http://' +
+          surveyDriver.questionUrl + ' and https://' +
+          surveyDriver.questionUrl + '?',
+      false);
   difference.setPlaceholder('What does the symbol make you think of?');
   return difference;
 };

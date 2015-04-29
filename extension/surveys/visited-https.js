@@ -7,8 +7,8 @@
  * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {
-  addQuestion(parentNode, commonQuestions.createNoticeSymbolQuestion());
-  addQuestion(parentNode, commonQuestions.createSymbolMeaningQuestion());
+  addQuestion(parentNode, commonQuestions.createHttpsNoticeSymbolQuestion());
+  addQuestion(parentNode, commonQuestions.createHttpsSymbolMeaningQuestion());
   addQuestion(parentNode, commonQuestions.createDifferenceQuestion());
 }
 
@@ -28,4 +28,12 @@ function setScreenshot() {
     default:
       $('example-img').src = 'screenshots/https-win.png';
   }
+  $('example-img').style.width = 'auto';
+  $('example-img').style.height = 'auto';
+
+  // For HTTP/HTTPS, we also want to update the caption.
+  $('saw-a-page').textContent =
+      'You just now saw a URL bar, like the one shown above.';
+  $('following-questions').textContent =
+      'The following questions are about the URL bar.';
 }
