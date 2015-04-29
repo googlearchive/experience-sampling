@@ -59,7 +59,6 @@
   background-color: #ECF3FE;
   border: none;
   margin-bottom: 1em;
-  min-width: 900px;
   padding-bottom: 8px;
   padding-left: 3%;
   padding-right: 3%;
@@ -96,6 +95,10 @@ h2.scroll-heading {
   padding-bottom: 5px;
   text-align: center;
   width: 130px;
+}
+
+.horizontal-scale-container {
+  min-width: 870px;
 }
 
 html, body {
