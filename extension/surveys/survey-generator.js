@@ -268,6 +268,8 @@ ScaleQuestion.prototype.setAttributes = function(attributes) {
 ScaleQuestion.prototype.makeSingleRow =
     function(horizontal, questionName, reverse, showLabels) {
   var container = document.createElement('div');
+  if (horizontal)
+    container.classList.add('horizontal-scale-container')
   var reversedScale = reverse ?
       flipArray(this.scale, this.randomize) :
       this.scale;

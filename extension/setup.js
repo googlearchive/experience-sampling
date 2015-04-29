@@ -436,7 +436,7 @@ function addQuestions(parentNode) {
       constants.Randomize.NONE);
   addQuestion(parentNode, antivirus);
 
-  var techFamiliar = new ScaleQuestion(
+  /*var techFamiliar = new ScaleQuestion(
       constants.QuestionType.MULT_HORIZ_SCALE,
       'How familiar are you with each of the following computer and' +
       ' Internet-related items? I have...',
@@ -460,7 +460,7 @@ function addQuestions(parentNode) {
         'HTRMB',
         'DendoPort'
       ]);
-  addQuestion(parentNode, techFamiliar);
+  addQuestion(parentNode, techFamiliar);*/
 }
 
 /**
@@ -480,6 +480,7 @@ function setupSurveyForm(savedState) {
     // Show the survey.
     $('explanation').classList.remove('hidden');
     $('survey-container').classList.remove('hidden');
+    $('survey-container').classList.add('setup-survey');
     addQuestions($('survey-form'));
     $('survey-form').appendChild(makeSubmitButtonDOM());
     document.forms['survey-form'].addEventListener(
