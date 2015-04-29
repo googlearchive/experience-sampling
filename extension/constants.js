@@ -134,7 +134,7 @@ constants.FindEventType = function(str) {
 };
 
 // After a survey is completed, automatically close the survey after a pause.
-constants.SURVEY_CLOSE_TIME = 9000;  // Nine seconds, in milliseconds.
+constants.SURVEY_CLOSE_TIME = 300000;  // Five minutes, in milliseconds.
 
 // An element lookup shortcut, per convention.
 var $ = function(id) { return document.getElementById(id); };
