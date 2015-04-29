@@ -24,9 +24,11 @@ TECHFAMILIAR_QUESTION_PREFIX = ('How familiar are you with each of the '
 ATTRIBUTE_QUESTION_PREFIX = 'To what degree do each of the following'
 
 
-def ProcessResults(json_in_file, csv_prefix,
-                   start_date = FRIENDS_AND_FAMILY_BETA_DATE,
-                   demographic_start_date = FRIENDS_AND_FAMILY_BETA_DATE):
+def ProcessResults(
+    json_in_file,
+    csv_prefix,
+    filter_items_before_date = FRIENDS_AND_FAMILY_BETA_DATE,
+    filter_demographic_items_before_date = FRIENDS_AND_FAMILY_BETA_DATE):
   """Take results from AppEngine JSON file, process, and write to CSV file.
 
   Results from the input JSON file will be filtered into the 9 experimental
@@ -50,11 +52,11 @@ def ProcessResults(json_in_file, csv_prefix,
   demo_results, parsed_events = _ParseSurveyResults(json_in_file)
 
   demo_results, demo_index = _FilterDemographicResults(
-      demo_results, demographic_start_date)
+      demo_results, filter_demographic_items_before_date)
   _WriteToCsv(demo_results, demo_index, csv_prefix +
               DEMOGRAPHIC_CSV_PREFIX + '.csv')
 
-  parsed_events = _DiscardResultsBeforeDate(parsed_events, start_date)
+  parsed_events = _DiscardResultsBeforeDate(parsed_events, filter_items_before_date)
 
   for c in CONDITIONS:
     try:

@@ -37,7 +37,6 @@ class TestProcessResults(unittest.TestCase):
                     csv_headers)
 
       test_line = csv_file.readline()
-      print test_line
       self.assertIn(('P2DA1,"0-Female-Whatisyourgender,'
                      '1-Male-Whatisyourgender,2-Other-Whatisyourgender",'
                      'P2DendoPortAnswer,P2TCPIPAnswer'), test_line)
