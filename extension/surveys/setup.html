@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <div class="centered inner-centering">
+  <div class="centered inner-centering" id="page-title">
     <h2>Join Chrome's survey program</h2>
   </div>
 
@@ -22,16 +22,16 @@
       use this information to identify you personally. Thank you!
   </div>
 
-  <div class="centered inner-centering alert hidden" id="already-submitted">
+  <div class="centered inner-centering alert hidden" id="already-completed">
     <b>You've already completed this form. Thanks!</b>
     <br>
-    This window will close in a few seconds.
+    This window will close in a few minutes.
   </div>
 
-  <div class="centered inner-centering alert hidden" id="thank-you">
-    <b>Thank you for participating!</b>
-    <br>
-    This window will close in a few seconds.
+  <div class="centered inner-centering alert-gentle hidden" id="thank-you">
+    <p class="heavy">Thanks for signing up!</p>
+    <p>Keep an eye out for notifications that look like this:</p>
+    <img src="screenshots/example-notification.png" id="thanks-notification">
   </div>
 
   <div class="centered hidden" id="survey-container">

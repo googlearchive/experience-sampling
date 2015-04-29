@@ -534,6 +534,7 @@ function setupFormSubmitted(event) {
   $('explanation').classList.add('hidden');
   $('survey-container').classList.add('hidden');
   $('thank-you').classList.remove('hidden');
+  $('page-title').classList.add('hidden');
   setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
 }
 
