@@ -351,12 +351,14 @@ commonQuestions.createClarificationQuestion = function() {
 commonQuestions.createHttpNoticeSymbolQuestion = function() {
   var symbol = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you ever noticed a white symbol next to the URL before?',
+      'Have you ever noticed the white symbol (circled in red above)' +
+      ' to the left of the URL before?',
       true,
       ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
-  symbol.setPlaceholder('Have you ever noticed the symbol on the left of the ' +
-      'screenshot?');
+  symbol.setPlaceholder(
+      'Have you ever noticed the while symbol (circled in red above)' +
+      ' to the left of the URL before?');
   return symbol;
 };
 
@@ -367,12 +369,14 @@ commonQuestions.createHttpNoticeSymbolQuestion = function() {
 commonQuestions.createHttpsNoticeSymbolQuestion = function() {
   var symbol = new FixedQuestion(
       constants.QuestionType.RADIO,
-      'Have you ever noticed a green symbol next to the URL before?',
+      'Have you ever noticed the green symbol (circled in red above)' +
+      ' to the left of the URL before?',
       true,
       ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
-  symbol.setPlaceholder('Have you ever noticed the symbol on the left of the ' +
-      'screenshot?');
+  symbol.setPlaceholder(
+      'Have you ever noticed the green symbol (circled in red above)' +
+      ' to the left of the URL before?');
   return symbol;
 };
 
@@ -384,9 +388,10 @@ commonQuestions.createHttpsNoticeSymbolQuestion = function() {
 commonQuestions.createHttpSymbolMeaningQuestion = function() {
   var symbol = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
-      'What does the white symbol next to the URL make you think of?',
+      'What does the white symbol to the left of the URL make you think of?',
       false);
-  symbol.setPlaceholder('What does the white symbol make you think of?');
+  symbol.setPlaceholder(
+      'What does the white symbol to the left of the URL make you think of?');
   return symbol;
 };
 
@@ -397,9 +402,10 @@ commonQuestions.createHttpSymbolMeaningQuestion = function() {
 commonQuestions.createHttpsSymbolMeaningQuestion = function() {
   var symbol = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
-      'What does the green symbol next to the URL make you think of?',
+      'What does the green symbol to the left of the URL make you think of?',
       false);
-  symbol.setPlaceholder('What does the green symbol make you think of?');
+  symbol.setPlaceholder(
+      'What does the green symbol to the left of the URL make you think of?');
   return symbol;
 };
 
