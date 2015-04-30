@@ -19,14 +19,14 @@ function setScreenshot() {
   switch (surveyDriver.operatingSystem) {
     case constants.OS.MAC:
     case constants.OS.CROS:
-      $('example-img').src = 'screenshots/http-mac.png';
+      $('example-img').src = 'screenshots/http-mac-circled.png';
       break;
     case constants.OS.LINUX:
-      $('example-img').src = 'screenshots/http-linux.png';
+      $('example-img').src = 'screenshots/http-linux-circled.png';
       break;
     case constants.OS.WIN:
     default:
-      $('example-img').src = 'screenshots/http-win.png';
+      $('example-img').src = 'screenshots/http-win-circled.png';
   }
   $('example-img').style.width = 'auto';
   $('example-img').style.height = 'auto';
