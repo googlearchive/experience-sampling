@@ -47,12 +47,19 @@
 }
 
 .example {
-  padding-top: 20px;
+  position: relative;
+  vertical-align: middle;
 }
 
-#explanation {
+.explanation-text {
   max-width: 600px;
   padding-bottom: 20px;
+}
+
+.explanation-img {
+  line-height: 220px;
+  height: 220px;
+  max-width: 600px;
 }
 
 .fieldset {
