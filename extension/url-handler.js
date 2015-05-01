@@ -39,60 +39,66 @@ urlHandler.GetMinimalUrl = function(inputUrl) {
 urlHandler.IsGreenLockSite = function(url) {
   // Reject a site unless it's a domain known to produce a green lock.
   var greenLockSites = [
-    '^google\\.\\\\*',
-    '^facebook\\.com',
-    '^mail\\.ru',
-    '^pinterest\\.com',
-    '^baidu\\.com',
-    '^ask\\.com',
-    '^stackoverflow\\.com',
-    '^twitter\\.com',
-    '^linkedin\\.com',
-    '^live\\.com',
-    '^bing\\.com',
-    '^tumblr\\.com',
-    '^imgur\\.com',
-    '^instagram\\.com',
-    '^wordpress\\.com',
-    '^yahoo\\.com',
-    '^wikipedia\\.org',
-    '^wikimedia\\.org',
-    '^paypal\\.com',
-    '^vk\\.com',
-    '\\\\*\\.google\\.\\\\*',
-    '\\\\*\\.facebook\\.com',
-    '\\\\*\\.mail\\.ru',
-    '\\\\*\\.pinterest\\.com',
-    '\\\\*\\.baidu\\.com',
-    '\\\\*\\.ask\\.com',
-    '\\\\*\\.stackoverflow\\.com',
-    '\\\\*\\.twitter\\.com',
-    '\\\\*\\.linkedin\\.com',
-    '\\\\*\\.live\\.com',
-    '\\\\*\\.bing\\.com',
-    '\\\\*\\.tumblr\\.com',
-    '\\\\*\\.imgur\\.com',
-    '\\\\*\\.instagram\\.com',
-    '\\\\*\\.wordpress\\.com',
-    '\\\\*\\.yahoo\\.com',
-    '\\\\*\\.wikipedia\\.org',
-    '\\\\*\\.wikimedia\\.org',
-    '\\\\*\\.paypal\\.com',
-    '\\\\*\\.vk\\.com',
+    /^google\..\\*/,
+    /^facebook\.com/,
+    /^mail\.ru/,
+    /^pinterest\.com/,
+    /^baidu\.com/,
+    /^ask\.com/,
+    /^stackoverflow\.com/,
+    /^twitter\.com/,
+    /^linkedin\.com/,
+    /^live\.com/,
+    /^bing\.com/,
+    /^tumblr\.com/,
+    /^imgur\.com/,
+    /^instagram\.com/,
+    /^wordpress\.com/,
+    /^yahoo\.com/,
+    /^wikipedia\.org/,
+    /^wikimedia\.org/,
+    /^paypal\.com/,
+    /^vk\.com/,
+    /\\*\.google\..\\*/,
+    /\\*\.facebook\.com/,
+    /\\*\.mail\.ru/,
+    /\\*\.pinterest\.com/,
+    /\\*\.baidu\.com/,
+    /\\*\.ask\.com/,
+    /\\*\.stackoverflow\.com/,
+    /\\*\.twitter\.com/,
+    /\\*\.linkedin\.com/,
+    /\\*\.live\.com/,
+    /\\*\.bing\.com/,
+    /\\*\.tumblr\.com/,
+    /\\*\.imgur\.com/,
+    /\\*\.instagram\.com/,
+    /\\*\.wordpress\.com/,
+    /\\*\.yahoo\.com/,
+    /\\*\.wikipedia\.org/,
+    /\\*\.wikimedia\.org/,
+    /\\*\.paypal\.com/,
+    /\\*\.vk\.com/
   ];
   var shortUrl = urlHandler.GetMinimalUrl(url);
-  var whitelistRe = new RegExp(greenLockSites.join('|'));
-  if (!shortUrl.match(whitelistRe))
-    return false;
+  var found = false;
+  for (var i = 0; i < greenLockSites.length; i++) {
+    if (shortUrl.match(greenLockSites[i])) {
+      found = true;
+      break;
+    }
+  }
+  if (!found) return false;
 
   // Reject subdomains/directories of whitelisted sites with mixed content.
   var blacklist = [
-    '^https\:\\/\\/images\\.google\\.com\\\\*',
-    '^https\:\/\/www\\.bing\\.com\/images\\\\*'
+    /^https\:\/\/images\.google\.com\/?\\*/,
+    /^https\:\/\/www\.bing\.com\/images\\*/
   ];
-  var blacklistRe = new RegExp(blacklist.join('|'));
-  if (url.match(blacklistRe))
-    return false;
+  for (var i = 0; i < blacklist.length; i++) {
+    if (url.match(blacklist[i]))
+      return false;
+  }
 
   return true;
 };
