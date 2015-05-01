@@ -6,7 +6,7 @@
   "version": "3.0.0",
 
   "background": {
-    "scripts": ["constants.js", "survey-submission.js", "url-prettify.js", "background.js"],
+    "scripts": ["constants.js", "survey-submission.js", "url-handler.js", "background.js"],
     "persistent": false
   },
 

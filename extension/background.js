@@ -35,7 +35,7 @@ cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
 cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
 cesp.FIRST_SURVEY_READY = 'firstSurveyReady';
-cesp.FIRST_SURVEY_DELAY_LENGTH = 40;  // minutes
+cesp.FIRST_SURVEY_DELAY_LENGTH = 1;//40;  // minutes
 
 // SETUP
 
@@ -288,9 +288,11 @@ function handleTabUpdated(tabId, changeInfo, tab) {
     if (!items || !items[cesp.FIRST_SURVEY_READY])
       return;
 
+    // Only survey about HTTP and HTTPS navigations.
     if (!tab.url) return;
     var scheme = tab.url.split(':')[0];
     if (scheme !== 'https' && scheme !== 'http') return;
+    if (scheme === 'https' && !urlHandler.IsGreenLockSite(tab.url)) return;
 
     var timeFired = Date.now();
     var element = {
