@@ -69,6 +69,9 @@ function runTests() {
   // Origin with non-standard port.
   runMinimizerTest('http://www.example.com:3000', 'www.example.com:3000');
 
+  // chrome:// scheme.
+  runMinimizerTest('chrome://interstitials', 'chrome://interstitials');
+
   // Check that whitelisting works.
   runGreenLockTest('https://www.google.com', true);
   runGreenLockTest('https://google.com', true);

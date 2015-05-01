@@ -9,26 +9,26 @@ var urlHandler = {};  // Namespace
 urlHandler.GetMinimalUrl = function(inputUrl) {
   var scheme = '';
   var hostport = '';
-  var parser = document.createElement('a');
-  parser.href = inputUrl;
+  var anchor = document.createElement('a');
+  anchor.href = inputUrl;
 
-  if (parser.protocol === 'chrome-extension:') {
-    // The parser interprets some urls without schemes as relative to
+  if (anchor.protocol === 'chrome-extension:') {
+    // The anchor interprets some urls without schemes as relative to
     // chrome-extension:. If that happens, turn it into a https url instead.
-    parser.href = 'https://' + inputUrl;
+    anchor.href = 'https://' + inputUrl;
   }
-  if ((parser.protocol === 'file:' || parser.protocol === ':') && 
+  if ((anchor.protocol === 'file:' || anchor.protocol === ':') && 
       (inputUrl.substring(0, 6).indexOf(':') == -1)) {
     // If the protocol is empty, it might be missing the scheme. Add a scheme
     // and then try again.
     inputUrl = 'http://' + inputUrl;
-    parser.href = inputUrl;
+    anchor.href = inputUrl;
   }
 
-  if (parser.protocol !== 'http:' && parser.protocol !== 'https:')
-    scheme = parser.protocol + '//';
+  if (anchor.protocol !== 'http:' && anchor.protocol !== 'https:')
+    scheme = anchor.protocol + '//';
 
-  return scheme + parser.host;
+  return scheme + anchor.host;
 };
 
 /**
