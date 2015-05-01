@@ -288,9 +288,11 @@ function handleTabUpdated(tabId, changeInfo, tab) {
     if (!items || !items[cesp.FIRST_SURVEY_READY])
       return;
 
+    // Only survey about HTTP and HTTPS navigations.
     if (!tab.url) return;
     var scheme = tab.url.split(':')[0];
     if (scheme !== 'https' && scheme !== 'http') return;
+    if (scheme === 'https' && !urlHandler.IsGreenLockSite(tab.url)) return;
 
     var timeFired = Date.now();
     var element = {

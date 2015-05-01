@@ -14,13 +14,24 @@ function addResult(testInput, testOutput, passed) {
 }
 
 /**
- * Check whether the ReplaceUrl method gives the expected output.
+ * Check whether the GetMinimalUrl method gives the expected output.
  * @param {string} testInput The input URL.
  * @param {string} expectedOutput The anticipated output URL.
- * @returns {boolean} Whether they result matches the output.
+ * @returns {boolean} Whether the result matches the output.
  */
-function runTest(testInput, expectedOutput) {
+function runMinimizerTest(testInput, expectedOutput) {
   var actualOutput = urlHandler.GetMinimalUrl(testInput);
+  addResult(testInput, actualOutput, actualOutput === expectedOutput);
+}
+
+/**
+ * Check whether the ReplaceUrl method gives the expected output.
+ * @param {string} testInput The input URL.
+ * @param {bool} expectedOutput The anticipated result.
+ * @returns {boolean} Whether the result matches the output.
+ */
+function runGreenLockTest(testInput, expectedOutput) {
+  var actualOutput = urlHandler.IsGreenLockSite(testInput);
   addResult(testInput, actualOutput, actualOutput === expectedOutput);
 }
 
@@ -29,39 +40,55 @@ function runTest(testInput, expectedOutput) {
  */
 function runTests() {
   // Basic origin.
-  runTest('www.example.com', 'www.example.com');
+  runMinimizerTest('www.example.com', 'www.example.com');
 
   // Origin with a trailing slash.
-  runTest('www.example.com/', 'www.example.com');
+  runMinimizerTest('www.example.com/', 'www.example.com');
 
   // Origin with a simple path.
-  runTest('www.example.com/path', 'www.example.com');
+  runMinimizerTest('www.example.com/path', 'www.example.com');
 
   // Origin with a longer path.
-  runTest('www.example.com/path.path/path/', 'www.example.com');
+  runMinimizerTest('www.example.com/path.path/path/', 'www.example.com');
 
   // Origin with a mix of numbers and letters.
-  runTest('www.exa123mple.com', 'www.exa123mple.com');
+  runMinimizerTest('www.exa123mple.com', 'www.exa123mple.com');
 
   // Origin with scheme.
-  runTest('https://www.example.com', 'www.example.com');
+  runMinimizerTest('https://www.example.com', 'www.example.com');
 
   // Origin with scheme.
-  runTest('http://www.example.com', 'www.example.com');
+  runMinimizerTest('http://www.example.com', 'www.example.com');
 
   // Origin with non-standard scheme.
-  runTest('file://www.example.com', 'file://www.example.com');
-
-  // Origin with missing scheme.
-  runTest('://www.example.com', '');
+  runMinimizerTest('file://www.example.com', 'file://www.example.com');
 
   // Origin with standard port.
-  runTest('http://www.example.com:80', 'www.example.com');
+  runMinimizerTest('http://www.example.com:80', 'www.example.com');
 
   // Origin with non-standard port.
-  runTest('http://www.example.com:3000', 'www.example.com:3000');
+  runMinimizerTest('http://www.example.com:3000', 'www.example.com:3000');
 
-  // Origin with 
+  // chrome:// scheme.
+  runMinimizerTest('chrome://interstitials', 'chrome://interstitials');
+
+  // Check that whitelisting works.
+  runGreenLockTest('https://www.google.com', true);
+  runGreenLockTest('https://google.com', true);
+  runGreenLockTest('https://mail.google.com', true);
+  runGreenLockTest('https://googlefoo.com', false);
+  runGreenLockTest('https://foogoogle.com', false);
+  runGreenLockTest('https://googleqcom', false);
+  runGreenLockTest('https://foo.com', false);
+  runGreenLockTest('https://google.co.uk', true);
+  runGreenLockTest('https://www.google.fr', true);
+
+  // This isn't ideal, but I want to capture all Google properties.
+  runGreenLockTest('https://google.example.com', true);
+
+  // Check that blacklisting works.
+  runGreenLockTest('https://images.google.com', false);
+  runGreenLockTest('https://images.google.com/sldfkj', false);
 }
 
 document.addEventListener('DOMContentLoaded', runTests);
