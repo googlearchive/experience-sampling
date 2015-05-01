@@ -35,7 +35,9 @@ cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
 cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
 cesp.FIRST_SURVEY_READY = 'firstSurveyReady';
-cesp.FIRST_SURVEY_DELAY_LENGTH = 40;  // minutes
+cesp.FIRST_SURVEY_OVER = 'firstSurveyOver';
+cesp.FIRST_SURVEY_DELAY_LENGTH = 3;  // minutes
+cesp.FIRST_SURVEY_END_LENGTH = 360;  // minutes
 
 // SETUP
 
@@ -200,6 +202,8 @@ function storageUpdated(changes, areaName) {
     chrome.runtime.sendMessage({ 'message_type': constants.MSG_SETUP });
     chrome.alarms.create(cesp.FIRST_SURVEY_READY,
         {delayInMinutes: cesp.FIRST_SURVEY_DELAY_LENGTH});
+    chrome.alarms.create(cesp.FIRST_SURVEY_OVER,
+        {delayInMinutes: cesp.FIRST_SURVEY_END_LENGTH});
   }
 }
 chrome.storage.onChanged.addListener(storageUpdated);
@@ -260,21 +264,41 @@ function getOperatingSystem() {
 function endFirstSurvey() {
   setFirstSurveyReady(false);
   chrome.tabs.onUpdated.removeListener(handleTabUpdated);
-  chrome.alarms.onAlarm.removeListener(lookForFirstSurveyEvent);
+  chrome.runtime.onStartup.removeListener(endFirstSurvey);
+  chrome.alarms.onAlarm.removeListener(lookForStartFirstSurveyEvent);
+  chrome.alarms.onAlarm.removeListener(lookForEndFirstSurveyEvent);
   chrome.alarms.clear(cesp.FIRST_SURVEY_READY);
-};
+  chrome.alarms.clear(cesp.FIRST_SURVEY_OVER);
+}
 
 /**
  * After the initial wait time has completed, begin watching for potential
- * events.
+ * HTTP/HTTPS events.
  * @param {Alarm} alarm An alarm that may or may not be from the right timer.
  */
-function lookForFirstSurveyEvent(alarm) {
+function lookForStartFirstSurveyEvent(alarm) {
   if (alarm.name !== cesp.FIRST_SURVEY_READY)
     return;
   setFirstSurveyReady(true);
-};
-chrome.alarms.onAlarm.addListener(lookForFirstSurveyEvent);
+}
+chrome.alarms.onAlarm.addListener(lookForStartFirstSurveyEvent);
+
+/**
+ * After a certain amount of time has completed, stop looking for potential
+ * HTTP/HTTPS survey events. We don't want to do the first survey too long
+ * after the initial install.
+ * @param {Alarm} alarm An alarm that may or may not be from the right timer.
+ */
+function lookForEndFirstSurveyEvent(alarm) {
+  if (alarm.name !== cesp.FIRST_SURVEY_OVER)
+    return;
+  endFirstSurvey();
+}
+chrome.alarms.onAlarm.addListener(lookForEndFirstSurveyEvent);
+
+// Also end the HTTP/HTTPS eligibility period if the browser is restarted
+// during the wait period.
+chrome.runtime.onStartup.addListener(endFirstSurvey);
 
 /**
  * Look to see if a tab updated event would be appropriate for a survey. If so,
