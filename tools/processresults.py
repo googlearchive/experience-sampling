@@ -14,6 +14,7 @@ DOGFOOD_START_DATE = datetime(2014, 12, 01, 0, 0, 0, 0)
 DEMOGRAPHIC_STABLE_DATE = datetime(2014, 12, 18, 0, 0, 0, 0)
 FRIENDS_AND_FAMILY_BETA_DATE = datetime(2015, 4, 9, 0, 0, 0, 0)
 DEMOGRAPHIC_CSV_PREFIX = 'demographics'
+MANUFACTURED_CSV_PREFIX = 'manufactured'
 CONDITIONS = [
     'ssl-overridable-proceed', 'ssl-overridable-noproceed',
     'ssl-nonoverridable', 'malware-proceed', 'malware-noproceed',
@@ -56,7 +57,12 @@ def ProcessResults(
   _WriteToCsv(demo_results, demo_index, csv_prefix +
               DEMOGRAPHIC_CSV_PREFIX + '.csv')
 
-  parsed_events = _DiscardResultsBeforeDate(parsed_events, filter_items_before_date)
+  parsed_events = _DiscardResultsBeforeDate(parsed_events,
+                                            filter_items_before_date)
+
+  manuf_events, manuf_index = _FilterManufacturedEvents(parsed_events)
+  _WriteToCsv(manuf_events, manuf_index,
+              csv_prefix + MANUFACTURED_CSV_PREFIX + '.csv')
 
   for c in CONDITIONS:
     try:
@@ -107,16 +113,29 @@ def _FilterDemographicResults(demo_res, discard_before_date):
 
   _ReorderAttributeQuestions(filtered_results, TECHFAMILIAR_QUESTION_PREFIX)
 
-  # Any response with the max number of questions should now be fine as
-  # the canonical list of questions; find one such response.
-  max_list_len = len(filtered_results[0]['responses'])
-  canonical_index = 0
-  for i, r in enumerate(filtered_results):
-    if len(r['responses']) > max_list_len:
-      max_list_len = len(r['responses'])
-      canonical_index = i
+  return filtered_results, _GetCanonicalIndex(filtered_results)
 
-  return filtered_results, canonical_index
+
+def _FilterManufacturedEvents(results):
+  """Return a list of results where first question is 'MANUFACTURED'.
+
+  Manufactured events are either Recording events that correspond to
+  an instrumented event in the browser, or Showed notification events
+  that correspond to when the user was invited to take a survey.
+
+  Args:
+    results: Results parsed from JSON. Assumed to already be filtered by date.
+
+  Returns:
+    (1) List of results that are manufactured events.
+    (2) Integer index into the results list indicating which list
+    element's questions can be considered canonical and complete.
+  """
+  manuf_events= [
+    r for r in results
+    if r['responses'][0]['question'] == 'MANUFACTURED']
+
+  return manuf_events, _GetCanonicalIndex(manuf_events)
 
 
 def _DiscardResultsBeforeDate(results, date):
@@ -219,14 +238,7 @@ def _CanonicalizeQuestions(results):
 
   _ReplaceUrlWithPlaceholder(fixed_results)
 
-  # Any response with the max number of questions should now be fine as
-  # the canonical list of questions; find one such response.
-  max_list_len = len(fixed_results[0]['responses'])
-  canonical_index = 0
-  for i, r in enumerate(fixed_results):
-    if len(r['responses']) > max_list_len:
-      max_list_len = len(r['responses'])
-      canonical_index = i
+  canonical_index = _GetCanonicalIndex(fixed_results)
 
   # Do some light error checking; all questions lists should now be the same,
   # except some question lists may have extra questions. So, check each list
@@ -243,6 +255,28 @@ def _CanonicalizeQuestions(results):
                  j, i, r['responses'][i]['question']))
 
   return fixed_results, canonical_index
+
+
+def _GetCanonicalIndex(filtered_results):
+  """Get index of a result in filtered_results with max number of questions
+
+  Useful when any response with the max number of questions is fine to use
+  as the canonical list of questions for making CSV column headers.
+
+  Args:
+    filtered_results: Results filtered for some particular condition, or
+      for demographic or manufactued results
+
+  Returns:
+    Index of some result with the longest list of q/a pairs
+  """
+  max_list_len = len(filtered_results[0]['responses'])
+  canonical_index = 0
+  for i, r in enumerate(filtered_results):
+    if len(r['responses']) > max_list_len:
+      max_list_len = len(r['responses'])
+      canonical_index = i
+  return canonical_index
 
 
 def _WriteToCsv(results, canonical_index, out_file):

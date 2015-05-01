@@ -2,7 +2,7 @@
 
 Run on command line with: python processresults_test.py
 Should print 7 exceptions (these are expected output from ProcessResults)
-and pass 10 tests.
+and pass 11 tests.
 """
 
 import datetime
@@ -75,8 +75,10 @@ class TestProcessResults(unittest.TestCase):
                     'P4AttributeBAnswer,P4AttributeCAnswer,P4A7', test_line)
 
   def test__DiscardResultsBeforeDate_filters_out_two_november_dates(self):
-    results = [r for r in self.mock_results
-               if r['survey_type'] != 'setup.js']
+    results = [
+        r for r in self.mock_results
+        if (r['survey_type'] != 'setup.js' and
+            r['responses'][0]['question'] != 'MANUFACTURED')]
     results = processresults._DiscardResultsBeforeDate(
         results, datetime.datetime(2014, 12, 01, 0, 0, 0, 0))
 
@@ -142,8 +144,10 @@ class TestProcessResults(unittest.TestCase):
     self.assertEqual(canonical_index, 1)
 
   def test__CanonicalizeQuestions_raises_exception_on_nonequal_questions(self):
-    results = [r for r in self.mock_results
-               if r['survey_type'] != 'setup.js']
+    results = [
+        r for r in self.mock_results
+        if (r['survey_type'] != 'setup.js' and
+            r['responses'][0]['question'] != 'MANUFACTURED')]
     self.assertRaises(processresults.QuestionError,
                       processresults._CanonicalizeQuestions, results)
 
@@ -171,6 +175,16 @@ class TestProcessResults(unittest.TestCase):
         results[0]['responses'][3]['question'],
         ('How familiar are you with each of the following computer and '
          'Internet-related items? I have...(TCP/IP)'))
+
+  def test__FilterManufacturedEvents_returns_correct_events_and_index(self):
+    results = [r for r in self.mock_results
+               if r['survey_type'] != 'setup.js']
+    results = processresults._DiscardResultsBeforeDate(
+        results, datetime.datetime(2014, 12, 01, 0, 0, 0, 0))
+    results, canonical_index = processresults._FilterManufacturedEvents(results)
+
+    self.assertEqual(len(results), 2)
+    self.assertEqual(canonical_index, 1)
 
   def tearDown(self):
     try:
