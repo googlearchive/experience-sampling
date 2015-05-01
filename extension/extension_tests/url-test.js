@@ -83,6 +83,9 @@ function runTests() {
   runGreenLockTest('https://google.co.uk', true);
   runGreenLockTest('https://www.google.fr', true);
 
+  // This isn't ideal, but I want to capture all Google properties.
+  runGreenLockTest('https://google.example.com', true);
+
   // Check that blacklisting works.
   runGreenLockTest('https://images.google.com', false);
   runGreenLockTest('https://images.google.com/sldfkj', false);
