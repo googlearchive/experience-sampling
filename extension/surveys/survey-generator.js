@@ -18,6 +18,14 @@ function Question(questionType, question, required) {
 }
 
 /**
+ * Set a DOM ID to associate with a Question.
+ * @param {string} id The DOM ID of the question in the current DOM.
+ */
+Question.prototype.setCurrentDomId = function(id) {
+  this.currentDomId = id;
+};
+
+/**
  * Set a placeholder version of the question. Instead of any URLs or private
  * info that might be in the full question, this version should be PII-free.
  * @param {string} placeholder The placeholder version of the question.
@@ -146,7 +154,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
         if (shuffledAnswers[i] == constants.OTHER) {
           var textInput = document.createElement('input');
           textInput.setAttribute('type', 'text');
-          textInput.setAttribute('name', shrunkenAnswer);
+          textInput.setAttribute('name', shrunkenQuestion + '-OTHER');
           var handleFocus = (function() {
             var currentInput = input;
             return function() {
@@ -539,7 +547,8 @@ function getFormValues(questionArr, form) {
   function grabQuestion(question) {
     var questionStr =
         question.placeholder || question.question;  // The question text.
-    var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
+    var questionLookup = question.currentDomId || getDomNameFromValue(questionStr);  // Dom ID
+
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
       var answerList = document.querySelectorAll(
@@ -566,8 +575,19 @@ function getFormValues(questionArr, form) {
       var response = new SurveySubmission.Response(questionStr, answer);
       responses.push(response);
     }
+
+    // Check for sub-questions.
     if (question.depChild)
       grabQuestion(question.depChild);
+    var otherQuestionLookup = getDomNameFromValue(question.question) + '-OTHER';
+    if (form[otherQuestionLookup]) {
+      var otherSubquestion = new EssayQuestion(
+        constants.QuestionType.SHORT_ESSAY,
+        '[OTHER] ' + question.question,
+        false);
+      otherSubquestion.setCurrentDomId(otherQuestionLookup);
+      grabQuestion(otherSubquestion);
+    }
   }
   for (var i = 0; i < questionArr.length; i++) {
     grabQuestion(questionArr[i]);
