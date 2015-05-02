@@ -146,7 +146,7 @@ FixedQuestion.prototype.makeDOMTree = function() {
         if (shuffledAnswers[i] == constants.OTHER) {
           var textInput = document.createElement('input');
           textInput.setAttribute('type', 'text');
-          textInput.setAttribute('name', shrunkenAnswer);
+          textInput.setAttribute('name', shrunkenQuestion + '-OTHER');
           var handleFocus = (function() {
             var currentInput = input;
             return function() {
@@ -536,10 +536,12 @@ function addRequiredMarker(parentNode) {
  */
 function getFormValues(questionArr, form) {
   var responses = [];
-  function grabQuestion(question) {
+  function grabQuestion(question, alternateDomId) {
     var questionStr =
         question.placeholder || question.question;  // The question text.
-    var questionLookup = getDomNameFromValue(questionStr);  // The DOM ID
+    var questionLookup =
+        alternateDomId || getDomNameFromValue(questionStr);  // Dom ID
+
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
       var answerList = document.querySelectorAll(
@@ -566,8 +568,18 @@ function getFormValues(questionArr, form) {
       var response = new SurveySubmission.Response(questionStr, answer);
       responses.push(response);
     }
+
+    // Check for sub-questions.
     if (question.depChild)
       grabQuestion(question.depChild);
+    var otherQuestionLookup = getDomNameFromValue(question.question) + '-OTHER';
+    if (form[otherQuestionLookup]) {
+      var otherSubquestion = new EssayQuestion(
+          constants.QuestionType.SHORT_ESSAY,
+          '[OTHER] ' + question.question,
+          false);
+      grabQuestion(otherSubquestion, otherQuestionLookup);
+    }
   }
   for (var i = 0; i < questionArr.length; i++) {
     grabQuestion(questionArr[i]);
