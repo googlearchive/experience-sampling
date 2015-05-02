@@ -536,11 +536,11 @@ function addRequiredMarker(parentNode) {
  */
 function getFormValues(questionArr, form) {
   var responses = [];
-  function grabQuestion(question, altDomId) {
+  function grabQuestion(question, alternateDomId) {
     var questionStr =
         question.placeholder || question.question;  // The question text.
     var questionLookup =
-        altDomId || getDomNameFromValue(questionStr);  // Dom ID
+        alternateDomId || getDomNameFromValue(questionStr);  // Dom ID
 
     if (question.questionType === constants.QuestionType.CHECKBOX) {
       // Checkboxes may have multiple answers.
@@ -575,9 +575,9 @@ function getFormValues(questionArr, form) {
     var otherQuestionLookup = getDomNameFromValue(question.question) + '-OTHER';
     if (form[otherQuestionLookup]) {
       var otherSubquestion = new EssayQuestion(
-        constants.QuestionType.SHORT_ESSAY,
-        '[OTHER] ' + question.question,
-        false);
+          constants.QuestionType.SHORT_ESSAY,
+          '[OTHER] ' + question.question,
+          false);
       grabQuestion(otherSubquestion, otherQuestionLookup);
     }
   }
