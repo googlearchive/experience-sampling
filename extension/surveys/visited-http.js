@@ -33,7 +33,7 @@ function setScreenshot() {
 
   // For HTTP/HTTPS, we also want to update the caption.
   $('saw-a-page').textContent =
-      'You just now saw a URL bar, like the one shown above.';
+      'You just now saw a URL bar like the one shown above.';
   $('following-questions').textContent =
       'The following questions are about the URL bar.';
 }

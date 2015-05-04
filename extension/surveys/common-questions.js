@@ -382,30 +382,30 @@ commonQuestions.createHttpsNoticeSymbolQuestion = function() {
 
 
 /**
- * What does the symbol make you think of? (HTTP version)
+ * What does the symbol mean to you? (HTTP version)
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createHttpSymbolMeaningQuestion = function() {
   var symbol = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
-      'What does the white symbol to the left of the URL make you think of?',
+      'What does the white symbol to the left of the URL mean to you?',
       false);
   symbol.setPlaceholder(
-      'What does the white symbol to the left of the URL make you think of?');
+      'What does the white symbol to the left of the URL mean to you?');
   return symbol;
 };
 
 /**
- * What does the symbol make you think of? (HTTPS version)
+ * What does the symbol mean to you? (HTTPS version)
  * @returns {object} The DOM subtree with the question.
  */
 commonQuestions.createHttpsSymbolMeaningQuestion = function() {
   var symbol = new EssayQuestion(
       constants.QuestionType.SHORT_ESSAY,
-      'What does the green symbol to the left of the URL make you think of?',
+      'What does the green symbol to the left of the URL mean to you?',
       false);
   symbol.setPlaceholder(
-      'What does the green symbol to the left of the URL make you think of?');
+      'What does the green symbol to the left of the URL mean to you?');
   return symbol;
 };
 
