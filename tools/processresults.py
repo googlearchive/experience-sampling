@@ -131,7 +131,7 @@ def _FilterManufacturedEvents(results):
     (2) Integer index into the results list indicating which list
     element's questions can be considered canonical and complete.
   """
-  manuf_events= [
+  manuf_events = [
     r for r in results
     if r['responses'][0]['question'] == 'MANUFACTURED']
 
