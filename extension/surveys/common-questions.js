@@ -357,7 +357,7 @@ commonQuestions.createHttpNoticeSymbolQuestion = function() {
       ['Yes', 'No', 'I\'m not sure', constants.NO_ANSWER],
       constants.Randomize.ANCHOR_LAST);
   symbol.setPlaceholder(
-      'Have you ever noticed the while symbol (circled in red above)' +
+      'Have you ever noticed the white symbol (circled in red above)' +
       ' to the left of the URL before?');
   return symbol;
 };
