@@ -10,7 +10,6 @@ function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createHttpsNoticeSymbolQuestion());
   addQuestion(parentNode, commonQuestions.createHttpsSymbolMeaningQuestion());
   addQuestion(parentNode, commonQuestions.createDifferenceQuestion());
-  addQuestion(parentNode, commonQuestions.createIfIconHadBeenRedQuestion());
 }
 
 /**

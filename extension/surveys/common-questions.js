@@ -424,17 +424,3 @@ commonQuestions.createDifferenceQuestion = function() {
       ' and [HTTPS URL]?');
   return difference;
 };
-
-/**
- * If this icon had been red, would you have done something differently?
- * @returns {object} The DOM subtree with the question.
- */
-commonQuestions.createIfIconHadBeenRedQuestion = function() {
-  var difference = new EssayQuestion(
-      constants.QuestionType.SHORT_ESSAY,
-      'If this icon had been red, would you have done something differently?',
-      false);
-  difference.setPlaceholder('If this icon had been red, would you have' +
-      ' done something differently?');
-  return difference;
-};
