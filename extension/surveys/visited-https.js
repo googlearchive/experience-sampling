@@ -10,6 +10,7 @@ function addQuestions(parentNode) {
   addQuestion(parentNode, commonQuestions.createHttpsNoticeSymbolQuestion());
   addQuestion(parentNode, commonQuestions.createHttpsSymbolMeaningQuestion());
   addQuestion(parentNode, commonQuestions.createDifferenceQuestion());
+  addQuestion(parentNode, commonQuestions.createIfIconHadBeenRedQuestion());
 }
 
 /**
@@ -33,7 +34,7 @@ function setScreenshot() {
 
   // For HTTP/HTTPS, we also want to update the caption.
   $('saw-a-page').textContent =
-      'You just now saw a URL bar, like the one shown above.';
+      'You just now saw a URL bar like the one shown above.';
   $('following-questions').textContent =
       'The following questions are about the URL bar.';
 }
