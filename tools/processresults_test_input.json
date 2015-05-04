@@ -230,5 +230,45 @@
     ],
     "date_taken": "2015-01-05T01:02:03.789123",
     "participant_id": "P2"
+  },
+  {
+    "survey_type": "ssl_interstitial_overridable",
+    "date_received": "2015-01-05T13:14:15.345678",
+    "responses": [
+      {
+        "answer": "Showed notification",
+        "question": "MANUFACTURED"
+      }
+    ],
+    "date_taken": "2015-01-05T01:02:03.912345",
+    "participant_id": "P2"
+  },
+  {
+    "survey_type": "ssl_interstitial_overridable",
+    "date_received": "2015-01-05T13:14:15.234567",
+    "responses": [
+      {
+        "answer": "Recording event",
+        "question": "MANUFACTURED"
+      },
+      {
+        "answer": "ssl_interstitial_overridable",
+        "question": "Full event type"
+      },
+      {
+        "answer": "deny",
+        "question": "Response"
+      },
+      {
+        "answer": "FALSE",
+        "question": "Details"
+      },
+      {
+        "answer": "FALSE",
+        "question": "Learn more"
+      }
+    ],
+    "date_taken": "2015-01-05T01:02:03.891234",
+    "participant_id": "P2"
   }
 ]
