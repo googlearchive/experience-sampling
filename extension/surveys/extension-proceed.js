@@ -23,17 +23,17 @@ function addQuestions(parentNode) {
 function setScreenshot() {
   switch (surveyDriver.operatingSystem) {
     case constants.OS.MAC:
-      $('example-img').src = 'screenshots/extension-mac.png';
+      $('example-img').src = 'screenshots/extension-mac-border.png';
       $('example-img').style.width = 'auto';
       $('example-img').style.height = 'auto';
       break;
     case constants.OS.LINUX:
-      $('example-img').src = 'screenshots/extension-linux.png';
+      $('example-img').src = 'screenshots/extension-linux-border.png';
       break;
     case constants.OS.WIN:
     case constants.OS.CROS:
     default:
-      $('example-img').src = 'screenshots/extension-win.png';
+      $('example-img').src = 'screenshots/extension-win-border.png';
   }
 
   // For extensions, we also want to update the caption.
