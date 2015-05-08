@@ -1,9 +1,9 @@
 /**
- * Malware (did proceed) survey.
+ * Harmful (did proceed) survey. Currently identical to the malware survey.
  */
 
 /**
- * Adds the questions for the malware survey.
+ * Adds the questions for the harmful survey.
  * @param {object} parentNode The DOM node to attach the surveys to.
  */
 function addQuestions(parentNode) {

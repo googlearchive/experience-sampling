@@ -364,6 +364,7 @@ function showSurveyNotification(element, decision) {
     case constants.EventType.SSL_OVERRIDABLE:
     case constants.EventType.SSL_NONOVERRIDABLE:
     case constants.EventType.MALWARE:
+    case constants.EventType.HARMFUL:
     case constants.EventType.PHISHING:
     case constants.EventType.EXTENSION_INSTALL:
     case constants.EventType.EXTENSION_BUNDLE:
@@ -377,7 +378,6 @@ function showSurveyNotification(element, decision) {
       if (decision['name'] === constants.DecisionType.DENY)
         return;
       break;
-    case constants.EventType.HARMFUL:
     case constants.EventType.SB_OTHER:
     case constants.EventType.DOWNLOAD_MALICIOUS:
     case constants.EventType.DOWNLOAD_DANGEROUS:
@@ -495,6 +495,12 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
               constants.SurveyLocation.MALWARE_NOPROCEED;
           visitUrl = urlHandler.GetMinimalUrl(element['destination']);
           break;
+        case constants.EventType.HARMFUL:
+          surveyUrl = userDecision === constants.DecisionType.PROCEED ?
+              constants.SurveyLocation.HARMFUL_PROCEED :
+              constants.SurveyLocation.HARMFUL_NOPROCEED;
+          visitUrl = urlHandler.GetMinimalUrl(element['destination']);
+          break;
         case constants.EventType.PHISHING:
           surveyUrl = userDecision === constants.DecisionType.PROCEED ?
               constants.SurveyLocation.PHISHING_PROCEED :
@@ -516,7 +522,6 @@ function loadSurvey(element, decision, timePromptShown, timePromptClicked) {
           surveyUrl = constants.SurveyLocation.VISITED_HTTP;
           visitUrl = urlHandler.GetMinimalUrl(element['destination']);
           break;
-        case constants.EventType.HARMFUL:
         case constants.EventType.SB_OTHER:
         case constants.EventType.DOWNLOAD_MALICIOUS:
         case constants.EventType.DOWNLOAD_DANGEROUS:

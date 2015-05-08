@@ -48,6 +48,8 @@ function loadSurveyScript() {
     case constants.SurveyLocation.SSL_NONOVERRIDABLE:
     case constants.SurveyLocation.MALWARE_PROCEED:
     case constants.SurveyLocation.MALWARE_NOPROCEED:
+    case constants.SurveyLocation.HARMFUL_PROCEED:
+    case constants.SurveyLocation.HARMFUL_NOPROCEED:
     case constants.SurveyLocation.PHISHING_PROCEED:
     case constants.SurveyLocation.PHISHING_NOPROCEED:
     case constants.SurveyLocation.VISITED_HTTPS:

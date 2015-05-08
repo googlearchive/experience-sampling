@@ -91,6 +91,8 @@ constants.SurveyLocation = {
   SSL_NONOVERRIDABLE: 'ssl-nonoverridable.js',
   MALWARE_PROCEED: 'malware-proceed.js',
   MALWARE_NOPROCEED: 'malware-noproceed.js',
+  HARMFUL_PROCEED: 'harmful-proceed.js',
+  HARMFUL_NOPROCEED: 'harmful-noproceed.js',
   PHISHING_PROCEED: 'phishing-proceed.js',
   PHISHING_NOPROCEED: 'phishing-noproceed.js',
   EXTENSION_PROCEED: 'extension-proceed.js',
