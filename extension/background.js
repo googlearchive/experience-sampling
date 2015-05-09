@@ -15,6 +15,7 @@
 var cesp = cesp || {};
 
 cesp.openTabId = -1;
+cesp.openConsentTabId = -1;
 
 // Settings.
 cesp.NOTIFICATION_TITLE = 'Take a Chrome user experience survey!';
@@ -168,8 +169,11 @@ function maybeShowConsentOrSetupSurvey() {
     if (!lookup || !lookup[constants.CONSENT_KEY] ||
         lookup[constants.CONSENT_KEY] === constants.CONSENT_PENDING) {
       getOperatingSystem().then(function(os) {
-        chrome.tabs.create(
-            {'url': chrome.extension.getURL('consent.html?os=' + os)});
+        chrome.tabs.create({
+          'url': chrome.extension.getURL('consent.html?os=' + os)
+        }, function(tab) {
+          cesp.openConsentTabId = tab.id;
+        });
       });
     } else if (lookup[constants.CONSENT_KEY] === constants.CONSENT_REJECTED) {
       chrome.management.uninstallSelf();
@@ -415,6 +419,11 @@ function showSurveyNotification(element, decision) {
             if (buttonIndex != 1) return;
             chrome.tabs.create({
               'url': chrome.extension.getURL('consent.html')
+            }, function(tab) {
+              try {
+                chrome.tabs.remove(cesp.openConsentTabId);
+              } catch (err) { }
+              cesp.openConsentTabId = tab.id;
             });
           };
           loadSurvey(element, decision, timePromptShown, timePromptClicked)
