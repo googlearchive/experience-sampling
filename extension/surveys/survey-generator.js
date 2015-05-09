@@ -268,8 +268,6 @@ ScaleQuestion.prototype.setAttributes = function(attributes) {
 ScaleQuestion.prototype.makeSingleRow =
     function(horizontal, questionName, reverse, showLabels) {
   var container = document.createElement('div');
-  if (horizontal)
-    container.classList.add('horizontal-scale-container')
   var reversedScale = reverse ?
       flipArray(this.scale, this.randomize) :
       this.scale;
@@ -292,16 +290,8 @@ ScaleQuestion.prototype.makeSingleRow =
     label.setAttribute('for', shrunkenAnswer);
     label.textContent = reversedScale[i];
 
-    if (horizontal) {
-      if (showLabels) {
-        answer.appendChild(label);
-        answer.appendChild(document.createElement('br'));
-      }
-      answer.appendChild(radio);
-    } else {
-      answer.appendChild(radio);
-      answer.appendChild(label);
-    }
+    answer.appendChild(radio);
+    answer.appendChild(label);
     container.appendChild(answer);
   }
 
@@ -339,27 +329,35 @@ ScaleQuestion.prototype.makeDOMTree = function() {
     addRequiredMarker(legend);
   container.appendChild(legend);
 
+  var responseContainer = document.createElement('div');
+  if (horizontal)
+    responseContainer.classList.add('horizontal-scale-container');
+
   var reverse = this.randomize == constants.Randomize.NONE ? false : coinToss();
   var shrunkenQuestion = getDomNameFromValue(this.placeholder || this.question);
   if (multi) {
     var shuffledAttributes =
         knuthShuffle(this.attributes, constants.Randomize.ALL);
     for (var i = 0; i < shuffledAttributes.length; i++) {
+      var row = document.createElement('div');
       var floatScale = document.createElement('div');
-      floatScale.classList.add('horizontal-rowlabel');
-      if (i == 0)
-        floatScale.classList.add('first-rowlabel');
+      if (horizontal) {
+        floatScale.classList.add('horizontal-rowlabel');
+        row.classList.add('horizontal-scale-row');
+      }
       floatScale.textContent = shuffledAttributes[i] + ':';
-      container.appendChild(floatScale);
+      row.appendChild(floatScale);
       var questionName =
           getDomNameFromValue(shuffledAttributes[i]) + shrunkenQuestion;
-      container.appendChild(
+      row.appendChild(
           this.makeSingleRow(horizontal, questionName, reverse, (i == 0)));
+      responseContainer.appendChild(row);
     }
   } else {
-    container.appendChild(
+    responseContainer.appendChild(
         this.makeSingleRow(horizontal, shrunkenQuestion, reverse, true));
   }
+  container.appendChild(responseContainer);
   return container;
 };
 
