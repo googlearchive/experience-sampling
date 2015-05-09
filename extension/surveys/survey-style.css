@@ -65,8 +65,8 @@
 .fieldset {
   background-color: #ECF3FE;
   border: none;
-  overflow-x: auto;
   margin-bottom: 1em;
+  overflow-x: auto;
   padding-bottom: 8px;
   padding-left: 3%;
   padding-right: 3%;
