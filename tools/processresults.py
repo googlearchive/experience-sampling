@@ -237,9 +237,9 @@ def _CanonicalizeQuestions(results):
   try:
     _ReorderAttributeQuestions(fixed_results, ATTRIBUTE_QUESTION_PREFIX)
   except UnexpectedFormatException as e:
-      # Print UnexpectedFormatException and continue, since this is usually
-      # due to lack of attribute questions in survey, which is fine.
-      print 'Exception from _ReorderAttributeQuestions: %s' % (e.value)
+    # Print UnexpectedFormatException and continue, since this is usually
+    # due to lack of attribute questions in survey, which is fine.
+    print 'Exception from _ReorderAttributeQuestions: %s' % (e.value)
 
   _ReplaceUrlWithPlaceholder(fixed_results)
 
