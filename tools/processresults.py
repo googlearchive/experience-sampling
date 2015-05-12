@@ -19,7 +19,7 @@ CONDITIONS = [
     'ssl-overridable-proceed', 'ssl-overridable-noproceed',
     'ssl-nonoverridable', 'malware-proceed', 'malware-noproceed',
     'phishing-proceed', 'phishing-noproceed', 'extension-proceed',
-    'extension-noproceed']
+    'extension-noproceed', 'visited-http', 'visited-https']
 TECHFAMILIAR_QUESTION_PREFIX = ('How familiar are you with each of the '
     'following computer and Internet-related items? I have...')
 ATTRIBUTE_QUESTION_PREFIX = 'To what degree do each of the following'
@@ -234,7 +234,12 @@ def _CanonicalizeQuestions(results):
   if not fixed_results:
     raise UnexpectedFormatException('No results with questions found')
 
-  _ReorderAttributeQuestions(fixed_results, ATTRIBUTE_QUESTION_PREFIX)
+  try:
+    _ReorderAttributeQuestions(fixed_results, ATTRIBUTE_QUESTION_PREFIX)
+  except UnexpectedFormatException as e:
+    # Print UnexpectedFormatException and continue, since this is usually
+    # due to lack of attribute questions in survey, which is fine.
+    print 'Exception from _ReorderAttributeQuestions: %s' % (e.value)
 
   _ReplaceUrlWithPlaceholder(fixed_results)
 
@@ -364,7 +369,7 @@ def _ReorderAttributeQuestions(results, question_prefix):
   # Do some error checking; attribute questions should have the same indices
   # for all results and should appear consecutively. Since they should be the
   # same for all results, we grab the min and max index from the first result.
-  if not attribute_question_indices:
+  if not attribute_question_indices or not attribute_question_indices[0]:
     raise UnexpectedFormatException('Attributes questions not found.')
   min_index = attribute_question_indices[0][0]
   max_index = attribute_question_indices[0][-1]
