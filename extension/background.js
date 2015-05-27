@@ -34,7 +34,7 @@ cesp.UNINSTALL_ALARM_NAME = 'uninstallAlarm';
 cesp.READY_FOR_SURVEYS = 'readyForSurveys';
 cesp.PARTICIPANT_ID_LOOKUP = 'participantId';
 cesp.LAST_NOTIFICATION_TIME = 'lastNotificationTime';
-cesp.MINIMUM_SURVEY_DELAY = 300000;  // 5 minutes in ms.
+cesp.MINIMUM_SURVEY_DELAY = 1;//300000;  // 5 minutes in ms.
 cesp.FIRST_SURVEY_READY = 'firstSurveyReady';
 cesp.FIRST_SURVEY_OVER = 'firstSurveyOver';
 cesp.FIRST_SURVEY_DELAY_LENGTH = 15;  // minutes
@@ -57,6 +57,7 @@ function setReadyForSurveysStorageValue(newState) {
  * @param {int} newCount The desired new survey count value.
  */
 function setSurveysShownDaily(newCount) {
+  console.log("set surveys shown daily to: " + newCount);
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
   chrome.storage.sync.set(items);
@@ -77,6 +78,7 @@ function setFirstSurveyReady(newState) {
  * @param {int} newCount The desired new survey count value.
  */
 function setSurveysShownWeekly(newCount) {
+  console.log("set surveys shown weekly to: " + newCount);
   var items = {};
   items[cesp.SURVEYS_SHOWN_THIS_WEEK] = newCount;
   chrome.storage.sync.set(items);
@@ -452,8 +454,8 @@ function showSurveyNotification(element, decision) {
         });
         chrome.notifications.onClicked.addListener(clickHandler);
         chrome.notifications.onButtonClicked.addListener(clickHandler);
-        setSurveysShownDaily(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
-        setSurveysShownWeekly(items[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
+        setSurveysShownDaily(today[cesp.SURVEYS_SHOWN_TODAY] + 1);
+        setSurveysShownWeekly(week[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
         resetLastNotificationTimeStorageValue();
       });
     });
