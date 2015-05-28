@@ -452,8 +452,8 @@ function showSurveyNotification(element, decision) {
         });
         chrome.notifications.onClicked.addListener(clickHandler);
         chrome.notifications.onButtonClicked.addListener(clickHandler);
-        setSurveysShownDaily(items[cesp.SURVEYS_SHOWN_TODAY] + 1);
-        setSurveysShownWeekly(items[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
+        setSurveysShownDaily(today[cesp.SURVEYS_SHOWN_TODAY] + 1);
+        setSurveysShownWeekly(week[cesp.SURVEYS_SHOWN_THIS_WEEK] + 1);
         resetLastNotificationTimeStorageValue();
       });
     });
