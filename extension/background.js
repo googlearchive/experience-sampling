@@ -57,7 +57,6 @@ function setReadyForSurveysStorageValue(newState) {
  * @param {int} newCount The desired new survey count value.
  */
 function setSurveysShownDaily(newCount) {
-  console.log("set surveys shown daily to: " + newCount);
   var items = {};
   items[cesp.SURVEYS_SHOWN_TODAY] = newCount;
   chrome.storage.sync.set(items);
@@ -78,7 +77,6 @@ function setFirstSurveyReady(newState) {
  * @param {int} newCount The desired new survey count value.
  */
 function setSurveysShownWeekly(newCount) {
-  console.log("set surveys shown weekly to: " + newCount);
   var items = {};
   items[cesp.SURVEYS_SHOWN_THIS_WEEK] = newCount;
   chrome.storage.sync.set(items);
