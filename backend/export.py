@@ -20,6 +20,7 @@ from models import SurveyModel
 import webapp2
 
 from google.appengine.api import taskqueue
+from google.appengine.api import background_thread
 
 package = 'ChromeExperienceSampling'
 
@@ -74,24 +75,42 @@ class ExportWorker(webapp2.RequestHandler):
     def export_data(filename):
       with gcs.open('/' + bucket_name + '/' + filename, 'w') as f:
         query = SurveyModel.query()
-        cursor = None
-        more = True
-        delim = ''
+        delim=''
         f.write('[')
-        while more:
-          records, cursor, more = query.fetch_page(50, start_cursor=cursor)
-          gc.collect()
-          for record in records:
-            f.write(delim)
-            f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
-            delim = ',\n'
+        for record in query:
+          f.write(delim)
+          f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+          delim = ',\n'
         f.write(']')
+        f.close()
 
-    export_data(filename)
+#        query = SurveyModel.query()
+#         cursor = None
+#         more = True
+#         delim = ''
+#         f.write('[')
+# #DEBUG        gc.set_debug(gc.DEBUG_STATS)
+#         numpages = 0
+#         while more:
+#           records, cursor, more = query.fetch_page(50, start_cursor=cursor)
+#           numpages = numpages + 1
+# #DEBUG          if (numpages % 10 == 0):
+#             print >> out.stderr 'Pages so far: %d' % numpages
+#           gc.collect()
+#           for record in records:
+#             f.write(delim)
+#             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+# #DEBUG            f.flush()
+#             delim = ',\n'
+#         f.write(']')
+#         f.close()
+
+    tid = background_thread.start_new_background_thread(
+        export_data, [filename])
+#    export_data(filename)
 
 APPLICATION = webapp2.WSGIApplication([
     ('/export/', ExportPage),
     ('/export', ExportPage),
     ('/export/worker', ExportWorker)
 ])
-
