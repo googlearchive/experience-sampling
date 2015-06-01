@@ -172,6 +172,8 @@ function setupFormSubmitted(event) {
   );
   $('explanation').classList.add('hidden');
   $('survey-container').classList.add('hidden');
+  $('thanks-cake').src = Math.random() < 0.5 ?
+      'screenshots/thanks.png' : 'screenshots/thanks-2.png';
   $('thank-you').classList.remove('hidden');
   setTimeout(window.close, constants.SURVEY_CLOSE_TIME);
 }
