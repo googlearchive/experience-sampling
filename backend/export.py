@@ -10,6 +10,7 @@ admin's Google Drive.
 import datetime
 import gc
 import json
+import logging
 import site
 import time
 
@@ -73,6 +74,7 @@ class ExportWorker(webapp2.RequestHandler):
       filename = '.'.join(['surveys', time_string, 'json'])
 
     def export_data(filename):
+      logging.debug('Exporting data...')
       with gcs.open('/' + bucket_name + '/' + filename, 'w') as f:
         query = SurveyModel.query()
         delim=''
