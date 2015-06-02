@@ -3,7 +3,7 @@ module: export-module
 version: v1r2
 runtime: python27
 api_version: 1
-instance_class: B1
+instance_class: B2
 threadsafe: true
 manual_scaling:
   instances: 1
