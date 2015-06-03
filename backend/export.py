@@ -17,12 +17,12 @@ import time
 site.addsitedir('lib')
 import cloudstorage as gcs
 
-from models import SurveyModel
+from models import SurveyModel, OldDbSurveyModel
 import webapp2
 
 from google.appengine.api import taskqueue
 from google.appengine.api import background_thread
-from google.appengine.api import runtime
+from google.appengine.api import runtime #DEBUG
 
 package = 'ChromeExperienceSampling'
 
@@ -77,38 +77,46 @@ class ExportWorker(webapp2.RequestHandler):
     def export_data(filename):
       logging.debug('Exporting data...') #DEBUG
       with gcs.open('/' + bucket_name + '/' + filename, 'w') as f:
-        # query = SurveyModel.query()
-        # delim=''
-        # f.write('[')
-        # for record in query:
-        #   f.write(delim)
-        #   f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
-        #   delim = ',\n'
-        # f.write(']')
-        # f.close()
-
-        query = SurveyModel.query()
-        cursor = None
-        more = True
-        delim = ''
+        query = OldDbSurveyModel.all()
+        delim=''
         f.write('[')
-# #DEBUG        gc.set_debug(gc.DEBUG_STATS)
         numpages = 0
-        while more:
-          records, cursor, more = query.fetch_page(50, start_cursor=cursor)
-          numpages = numpages + 1
+        for record in query:
+          numpages = numpages + 1 #DEBUG
           if (numpages % 10 == 0): #DEBUG
             logging.debug(
                 'Pages/memory so far: %d %d' %
                 (numpages, runtime.memory_usage().current())) #DEBUG
-          gc.collect()
-          for record in records:
-            f.write(delim)
-            f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
-            f.flush()
-            delim = ',\n'
+
+          ndb_record = ndb.Key.from_old_key(record.key()).get()
+          f.write(delim)
+          f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+          delim = ',\n'
         f.write(']')
         f.close()
+
+#         query = SurveyModel.all()
+#         cursor = None
+#         more = True
+#         delim = ''
+#         f.write('[')
+# # #DEBUG        gc.set_debug(gc.DEBUG_STATS)
+#         numpages = 0
+#         while more:
+#           records, cursor, more = query.fetch_page(50, start_cursor=cursor)
+#           numpages = numpages + 1
+#           if (numpages % 10 == 0): #DEBUG
+#             logging.debug(
+#                 'Pages/memory so far: %d %d' %
+#                 (numpages, runtime.memory_usage().current())) #DEBUG
+#           gc.collect()
+#           for record in records:
+#             f.write(delim)
+#             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+#             f.flush()
+#             delim = ',\n'
+#         f.write(']')
+#         f.close()
 
     tid = background_thread.start_new_background_thread(
         export_data, [filename])
