@@ -20,9 +20,10 @@ import cloudstorage as gcs
 from models import SurveyModel, OldDbSurveyModel
 import webapp2
 
-from google.appengine.api import taskqueue
 from google.appengine.api import background_thread
+from google.appengine.ext import ndb
 from google.appengine.api import runtime #DEBUG
+from google.appengine.api import taskqueue
 
 package = 'ChromeExperienceSampling'
 
@@ -78,6 +79,7 @@ class ExportWorker(webapp2.RequestHandler):
       logging.debug('Exporting data...') #DEBUG
       with gcs.open('/' + bucket_name + '/' + filename, 'w') as f:
         query = OldDbSurveyModel.all()
+        logging.debug('ndb SurveyModel kind: %s' % SurveyModel._get_kind()) #DEBUG
         delim=''
         f.write('[')
         numpages = 0
@@ -90,7 +92,7 @@ class ExportWorker(webapp2.RequestHandler):
 
           ndb_record = ndb.Key.from_old_key(record.key()).get()
           f.write(delim)
-          f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+          f.write(json.dumps(ndb_record.to_dict(), cls=ModelEncoder))
           delim = ',\n'
         f.write(']')
         f.close()

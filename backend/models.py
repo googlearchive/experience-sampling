@@ -39,4 +39,6 @@ memory leak with ndb queries. See
 https://code.google.com/p/googleappengine/issues/detail?id=9610
 """
 class OldDbSurveyModel(db.Model):
-  pass
+  @classmethod
+  def kind(cls):
+    return 'SurveyModel'
