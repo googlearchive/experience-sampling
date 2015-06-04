@@ -3,7 +3,7 @@
 
   "name": "Chrome User Experience Surveys",
   "description": "Want to help make Chrome better? This extension occasionally shows surveys to get your feedback.",
-  "version": "3.0.2",
+  "version": "3.0.4",
 
   "background": {
     "scripts": ["constants.js", "survey-submission.js", "url-handler.js", "background.js"],
