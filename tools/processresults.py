@@ -8,11 +8,13 @@ import csv
 import dateutil.parser
 from datetime import datetime
 import json
+import logging
 import re
 
 DOGFOOD_START_DATE = datetime(2014, 12, 01, 0, 0, 0, 0)
 DEMOGRAPHIC_STABLE_DATE = datetime(2014, 12, 18, 0, 0, 0, 0)
 FRIENDS_AND_FAMILY_BETA_DATE = datetime(2015, 4, 9, 0, 0, 0, 0)
+PUBLIC_LAUNCH_DATE = datetime(2015, 5, 11, 13, 30, 0, 0)
 DEMOGRAPHIC_CSV_PREFIX = 'demographics'
 MANUFACTURED_CSV_PREFIX = 'manufactured'
 CONDITIONS = [
@@ -28,8 +30,8 @@ ATTRIBUTE_QUESTION_PREFIX = 'To what degree do each of the following'
 def ProcessResults(
     json_in_file,
     csv_prefix,
-    filter_items_before_date = FRIENDS_AND_FAMILY_BETA_DATE,
-    filter_demographic_items_before_date = FRIENDS_AND_FAMILY_BETA_DATE):
+    filter_items_before_date = PUBLIC_LAUNCH_DATE,
+    filter_demographic_items_before_date = PUBLIC_LAUNCH_DATE):
   """Take results from AppEngine JSON file, process, and write to CSV file.
 
   Results from the input JSON file will be filtered into the 9 experimental
@@ -71,9 +73,9 @@ def ProcessResults(
           filtered_results)
       _WriteToCsv(filtered_results, canonical_index, csv_prefix + c + '.csv')
     except UnexpectedFormatException as e:
-      # Print UnexpectedFormatException and continue, since they are usually
+      # Log UnexpectedFormatException and continue, since they are usually
       # due to lack of data for a condition.
-      print 'Exception in %s: %s' % (c, e.value)
+      logging.warning ('Exception in %s: %s' % (c, e.value))
 
 
 def _ParseSurveyResults(in_file):
@@ -111,7 +113,16 @@ def _FilterDemographicResults(demo_res, discard_before_date):
       r for r in filtered_results
       if r['responses'][0]['question'] != 'PLACEHOLDER']
 
-  _ReorderAttributeQuestions(filtered_results, TECHFAMILIAR_QUESTION_PREFIX)
+  while(True):
+    try:
+      _ReorderAttributeQuestions(filtered_results, TECHFAMILIAR_QUESTION_PREFIX)
+      break
+    except BadlyFormattedEntryException as e:
+      # Warn about bad entry, but retry. A few of these are
+      # OK to ignore, but if there are a lot, someone should look into it.
+      logging.warning ('Bad entry found in _ReorderAttributeQuestions: '
+                       '%s Index: %d' % (e.value, e.entry_index))
+      filtered_results.pop(e.entry_index)
 
   return filtered_results, _GetCanonicalIndex(filtered_results)
 
@@ -189,6 +200,15 @@ class UnexpectedFormatException(BaseException):
     return(repr(self.value))
 
 
+class BadlyFormattedEntryException(BaseException):
+  def __init__(self, value, entry_index):
+    BaseException.__init__(self, value)
+    self.value = value
+    self.entry_index = entry_index
+  def __str__(self):
+    return(repr(self.value))
+
+
 def _CanonicalizeQuestions(results):
   """Apply various fixes to questions in results
 
@@ -237,9 +257,10 @@ def _CanonicalizeQuestions(results):
   try:
     _ReorderAttributeQuestions(fixed_results, ATTRIBUTE_QUESTION_PREFIX)
   except UnexpectedFormatException as e:
-    # Print UnexpectedFormatException and continue, since this is usually
+    # Log UnexpectedFormatException and continue, since this is usually
     # due to lack of attribute questions in survey, which is fine.
-    print 'Exception from _ReorderAttributeQuestions: %s' % (e.value)
+    logging.warning (
+        'Exception from _ReorderAttributeQuestions: %s' % (e.value))
 
   _ReplaceUrlWithPlaceholder(fixed_results)
 
@@ -375,12 +396,13 @@ def _ReorderAttributeQuestions(results, question_prefix):
   max_index = attribute_question_indices[0][-1]
   for i, index_list in enumerate(attribute_question_indices):
     if min(index_list) != min_index or max(index_list) != max_index:
-      raise UnexpectedFormatException(
-          'min and max indices in list %d not equal to min and max index '
-          'in list 0' % (i))
+      raise BadlyFormattedEntryException(
+          'min and max indices (%d and %d) in list %d not equal to min and '
+          'max index (%d and %d) in list 0'
+          % (min(index_list), max(index_list), i, min_index, max_index), i)
     if index_list != range(min_index, max_index+1): # Check for consecutive
-      raise UnexpectedFormatException(
-          'indices in list %d not consecutive' % (i))
+      raise BadlyFormattedEntryException(
+          'indices in list %d not consecutive' % (i), i)
 
   for r in results:
     r['responses'][min_index:max_index+1] = sorted(
