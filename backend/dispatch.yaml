@@ -1,0 +1,6 @@
+application: chrome-experience-sampling
+
+dispatch:
+# Export goes to module with basic scaling, to allow background processing
+- url: "*/export/*"
+  module: export-module

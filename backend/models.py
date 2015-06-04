@@ -3,7 +3,7 @@
 These classes define the data models for form and survey responses.
 """
 
-from google.appengine.ext import ndb
+from google.appengine.ext import db, ndb
 
 package = 'ChromeExperienceSampling'
 
@@ -32,3 +32,13 @@ class SurveyModel(ndb.Model):
                        date_taken=message.date_taken,
                        responses=map(ResponseModel.fromMessage,
                                      message.responses))
+
+"""
+This is a seeminly useless class, but is needed as a workaround to a
+memory leak with ndb queries. See
+https://code.google.com/p/googleappengine/issues/detail?id=9610
+"""
+class OldDbSurveyModel(db.Model):
+  @classmethod
+  def kind(cls):
+    return 'SurveyModel'

@@ -10,15 +10,19 @@ admin's Google Drive.
 import datetime
 import gc
 import json
+import logging
 import site
 import time
 
 site.addsitedir('lib')
 import cloudstorage as gcs
 
-from models import SurveyModel
+from models import SurveyModel, OldDbSurveyModel
 import webapp2
 
+from google.appengine.api import background_thread
+from google.appengine.ext import ndb
+from google.appengine.api import runtime #DEBUG
 from google.appengine.api import taskqueue
 
 package = 'ChromeExperienceSampling'
@@ -72,26 +76,59 @@ class ExportWorker(webapp2.RequestHandler):
       filename = '.'.join(['surveys', time_string, 'json'])
 
     def export_data(filename):
+      logging.debug('Exporting data...') #DEBUG
+      ctx = ndb.get_context();
+      ctx.set_cache_policy(False);
       with gcs.open('/' + bucket_name + '/' + filename, 'w') as f:
+        # query = OldDbSurveyModel.all()
+        # logging.debug('ndb SurveyModel kind: %s' % SurveyModel._get_kind()) #DEBUG
+        # delim=''
+        # f.write('[')
+        # numpages = 0
+        # for record in query.run(keys_only=True):
+        #   numpages = numpages + 1 #DEBUG
+        #   if (numpages % 10 == 0): #DEBUG
+        #     logging.debug(
+        #         'Pages/memory so far: %d %d' %
+        #         (numpages, runtime.memory_usage().current())) #DEBUG
+
+        #   ndb_record = ndb.Key.from_old_key(record).get()
+        #   f.write(delim)
+        #   f.write(json.dumps(ndb_record.to_dict(), cls=ModelEncoder))
+        #   delim = ',\n'
+        #   gc.collect()
+        # f.write(']')
+        # f.close()
+
         query = SurveyModel.query()
         cursor = None
         more = True
         delim = ''
         f.write('[')
+# #DEBUG        gc.set_debug(gc.DEBUG_STATS)
+        numpages = 0
         while more:
           records, cursor, more = query.fetch_page(50, start_cursor=cursor)
+          numpages = numpages + 1
+          if (numpages % 10 == 0): #DEBUG
+            logging.debug(
+                'Pages/memory so far: %d %d' %
+                (numpages, runtime.memory_usage().current())) #DEBUG
           gc.collect()
           for record in records:
             f.write(delim)
             f.write(json.dumps(record.to_dict(), cls=ModelEncoder))
+            f.flush()
             delim = ',\n'
         f.write(']')
+        f.close()
 
-    export_data(filename)
+    tid = background_thread.start_new_background_thread(
+        export_data, [filename])
+#    export_data(filename)
 
 APPLICATION = webapp2.WSGIApplication([
     ('/export/', ExportPage),
     ('/export', ExportPage),
     ('/export/worker', ExportWorker)
 ])
-

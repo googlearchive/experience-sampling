@@ -1,5 +1,5 @@
 application: chrome-experience-sampling
-version: 1
+version: v1r2
 runtime: python27
 threadsafe: true
 api_version: 1
@@ -8,12 +8,6 @@ handlers:
 # Endpoints handler
 - url: /_ah/spi/.*
   script: survey_backend_api.APPLICATION
-
-# Data export
-- url: /export($|/.*$)
-  script: export.APPLICATION
-  secure: always
-  login: admin
 
 libraries:
 - name: endpoints
@@ -25,4 +19,3 @@ admin_console:
   pages:
   - name: Data Export
     url: /export
-
