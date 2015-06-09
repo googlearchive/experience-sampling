@@ -14,7 +14,11 @@ import re
 DOGFOOD_START_DATE = datetime(2014, 12, 01, 0, 0, 0, 0)
 DEMOGRAPHIC_STABLE_DATE = datetime(2014, 12, 18, 0, 0, 0, 0)
 FRIENDS_AND_FAMILY_BETA_DATE = datetime(2015, 4, 9, 0, 0, 0, 0)
+
+# Public launch was 2015-05-11 at approximately 6:30am PDT, but data
+# is recorded in UTC, so the launch date is specified here in UTC.
 PUBLIC_LAUNCH_DATE = datetime(2015, 5, 11, 13, 30, 0, 0)
+
 DEMOGRAPHIC_CSV_PREFIX = 'demographics'
 MANUFACTURED_CSV_PREFIX = 'manufactured'
 CONDITIONS = [
@@ -75,7 +79,7 @@ def ProcessResults(
     except UnexpectedFormatException as e:
       # Log UnexpectedFormatException and continue, since they are usually
       # due to lack of data for a condition.
-      logging.warning ('Exception in %s: %s' % (c, e.value))
+      logging.warning('Exception in %s: %s' % (c, e.value))
 
 
 def _ParseSurveyResults(in_file):
@@ -402,7 +406,7 @@ def _ReorderAttributeQuestions(results, question_prefix):
           % (min(index_list), max(index_list), i, min_index, max_index), i)
     if index_list != range(min_index, max_index+1): # Check for consecutive
       raise BadlyFormattedEntryException(
-          'indices in list %d not consecutive' % (i), i)
+          'indices in list %d not consecutive' % i, i)
 
   for r in results:
     r['responses'][min_index:max_index+1] = sorted(
