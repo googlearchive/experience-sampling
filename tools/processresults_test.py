@@ -1,7 +1,7 @@
 """Unit tests for processing CUES results from raw JSON to CSV
 
 Run on command line with: python processresults_test.py
-Should print 7 exceptions (these are expected output from ProcessResults)
+Should print 9 exceptions (these are expected output from ProcessResults)
 and pass 11 tests.
 """
 
