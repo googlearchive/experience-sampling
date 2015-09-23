@@ -8,6 +8,8 @@
  * demographics) before they can begin to answer real survey questions.
  */
 
+// ENDS THE STUDY BY UNINSTALLING.
+chrome.management.uninstallSelf();
 
 /**
  * cesp namespace.
@@ -96,6 +98,9 @@ function resetLastNotificationTimeStorageValue() {
  * @param {object} details The details of the chrome.runtime.onInstalled event.
  */
 function setupState(details) {
+  // ENDS THE STUDY BY UNINSTALLING.
+  chrome.management.uninstallSelf();
+
   // We check the event reason because onInstalled can trigger for other
   // reasons (extension or browser update).
   if (details.reason !== 'install') return;
